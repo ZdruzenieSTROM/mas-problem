@@ -10,12 +10,20 @@ User = get_user_model()  # Neviem ci bude stacit django USer model pr9padne si h
 
 class Grade(models.Model):
     """Školský ročník"""
+    class Meta:
+        verbose_name = 'Školský ročník'
+        verbose_name_plural = 'Školské ročníky'
+
     verbose_name = models.CharField(max_length=50)
     shortcut = models.CharField(max_length=5)
 
 
 class Game(models.Model):
     """Hra"""
+    class Meta:
+        verbose_name = 'Súťaž'
+        verbose_name_plural = 'Súťaže'
+
     start = models.DateTimeField()
     end = models.DateTimeField()
     registration_start = models.DateTimeField()
@@ -26,6 +34,10 @@ class Game(models.Model):
 
 class Level(models.Model):
     """úroveň príkladov"""
+    class Meta:
+        verbose_name = 'Úroveň'
+        verbose_name_plural = 'Úrovne'
+
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     order = models.IntegerField()
     min_solved_to_unlock = models.IntegerField()
@@ -36,6 +48,10 @@ class Level(models.Model):
 
 class Competitor(models.Model):
     """Súťažiaci"""
+    class Meta:
+        verbose_name = 'Súťažiaci'
+        verbose_name_plural = 'Súťažiaci'
+
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     # Nechajme zatial ako text, časom prepojíme asi v backendom stránky
     school = models.CharField(max_length=128)
@@ -53,14 +69,24 @@ class Competitor(models.Model):
 
 
 class Problem(models.Model):
+    """Úloha"""
+    class Meta:
+        verbose_name = 'Úloha'
+        verbose_name_plural = 'Úlohy'
+
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     text = models.TextField()
-    solution = models.FloatField()  # Treba overiť čo všetko môže byť výsledok
+    solution = models.CharField(max_length=25)
 
 
 class Submission(models.Model):
+    """Odvozdanie riešenia"""
+    class Meta:
+        verbose_name = 'Odpoveď na úlohu'
+        verbose_name_plural = 'Odpovede na úlohy'
+
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
-    competitor_answer = models.FloatField()  # Upravit podla Problem.solution
+    competitor_answer = models.CharField(max_length=25)
     submitted_at = models.DateTimeField()
-    correct = models.BooleanField()  # Neviem ci bude nutné nechám na zváženie
+    correct = models.BooleanField()
