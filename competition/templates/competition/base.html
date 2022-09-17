@@ -33,7 +33,7 @@
                             <a class="nav-link" href="#">Pravidlá</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Výsledky</a>
+                            <a class="nav-link" href="{% url 'competition:results' %}">Výsledky</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Archív</a>
@@ -43,17 +43,17 @@
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_active %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Súťaž</a>
+                            <a class="nav-link" href="{% url 'competition:game' %}">Súťaž</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Profil {{user.username}}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Odhlásiť sa</a>
+                            <a class="nav-link" href="{% url 'competition:logout' %}">Odhlásiť sa</a>
                         </li>
                         {% else %}
-                        <li><a href="#">Prihlásenie</a></li>
-                        <li><a href="#">Registrácia</a></li>
+                        <li><a href="{% url 'competition:login' %}">Prihlásenie</a></li>
+                        <li><a href="{% url 'competition:registration' %}">Registrácia</a></li>
                         {% endif %}
                     </ul>
                 </div>
