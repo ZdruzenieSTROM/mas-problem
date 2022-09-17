@@ -1,0 +1,34 @@
+{% extends "competition/base.html" %}
+
+{% block title %}Poradie - {{game.name}}{% endblock %}
+
+{% block content %}
+
+<h1>Výsledky</h1>
+{% for result in results %}
+<h2>{{result.name}}</h2>
+<table>
+    <tr>
+        <th>Poradie</th>
+        <th>Názov tímu</th>
+        <th>Škola</th>
+        <th>Ročník</th>
+        <th>Úroveň</th>
+        <th>Počet vyriešených úloh</th>
+        <th>Čas poslednej odovzdanej úlohy</th>
+    </tr>
+    {% for competitor in result.competitors %}
+    <tr>
+        <td>{{ forloop.counter }}.</td>
+        <td>{{ competitor.name }}</td>
+        <td>{{ competitor.school }}</td>
+        <td>{{ competitor.grade }}</td>
+        <td>{{ competitor.current_level }}</td>
+        <td>{{ competitor.number_of_solved }}</td>
+        <td>{%if competitor.last_correct_submission %}{{ competitor.last_correct_submission|date:'H:i:s' }}{% else
+            %}-{%endif%}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endfor %}
+{% endblock %}
