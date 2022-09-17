@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView
 
 from .forms import AuthForm, ChangePasswordForm, RegisterForm
-from .models import Competitor, Game, Grade, User
+from .models import Competitor, Game, Grade, Problem, User
 
 # Create your views here.
 
@@ -81,8 +81,19 @@ def logout_view(request):
 class GameView(DetailView):
     """Náhľad súťaže"""
     model = Game
+    template_name = 'competition/game.html'
+
+
+class ProblemView(DetailView):
+    model = Problem
+
+    def post(self):
+        """Odovzdanie úlohy"""
+        competitor =
+        if self.can_submit(competitor):
 
 
 class ResultView(DetailView):
     """Náhľad súťaže"""
     model = Game
+    template_name = 'competition/results.html'
