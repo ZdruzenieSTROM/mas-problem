@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView
 
 from .forms import AuthForm, ChangePasswordForm, RegisterForm
-from .models import Competitor, User
+from .models import Competitor, Grade, User
 
 # Create your views here.
 
@@ -34,8 +34,13 @@ class SignUpView(FormView):
             first_name=form.cleaned_data['first_name'],
             second_name=form.cleaned_data['second_name'],
             user=user,
+            grade=form.cleaned_data['grade'],
+            school=form.cleaned_data['school'],
             game=form.cleaned_data['game'],
-            is_online=form.cleaned_data['is_online']
+            phno_number=form.cleaned_data['phone_number'],
+            is_online=form.cleaned_data['is_online'],
+            current_level=1,
+            paid=False
         )
         return super().form_valid(form)
 
