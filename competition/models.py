@@ -41,14 +41,51 @@ class Level(models.Model):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     order = models.IntegerField()
-    min_solved_to_unlock = models.IntegerField()
     is_starting_level_for_grades = models.ManyToManyField(Grade, blank=True)
     previous_level = models.ForeignKey(
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
 
-    def unlocked_for_team(team):
+    def unlocked(self, competitor):
         """Vráti či tím má odomknutý level"""
-        return True
+        if self.previous_level is None:
+            return self.game == competitor.game
+        level_settings = CompetitorGroupLevelSettings.get_settings(
+            competitor, self)
+        return (
+            self.previous_level.number_of_solved(
+                competitor) > level_settings.num_to_unlock
+            and self.game == competitor.game
+        )
+
+    def number_of_solved(self, competitor):
+        """Počet vyriešených úloh"""
+        return Problem.objects.filter(
+            level=self,
+            submissions__competitor=competitor,
+            submissions__correct=True).count()
+
+
+class Problem(models.Model):
+    """Úloha"""
+    class Meta:
+        verbose_name = 'Úloha'
+        verbose_name_plural = 'Úlohy'
+
+    level = models.ForeignKey(
+        Level, on_delete=models.CASCADE, related_name='problems')
+    text = models.TextField()
+    solution = models.CharField(max_length=25)
+
+    def correctly_submitted(self, competitor):
+        """Vráti či tím správne odovzdal daný príklad"""
+        return Submission.objects.filter(correct=True).exist()
+
+    def can_submit(self, competitor):
+        return self.level.unlocked(competitor)
+
+    def get_timeout(self, competitor):
+        """Return timeout"""
+        return
 
 
 class Competitor(models.Model):
@@ -75,25 +112,6 @@ class Competitor(models.Model):
     paid = BooleanField()
 
 
-class Problem(models.Model):
-    """Úloha"""
-    class Meta:
-        verbose_name = 'Úloha'
-        verbose_name_plural = 'Úlohy'
-
-    level = models.ForeignKey(
-        Level, on_delete=models.CASCADE, related_name='problems')
-    text = models.TextField()
-    solution = models.CharField(max_length=25)
-
-    def correctly_submitted(self, competitor: Competitor):
-        """Vráti či tím správne odovzdal daný príklad"""
-        pass
-
-    def get_timeout(self, competitor: Competitor):
-        """Return timeout"""
-
-
 class Submission(models.Model):
     """Odvozdanie riešenia"""
     class Meta:
@@ -105,3 +123,27 @@ class Submission(models.Model):
     competitor_answer = models.CharField(max_length=25)
     submitted_at = models.DateTimeField()
     correct = models.BooleanField()
+
+
+class ResultGroup(models.Model):
+    game = models.ForeignKey(Game)
+    grades = models.ManyToManyField(Grade)
+
+
+class CompetitorGroup(models.Model):
+    game = models.ForeignKey(Game):
+    grades = models.ManyToManyField(Grade)
+
+    @classmethod
+    def get_group_from_competitor(cls, competitor: Competitor):
+        return cls.objects.get(grade=competitor.grade)
+
+
+class CompetitorGroupLevelSettings(models.Model):
+    level = models.ForeignKey(Level)
+    competitor_group = models.ForeignKey(Level)
+    num_to_unlock = models.PositiveSmallIntegerField()
+
+    @classmethod
+    def get_settings(cls, competitor, level):
+        return cls.objects.get(grade=competitor.grade, level=level)
