@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Máš problém?!</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'competition/game.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body class="override">
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-container">
+            <div class="container navbar-inner-container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+
+                <div id="navbar" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-left">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Pravidlá</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Výsledky</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Archív</a>
+                        </li>
+
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_active %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Súťaž</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Profil {{user.username}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Odhlásiť sa</a>
+                        </li>
+                        {% else %}
+                        <li><a href="#">Prihlásenie</a></li>
+                        <li><a href="#">Registrácia</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row content">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+</body>
+
+</html>
