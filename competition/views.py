@@ -44,9 +44,6 @@ class SignUpView(FormView):
         )
         return super().form_valid(form)
 
-    def get(self, request, *args, **kwargs):
-        return redirect('competition:home')
-
 
 class LoginFormView(LoginView):
     """Prihlasovací formulár"""
