@@ -8,6 +8,7 @@ User = get_user_model()  # Neviem ci bude stacit django USer model pr9padne si h
 
 
 class Grade(models.Model):
+    """Školský ročník"""
     verbose_name = models.CharField(max_length=50)
     shortcut = models.CharField(max_length=5)
 
