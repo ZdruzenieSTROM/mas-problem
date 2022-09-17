@@ -22,8 +22,7 @@ class RegisterForm(forms.Form):
         widget=forms.PasswordInput(attrs={'class': 'form-control main-input'}),
         label='Zopakuj heslo',)
     phone_number = forms.RegexField(
-        regex=r'^\+?1?\d{9,15}$',
-        error_message=("Telefónne číslo musí mať formát: '+4219111111111'."))
+        regex=r'^\+?1?\d{9,15}$')
 
     grade = forms.ModelChoiceField(
         widget=forms.Select(attrs={'class': 'main-input'}),
