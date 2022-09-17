@@ -1,0 +1,159 @@
+.content {
+    padding: 0 10% 10% 10%;
+}
+
+.logo {
+    max-height: 50px;
+    margin-left: 2%;
+}
+
+.navbar {
+    background-color: black;
+    border-radius: 0;
+}
+
+.navbar-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.navbar-inner-container {
+    margin-left: 0;
+    margin-right: 10%;
+    width: 100%;
+}
+
+.main-link {
+    color: #555555;
+}
+
+.main-link:hover {
+    color: black;
+    text-decoration: underline;
+}
+
+.main-link:visited {
+    color: #555555;
+    text-decoration: none;
+}
+
+.answer-alert {
+    padding: 5px;
+    background-color: #ff4423ff;
+    color: white;
+    opacity: 1;
+    transition: opacity 0.6s;
+    margin-bottom: 5px;
+}
+
+.answer-alert.success {
+    background-color: #98e626ff;
+}
+
+.answer-alert.info {
+    background-color: #2bc9ebff;
+}
+
+.answer-alert.warning {
+    background-color: #ff9800;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td,
+th {
+    border: 1px solid #888888;
+    text-align: left;
+    padding: 8px;
+    word-wrap: break-word;
+    max-width: 18vw;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.main-button {
+    color: black;
+    background-color: white;
+    border: black 2px solid;
+    font-weight: bold;
+}
+
+.main-button:hover {
+    color: white;
+    background-color: black;
+}
+
+.main-button__disabled {
+    color: gray;
+    border-color: gray;
+}
+
+.main-button__disabled:hover {
+    color: gray;
+    background-color: white;
+}
+
+.main-input {
+    color: black;
+    background-color: white;
+    border: black 2px solid;
+    border-radius: 0;
+}
+
+.main-input__disabled {
+    color: gray;
+    border-color: gray;
+}
+
+.checkbox-input {
+    border: 2px solid black !important;
+}
+
+.checkbox-input:checked {
+    accent-color: black;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+@media screen and (max-width: 768px) {
+    .content {
+        padding: 0 5% 5% 5%;
+    }
+
+    .logo {
+        position: absolute;
+    }
+
+    .navbar-container {
+        display: block;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    td,
+    th {
+        padding: 3px;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    h3 {
+        font-size: 20px
+    }
+}
