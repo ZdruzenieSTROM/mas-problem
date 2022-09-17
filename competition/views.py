@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView
 
 from .forms import AuthForm, ChangePasswordForm, RegisterForm
-from .models import Competitor, Grade, User
+from .models import Competitor, Game, Grade, User
 
 # Create your views here.
 
@@ -79,3 +79,13 @@ def logout_view(request):
     """Odhlásenie"""
     logout(request)
     return redirect('competition:game')
+
+
+class GameView(DetailView):
+    """Náhľad súťaže"""
+    model = Game
+
+
+class ResultView(DetailView):
+    """Náhľad súťaže"""
+    model = Game
