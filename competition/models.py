@@ -24,6 +24,7 @@ class Game(models.Model):
         verbose_name = 'Súťaž'
         verbose_name_plural = 'Súťaže'
 
+    name = models.CharField(max_length=128)
     start = models.DateTimeField()
     end = models.DateTimeField()
     registration_start = models.DateTimeField()
@@ -43,7 +44,11 @@ class Level(models.Model):
     min_solved_to_unlock = models.IntegerField()
     is_starting_level_for_grades = models.ManyToManyField(Grade, blank=True)
     previous_level = models.ForeignKey(
-        'Level', on_delete=models.SET_NULL, null=True, blank=True)
+        'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
+
+    def unlocked_for_team(team):
+        """Vráti či tím má odomknutý level"""
+        return True
 
 
 class Competitor(models.Model):
@@ -76,9 +81,17 @@ class Problem(models.Model):
         verbose_name = 'Úloha'
         verbose_name_plural = 'Úlohy'
 
-    level = models.ForeignKey(Level, on_delete=models.CASCADE)
+    level = models.ForeignKey(
+        Level, on_delete=models.CASCADE, related_name='problems')
     text = models.TextField()
     solution = models.CharField(max_length=25)
+
+    def correctly_submitted(self, competitor: Competitor):
+        """Vráti či tím správne odovzdal daný príklad"""
+        pass
+
+    def get_timeout(self, competitor: Competitor):
+        """Return timeout"""
 
 
 class Submission(models.Model):
