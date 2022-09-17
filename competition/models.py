@@ -54,6 +54,8 @@ class Competitor(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     # Nechajme zatial ako text, časom prepojíme asi v backendom stránky
+    first_name = models.CharField(max_length=64)
+    second_name = models.CharField(max_length=64)
     school = models.CharField(max_length=128)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
