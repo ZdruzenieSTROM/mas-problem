@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ['mas-problem.strom.sk', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = ['https://mas-problem.strom.sk',
                         'https://www.mas-problem.strom.sk']
-
+SITE_ID = 1
 
 # Application definition
 
