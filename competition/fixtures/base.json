@@ -46,5 +46,28 @@
             "verbose_name": "9. ročník ZŠ | Kvarta | 1. ročník 5-ročného gymnázia",
             "shortcut": "Z9"
         }
+    },
+    {
+        "model": "sites.site",
+        "pk": 1,
+        "fields": {
+            "domain": "mas-problem",
+            "name": "mas-problem"
+        }
+    },
+    {
+        "model": "flatpages.flatpage",
+        "pk": 1,
+        "fields": {
+            "url": "/pravidla/",
+            "title": "Pravidlá",
+            "content": "<h3>Pravidlá</h3> <p align=\"justify\">Máš problém?! je súťaž určená pre žiakov 4. - 9. ročníka ZŠ alebo prímy až kvarty OG (ale môžu sa zapojiť aj mladší). Súťažia jednotlivci v dvoch kategóriách: mladší (4. - 6. ročník ZŠ, príma) a starší (7. - 9. ročník ZŠ, sekunda až kvarta). V súťaži sa odovzdávajú len výsledky a je na ňu 60 minút.</p>",
+            "enable_comments": false,
+            "template_name": "",
+            "registration_required": false,
+            "sites": [
+                1
+            ]
+        }
     }
 ]
