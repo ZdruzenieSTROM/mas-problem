@@ -1,3 +1,59 @@
 from django.contrib import admin
 
+from competition import models
+
+
 # Register your models here.
+@admin.register(models.Grade)
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ('verbose_name', 'shortcut')
+
+
+@admin.register(models.Game)
+class GameAdmin(admin.ModelAdmin):
+    list_display = ('name', 'start', 'registration_start',
+                    'registration_end', 'results_public')
+    list_filter = ('results_public',)
+
+
+@admin.register(models.Level)
+class LevelAdmin(admin.ModelAdmin):
+    list_display = ('order', 'game', 'previous_level')
+    list_filter = ('game',)
+
+
+@admin.register(models.Level)
+class ProblemAdmin(admin.ModelAdmin):
+    list_display = ('level', 'get_game', 'text')
+    list_filter = ('level',)
+
+    @admin.display(ordering='level__game', description='Súťaž')
+    def get_game(self, obj):
+        return obj.level.game
+
+
+@admin.register(models.Competitor)
+class CompetitorAdmin(admin.ModelAdmin):
+    list_display = ('grade', 'school', 'current_level', 'started_at', 'paid')
+    list_filter = ('grade', 'paid')
+
+
+@admin.register(models.Submission)
+class SubmissionAdmin(admin.ModelAdmin):
+    list_display = ('problem', 'competitor', 'competitor_answer', 'correct')
+    list_filter = ('correct', 'problem')
+
+
+@admin.register(models.ResultGroup)
+class ResultGroupAdmin(admin.ModelAdmin):
+    list_display = ('game', 'grades')
+
+
+@admin.register(models.CompetitorGroup)
+class CompetitorGroupAdmin(admin.ModelAdmin):
+    list_display = ('game', 'grades', 'start_level', 'end_level')
+
+
+@admin.register(models.CompetitorGroupLevelSettings)
+class CompetitorGroupLevelSettings(admin.ModelAdmin):
+    list_display = ('level', 'competitor_group', 'num_to_unlock')
