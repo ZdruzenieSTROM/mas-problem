@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.fields import BooleanField
+from django.utils.timezone import now
 
 # Create your models here.
 
@@ -31,6 +32,14 @@ class Game(models.Model):
     registration_end = models.DateTimeField()
     max_session_duration = models.DurationField()
     results_public = models.BooleanField(default=False)
+
+    def get_finish_time(self, competitor):
+        """Čas kedy musí hráč hru ukončiť"""
+        return min(competitor.started_at+self.max_session_duration, self.end)
+
+    def start_or_continue_game(self, competitor):
+        if competitor.started_at is not None:
+            competitor.started_at = now()
 
 
 class Level(models.Model):
@@ -109,6 +118,7 @@ class Competitor(models.Model):
         validators=[phone_regex], max_length=17, blank=True)  # Validators should be a list
     current_level = models.ForeignKey(
         Level, on_delete=models.CASCADE, null=True)
+    started_at = models.DateTimeField(null=True)
     paid = BooleanField()
 
 
@@ -126,13 +136,26 @@ class Submission(models.Model):
 
 
 class ResultGroup(models.Model):
-    game = models.ForeignKey(Game)
+    """Skupina pre tvorbu výsledkov. 
+    Výsledkovky budú zoskupená opodľa týchto skupín ročníkov"""
+    class Meta:
+        verbose_name = 'výsledkové skupiny'
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     grades = models.ManyToManyField(Grade)
 
 
 class CompetitorGroup(models.Model):
-    game = models.ForeignKey(Game):
+    """Skupina ročníkov pre nastavenie hry"""
+    class Meta:
+        verbose_name = 'Skupina ročníkov pre hru'
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     grades = models.ManyToManyField(Grade)
+    start_level = models.ForeignKey(
+        Level, on_delete=models.CASCADE, related_name='groups_starting')
+    end_level = models.ForeignKey(
+        Level, on_delete=models.CASCADE, related_name='groups_ending')
 
     @classmethod
     def get_group_from_competitor(cls, competitor: Competitor):
@@ -140,8 +163,14 @@ class CompetitorGroup(models.Model):
 
 
 class CompetitorGroupLevelSettings(models.Model):
-    level = models.ForeignKey(Level)
-    competitor_group = models.ForeignKey(Level)
+    """Nastavenie postupových podmienok z levelu"""
+    class Meta:
+        verbose_name = 'postupové podmienky'
+
+    level = models.ForeignKey(
+        Level, on_delete=models.CASCADE, related_name='setting_groups')
+    competitor_group = models.ForeignKey(
+        CompetitorGroup, on_delete=models.CASCADE, related_name='setting_groups')
     num_to_unlock = models.PositiveSmallIntegerField()
 
     @classmethod
