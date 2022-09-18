@@ -1,0 +1,50 @@
+[
+    {
+        "model": "competition.Grade",
+        "pk": 0,
+        "fields": {
+            "verbose_name": "4. ročník ZŠ a mladší",
+            "shortcut": "Z4"
+        }
+    },
+    {
+        "model": "competition.Grade",
+        "pk": 1,
+        "fields": {
+            "verbose_name": "5. ročník ZŠ",
+            "shortcut": "Z5"
+        }
+    },
+    {
+        "model": "competition.Grade",
+        "pk": 2,
+        "fields": {
+            "verbose_name": "6. ročník ZŠ | Príma",
+            "shortcut": "Z6"
+        }
+    },
+    {
+        "model": "competition.Grade",
+        "pk": 3,
+        "fields": {
+            "verbose_name": "7. ročník ZŠ | Sekunda",
+            "shortcut": "Z7"
+        }
+    },
+    {
+        "model": "competition.Grade",
+        "pk": 4,
+        "fields": {
+            "verbose_name": "8. ročník ZŠ | Tercia",
+            "shortcut": "Z8"
+        }
+    },
+    {
+        "model": "competition.Grade",
+        "pk": 5,
+        "fields": {
+            "verbose_name": "9. ročník ZŠ | Kvarta | 1. ročník 5-ročného gymnázia",
+            "shortcut": "Z9"
+        }
+    }
+]
