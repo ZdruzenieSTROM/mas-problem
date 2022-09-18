@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-i26a%-vwf9_dfqkw@rc4#q$bb4$u%qzplnh%a3qtiu-a3dzv%)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mas-problem.strom.sk', 'localhost']
+
+CSRF_TRUSTED_ORIGINS = ['https://mas-problem.strom.sk',
+                        'https://www.mas-problem.strom.sk']
 
 
 # Application definition
