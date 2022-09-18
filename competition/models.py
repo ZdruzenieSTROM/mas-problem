@@ -18,6 +18,9 @@ class Grade(models.Model):
     verbose_name = models.CharField(max_length=50)
     shortcut = models.CharField(max_length=5)
 
+    def __str__(self):
+        return self.shortcut
+
 
 class Game(models.Model):
     """Hra"""
@@ -41,6 +44,9 @@ class Game(models.Model):
         if competitor.started_at is not None:
             competitor.started_at = now()
 
+    def __str__(self):
+        return self.name
+
 
 class Level(models.Model):
     """úroveň príkladov"""
@@ -50,7 +56,6 @@ class Level(models.Model):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     order = models.IntegerField()
-    is_starting_level_for_grades = models.ManyToManyField(Grade, blank=True)
     previous_level = models.ForeignKey(
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
 
@@ -72,6 +77,13 @@ class Level(models.Model):
             level=self,
             submissions__competitor=competitor,
             submissions__correct=True).count()
+
+    def level_letter(self):
+        """Converts order to letter"""
+        return chr(ord('A')-1+self.order)
+
+    def __str__(self):
+        return f'{self.game} - Úroveň {self.level_letter()}.'
 
 
 class Problem(models.Model):
@@ -96,6 +108,9 @@ class Problem(models.Model):
         """Return timeout"""
         return
 
+    def __str__(self):
+        return self.text
+
 
 class Competitor(models.Model):
     """Súťažiaci"""
@@ -106,7 +121,7 @@ class Competitor(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     # Nechajme zatial ako text, časom prepojíme asi v backendom stránky
     first_name = models.CharField(max_length=64)
-    second_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
     school = models.CharField(max_length=128)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
@@ -120,6 +135,9 @@ class Competitor(models.Model):
         Level, on_delete=models.CASCADE, null=True)
     started_at = models.DateTimeField(null=True)
     paid = BooleanField()
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class Submission(models.Model):
