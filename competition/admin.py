@@ -22,7 +22,7 @@ class LevelAdmin(admin.ModelAdmin):
     list_filter = ('game',)
 
 
-@admin.register(models.Level)
+@admin.register(models.Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('level', 'get_game', 'text')
     list_filter = ('level',)
