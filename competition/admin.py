@@ -46,12 +46,12 @@ class SubmissionAdmin(admin.ModelAdmin):
 
 @admin.register(models.ResultGroup)
 class ResultGroupAdmin(admin.ModelAdmin):
-    list_display = ('game', 'grades')
+    list_display = ('game',)
 
 
 @admin.register(models.CompetitorGroup)
 class CompetitorGroupAdmin(admin.ModelAdmin):
-    list_display = ('game', 'grades', 'start_level', 'end_level')
+    list_display = ('game', 'start_level', 'end_level')
 
 
 @admin.register(models.CompetitorGroupLevelSettings)
