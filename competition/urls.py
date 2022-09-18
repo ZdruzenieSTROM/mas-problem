@@ -1,3 +1,5 @@
+
+from django.contrib.flatpages.views import flatpage
 from django.urls import path
 
 from . import views
@@ -10,5 +12,6 @@ urlpatterns = [
     path('odhlasenie', views.logout_view, name='logout'),
     path('sutaz', views.GameView.as_view(), name='game'),
     path('vysledky', views.ResultView.as_view(), name='results'),
-    path('zmena-hesla', views.change_password, name='change-password')
+    path('zmena-hesla', views.change_password, name='change-password'),
+    path('', flatpage, {'url': '/pravidla/'}, name='pravidla'),
 ]
