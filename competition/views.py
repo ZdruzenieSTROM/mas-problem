@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView
 
 from .forms import AuthForm, ChangePasswordForm, RegisterForm
-from .models import Competitor, Game, Grade, Problem, User
+from .models import Competitor, Game, Grade, Level, Problem, Submission, User
 
 # Create your views here.
 
@@ -32,7 +32,7 @@ class SignUpView(FormView):
         # Create competitor
         Competitor.objects.create(
             first_name=form.cleaned_data['first_name'],
-            second_name=form.cleaned_data['second_name'],
+            last_name=form.cleaned_data['last_name'],
             user=user,
             grade=form.cleaned_data['grade'],
             school=form.cleaned_data['school'],
@@ -89,11 +89,50 @@ class ProblemView(DetailView):
 
     def post(self):
         """Odovzdanie úlohy"""
-        competitor =
-        if self.can_submit(competitor):
+        competitor = self.request.user.competitor
+        if not self.can_submit(competitor):
+            raise
+        answer = ''
+        Submission.objects.create(
+            problem=self.object,
+            competitor=competitor,
+            competitor_answer=answer,
+            submitted_at=now(),
+            correct=self.object.check_answer(answer)
+        )
+        if Level.objects.get(previous_level=self.object.level).unlocked(competitor):
+            competitor.current_level = max(
+                competitor.current_level, self.object.level+1)
+        return redirect('competition:game')
+
+
+class UploadGameView():
+    pass
 
 
 class ResultView(DetailView):
     """Náhľad súťaže"""
     model = Game
     template_name = 'competition/results.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        result_groups = self.object.result_groups
+        results = []
+        for result_group in result_groups:
+            result = self.objects.competitors.filter(grades__in=result_group.grades).annotate(
+                solved_problems=Count(
+                    'submissions', filter=Q(submissions__correct=True)),
+
+                last_correct_submission=Max(
+                    'submissions__submitted_at', filter=Q(submissions__correct=True))
+            ).order_by('-current_level', 'solved_problems', 'last_correct_submission')
+            results.append(
+                {
+                    'name': result_group.name,
+                    'results': result
+                }
+            )
+        context['results'] = result
+        return context
