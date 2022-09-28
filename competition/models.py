@@ -36,6 +36,27 @@ class Game(models.Model):
     max_session_duration = models.DurationField()
     results_public = models.BooleanField(default=False)
 
+    def create_game(levels):
+        game = Game.objects.create(
+            name='TO DO',
+            results_public=False
+        )
+        previous_level = None
+        for i, level in enumerate(levels):
+            previous_level = Level.objects.create(
+                game=game,
+                order=i+1,
+                previous_level=previous_level
+            )
+            for problem, solution in zip(level['problems'], level['results']):
+                Problem.objects.create(
+                    level=previous_level,
+                    text=problem,
+                    solution=solution
+                )
+
+        return game
+
     def get_finish_time(self, competitor):
         """Čas kedy musí hráč hru ukončiť"""
         return min(competitor.started_at+self.max_session_duration, self.end)
@@ -159,7 +180,9 @@ class ResultGroup(models.Model):
     class Meta:
         verbose_name = 'výsledkové skupiny'
 
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    name = models.CharField(max_length=128)
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, related_name='result_groups')
     grades = models.ManyToManyField(Grade)
 
 
