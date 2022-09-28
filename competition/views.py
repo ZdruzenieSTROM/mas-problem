@@ -37,7 +37,7 @@ class SignUpView(FormView):
             grade=form.cleaned_data['grade'],
             school=form.cleaned_data['school'],
             game=form.cleaned_data['game'],
-            phno_number=form.cleaned_data['phone_number'],
+            phone_number=form.cleaned_data['phone_number'],
             is_online=form.cleaned_data['is_online'],
             current_level=1,
             paid=False
