@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView
 from django.db.models import Count, Max, Q
 from django.http import FileResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView
 
@@ -120,13 +120,13 @@ class ResultView(DetailView):
 
         result_groups = self.object.result_groups
         results = []
-        for result_group in result_groups:
-            result = self.objects.competitors.filter(grades__in=result_group.grades).annotate(
+        for result_group in result_groups.all():
+            result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
                 solved_problems=Count(
-                    'submissions', filter=Q(submissions__correct=True)),
+                    'submission', filter=Q(submission__correct=True)),
 
                 last_correct_submission=Max(
-                    'submissions__submitted_at', filter=Q(submissions__correct=True))
+                    'submission__submitted_at', filter=Q(submission__correct=True))
             ).order_by('-current_level', 'solved_problems', 'last_correct_submission')
             results.append(
                 {
@@ -136,3 +136,12 @@ class ResultView(DetailView):
             )
         context['results'] = result
         return context
+
+
+class CurrentResultView(ResultView):
+    def dispatch(self, request, *args, **kwargs):
+        return redirect(
+            reverse(
+                'competition:results',
+                kwargs={'pk': Game.objects.order_by('-start').first().pk})
+        )
