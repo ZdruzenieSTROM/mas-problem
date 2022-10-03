@@ -25,8 +25,9 @@
         <td>{{ competitor.grade }}</td>
         <td>{{ competitor.current_level.level_letter }}</td>
         <td>{{ competitor.solved_problems}}</td>
-        <td>{%if competitor.last_correct_submission %}{{ competitor.last_correct_submission|date:'H:i:s' }}{% else
-            %}-{%endif%}</td>
+        <td>{%if competitor.last_correct_submission %}
+            {{ competitor.last_correct_submission|date:'H:i:s' }}
+            {% else%}-{%endif%}</td>
     </tr>
     {% endfor %}
 </table>
