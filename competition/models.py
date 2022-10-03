@@ -96,8 +96,8 @@ class Level(models.Model):
         """Počet vyriešených úloh"""
         return Problem.objects.filter(
             level=self,
-            submissions__competitor=competitor,
-            submissions__correct=True).count()
+            submission__competitor=competitor,
+            submission__correct=True).count()
 
     def level_letter(self):
         """Converts order to letter"""
@@ -139,7 +139,8 @@ class Competitor(models.Model):
         verbose_name = 'Súťažiaci'
         verbose_name_plural = 'Súťažiaci'
 
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.OneToOneField(
+        User, on_delete=models.SET_NULL, null=True, related_name='competitor')
     # Nechajme zatial ako text, časom prepojíme asi v backendom stránky
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
