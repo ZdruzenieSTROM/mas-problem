@@ -53,7 +53,7 @@ class LoginFormView(LoginView):
     template_name = 'competition/login.html'
 
 
-class EditProfileView(FormView, LoginRequiredMixin):
+class EditProfileView(LoginRequiredMixin, FormView):
     form_class = EditCompetitorForm
     model = Competitor
     template_name = 'competition/change_profile.html'
