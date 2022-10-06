@@ -1,0 +1,186 @@
+[
+    {
+        "model": "competition.Game",
+        "pk": 1,
+        "fields": {
+            "name": "Testovací máš problém",
+            "start": "2022-10-01T00:00:00.000Z",
+            "end": "2022-10-20T00:00:00.000Z",
+            "registration_start": "2022-06-01T00:00:00.000Z",
+            "registration_end": "2022-10-10T00:00:00.000Z",
+            "max_session_duration": "60:00.000",
+            "results_public": false
+        }
+    },
+    {
+        "model": "competition.Level",
+        "pk": 1,
+        "fields": {
+            "game": 1,
+            "order": 1,
+            "previous_level": null
+        }
+    },
+    {
+        "model": "competition.Level",
+        "pk": 2,
+        "fields": {
+            "game": 1,
+            "order": 2,
+            "previous_level": 1
+        }
+    },
+    {
+        "model": "competition.Level",
+        "pk": 3,
+        "fields": {
+            "game": 1,
+            "order": 3,
+            "previous_level": 2
+        }
+    },
+    {
+        "model": "competition.Problem",
+        "pk": 1,
+        "fields": {
+            "level": 1,
+            "text": "$1+1$",
+            "solution": "2"
+        }
+    },
+    {
+        "model": "competition.Problem",
+        "pk": 2,
+        "fields": {
+            "level": 1,
+            "text": "$1+5$",
+            "solution": "6"
+        }
+    },
+    {
+        "model": "competition.Problem",
+        "pk": 3,
+        "fields": {
+            "level": 1,
+            "text": "$4\\cdot5$",
+            "solution": "20"
+        }
+    },
+    {
+        "model": "competition.Problem",
+        "pk": 4,
+        "fields": {
+            "level": 2,
+            "text": "Koľko je políčok na mriežke $8\\times8$?",
+            "solution": "64"
+        }
+    },
+    {
+        "model": "competition.Problem",
+        "pk": 5,
+        "fields": {
+            "level": 2,
+            "text": "Je pravda, že 1 je záporné číslo?",
+            "solution": "nie"
+        }
+    },
+    {
+        "model": "competition.Problem",
+        "pk": 6,
+        "fields": {
+            "level": 3,
+            "text": "Prečítaj si túto rovnicu $\\frac{x^2}{8x}=\\sqrt{\\sum^{\\inf}_{1}\\frac{1}{x}}$. A potom ako odpoveď zadajte ako sa volá neznáma z rovnice",
+            "solution": "x"
+        }
+    },
+    {
+        "model": "competition.ResultGroup",
+        "pk": 0,
+        "fields": {
+            "name": "Mladší",
+            "game": 1,
+            "grades": [
+                0,
+                1,
+                2
+            ]
+        }
+    },
+    {
+        "model": "competition.ResultGroup",
+        "pk": 1,
+        "fields": {
+            "name": "Starší",
+            "game": 1,
+            "grades": [
+                3,
+                4,
+                5
+            ]
+        }
+    },
+    {
+        "model": "competition.CompetitorGroup",
+        "pk": 0,
+        "fields": {
+            "game": 1,
+            "grades": [
+                0,
+                1,
+                2
+            ],
+            "start_level": 1,
+            "end_level": 2
+        }
+    },
+    {
+        "model": "competition.CompetitorGroup",
+        "pk": 1,
+        "fields": {
+            "game": 1,
+            "grades": [
+                3,
+                4,
+                5
+            ],
+            "start_level": 2,
+            "end_level": 3
+        }
+    },
+    {
+        "model": "competition.CompetitorGroupLevelSettings",
+        "pk": 0,
+        "fields": {
+            "level": 1,
+            "competitor_group": 0,
+            "num_to_unlock": 2
+        }
+    },
+    {
+        "model": "competition.CompetitorGroupLevelSettings",
+        "pk": 1,
+        "fields": {
+            "level": 2,
+            "competitor_group": 0,
+            "num_to_unlock": 1
+        }
+    },
+    {
+        "model": "competition.CompetitorGroupLevelSettings",
+        "pk": 2,
+        "fields": {
+            "level": 2,
+            "competitor_group": 1,
+            "num_to_unlock": 1
+        }
+    },
+    {
+        "model": "competition.CompetitorGroupLevelSettings",
+        "pk": 3,
+        "fields": {
+            "level": 3,
+            "competitor_group": 1,
+            "num_to_unlock": 1
+        }
+    }
+]
