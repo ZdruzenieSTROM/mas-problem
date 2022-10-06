@@ -85,3 +85,23 @@ class AuthForm(AuthenticationForm):
 
 class EditCompetitorForm(forms.Form):
     """Form na úpravu tímových údajov"""
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Krstné meno')
+    last_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Priezvisko')
+    phone_number = forms.RegexField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Telefónne číslo (nepovinné)',
+        regex=r'^\+?1?\d{9,15}$', required=False)
+
+    grade = forms.ModelChoiceField(
+        widget=forms.Select(attrs={'class': 'main-input'}),
+        queryset=Grade.objects.all(),
+        label='Kategória'
+    )
+    school = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Škola'
+    )

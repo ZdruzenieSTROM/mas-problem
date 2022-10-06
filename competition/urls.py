@@ -11,7 +11,10 @@ urlpatterns = [
     path('prihlasenie', views.LoginFormView.as_view(), name='login'),
     path('odhlasenie', views.logout_view, name='logout'),
     path('sutaz', views.GameView.as_view(), name='game'),
-    path('vysledky', views.ResultView.as_view(), name='results'),
+    path('vysledky/<int:pk>', views.ResultView.as_view(), name='results'),
+    path('aktualne-vysledky', views.CurrentResultView.as_view(),
+         name='current-results'),
     path('zmena-hesla', views.change_password, name='change-password'),
+    path('profil', views.EditProfileView.as_view(), name='profile'),
     path('', flatpage, {'url': '/pravidla/'}, name='pravidla'),
 ]

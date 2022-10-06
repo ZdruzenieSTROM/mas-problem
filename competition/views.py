@@ -8,11 +8,12 @@ from django.db import IntegrityError
 from django.db.models import Count, Max, Q
 from django.http import FileResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, UpdateView
 
-from .forms import AuthForm, ChangePasswordForm, RegisterForm
+from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
+                    RegisterForm)
 from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Problem,
                      Submission, User)
 
@@ -62,6 +63,37 @@ class LoginFormView(LoginView):
     authentication_form = AuthForm
     next_page = reverse_lazy('competition:game')
     template_name = 'competition/login.html'
+
+
+class EditProfileView(LoginRequiredMixin, FormView):
+    form_class = EditCompetitorForm
+    model = Competitor
+    template_name = 'competition/change_profile.html'
+    success_url = reverse_lazy('competition:profile')
+
+    def get_initial(self):
+
+        initial = super().get_initial()
+        if not hasattr(self.request.user, 'competitor'):
+            return initial
+        competitor = self.request.user.competitor
+        initial['first_name'] = competitor.first_name
+        initial['last_name'] = competitor.last_name
+        initial['grade'] = competitor.grade
+        initial['school'] = competitor.school
+        initial['phone_number'] = competitor.phone_number
+        return initial
+
+    def form_valid(self, form):
+        if hasattr(self.request.user, 'competitor'):
+            competitor = self.request.user.competitor
+            competitor.first_name = form.cleaned_data['first_name']
+            competitor.last_name = form.cleaned_data['last_name']
+            competitor.grade = form.cleaned_data['grade']
+            competitor.school = form.cleaned_data['school']
+            competitor.phone_number = form.cleaned_data['phone_number']
+            competitor.save()
+        return super().form_valid(form)
 
 
 @login_required
@@ -147,15 +179,15 @@ class ResultView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        result_groups = self.object.result_groups
+        result_groups = self.object.result_groups.all()
         results = []
         for result_group in result_groups:
-            result = self.objects.competitors.filter(grades__in=result_group.grades).annotate(
+            result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
                 solved_problems=Count(
-                    'submissions', filter=Q(submissions__correct=True)),
+                    'submission', filter=Q(submission__correct=True)),
 
                 last_correct_submission=Max(
-                    'submissions__submitted_at', filter=Q(submissions__correct=True))
+                    'submission__submitted_at', filter=Q(submission__correct=True))
             ).order_by('-current_level', 'solved_problems', 'last_correct_submission')
             results.append(
                 {
@@ -163,5 +195,15 @@ class ResultView(DetailView):
                     'results': result
                 }
             )
-        context['results'] = result
+        context['results'] = results
+        print(result)
         return context
+
+
+class CurrentResultView(ResultView):
+    def dispatch(self, request, *args, **kwargs):
+        return redirect(
+            reverse(
+                'competition:results',
+                kwargs={'pk': Game.objects.order_by('-start').first().pk})
+        )
