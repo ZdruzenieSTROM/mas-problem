@@ -196,7 +196,6 @@ class ResultView(DetailView):
                 }
             )
         context['results'] = results
-        print(result)
         return context
 
 
