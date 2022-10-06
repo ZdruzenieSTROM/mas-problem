@@ -108,8 +108,13 @@ class EditCompetitorForm(forms.Form):
 
 
 class UploadFileForm(forms.Form):
-    name = forms.CharField(max_length=50)
+    name = forms.CharField(max_length=50, label='Názov ročníka')
     file = forms.FileField(
         attrs={'class': 'form-control main-input'},
         label='Zdroják brožúrky'
     )
+    start = forms.DateTimeField()
+    end = forms.DateTimeField()
+    registration_start = forms.DateTimeField()
+    registration_end = forms.DateTimeField()
+    max_session_duration = forms.DurationField()
