@@ -10,6 +10,7 @@ from django.db.models import Count, Max, Q
 from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 
@@ -122,7 +123,7 @@ def change_password(request):
 def logout_view(request):
     """Odhlásenie"""
     logout(request)
-    return redirect('competition:home')
+    return redirect('competition:login')
 
 
 class GameView(DetailView, LoginRequiredMixin):
@@ -212,7 +213,7 @@ class CurrentResultView(ResultView):
         )
 
 
-@staff_member_required
+@method_decorator(staff_member_required, name='dispatch')
 class CreateCompetitionView(FormView):
     form_class = CreateCompetitionForm
     template_name = ''
