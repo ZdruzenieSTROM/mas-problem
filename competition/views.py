@@ -11,7 +11,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView
 
-from .forms import AuthForm, ChangePasswordForm, RegisterForm
+from .forms import (AuthForm, ChangePasswordForm, CreateCompetitionForm,
+                    RegisterForm)
 from .models import Competitor, Game, Grade, Level, Problem, Submission, User
 
 # Create your views here.
@@ -145,3 +146,19 @@ class CurrentResultView(ResultView):
                 'competition:results',
                 kwargs={'pk': Game.objects.order_by('-start').first().pk})
         )
+
+
+class CreateCompetitionView(FormView):
+    form_class = CreateCompetitionForm
+    template_name = ''
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        files = request.FILES.getlist('file_field')
+        if form.is_valid():
+            for f in files:
+                pass  # Do something with each file.
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
