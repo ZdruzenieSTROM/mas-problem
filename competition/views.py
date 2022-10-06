@@ -50,6 +50,8 @@ class SignUpView(FormView):
             grade=form.cleaned_data['grade'],
             school=form.cleaned_data['school'],
             game=game,
+            address=form.cleaned_data['address'],
+            legal_representative=form.cleaned_data['legal_representative'],
             phone_number=form.cleaned_data['phone_number'],
             current_level=CompetitorGroup.objects.filter(
                 game=game, grades=form.cleaned_data['grade']).get().start_level,
