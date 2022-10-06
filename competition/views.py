@@ -150,9 +150,9 @@ class ResultView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        result_groups = self.object.result_groups
+        result_groups = self.object.result_groups.all()
         results = []
-        for result_group in result_groups.all():
+        for result_group in result_groups:
             result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
                 solved_problems=Count(
                     'submission', filter=Q(submission__correct=True)),
@@ -166,7 +166,8 @@ class ResultView(DetailView):
                     'results': result
                 }
             )
-        context['results'] = result
+        context['results'] = results
+        print(result)
         return context
 
 
