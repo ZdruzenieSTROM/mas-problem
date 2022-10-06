@@ -1,5 +1,6 @@
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -11,6 +12,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView, UpdateView
+
+from competition.parsers import MasProblemCurrentParser
 
 from .forms import (AuthForm, ChangePasswordForm, CreateCompetitionForm,
                     EditCompetitorForm, RegisterForm)
@@ -209,6 +212,7 @@ class CurrentResultView(ResultView):
         )
 
 
+@staff_member_required
 class CreateCompetitionView(FormView):
     form_class = CreateCompetitionForm
     template_name = ''
@@ -216,10 +220,10 @@ class CreateCompetitionView(FormView):
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        files = request.FILES.getlist('file_field')
+        file = request.FILES.get('file')
         if form.is_valid():
-            for f in files:
-                pass  # Do something with each file.
+            print(file)
+            # MasProblemCurrentParser()
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
