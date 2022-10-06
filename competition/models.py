@@ -157,6 +157,8 @@ class Competitor(models.Model):
         Level, on_delete=models.CASCADE, null=True)
     started_at = models.DateTimeField(null=True)
     paid = BooleanField()
+    address = models.CharField(max_length=256, blank=True)
+    legal_representative = models.CharField(max_length=128)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
