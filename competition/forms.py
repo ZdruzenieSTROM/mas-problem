@@ -118,3 +118,12 @@ class EditCompetitorForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
     )
+    legal_representative = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Zákonný zástupca:'
+    )
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Adresa (údaj je nepovinný a bude použitý iba v prípade zaslania ocenenia)',
+        required=False
+    )

@@ -84,6 +84,8 @@ class EditProfileView(LoginRequiredMixin, FormView):
         initial['grade'] = competitor.grade
         initial['school'] = competitor.school
         initial['phone_number'] = competitor.phone_number
+        initial['legal_representative'] = competitor.legal_representative
+        initial['address'] = competitor.address
         return initial
 
     def form_valid(self, form):
@@ -94,8 +96,18 @@ class EditProfileView(LoginRequiredMixin, FormView):
             competitor.grade = form.cleaned_data['grade']
             competitor.school = form.cleaned_data['school']
             competitor.phone_number = form.cleaned_data['phone_number']
+            competitor.legal_representative = form.cleaned_data['legal_representative']
+            competitor.address = form.cleaned_data['address']
             competitor.save()
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['paid'] = (
+            self.request.user.competitor.paid
+            if hasattr(self.request.user, 'competitor') else False
+        )
+        return context
 
 
 @login_required
