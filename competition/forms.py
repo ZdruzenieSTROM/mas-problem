@@ -35,6 +35,7 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
     )
+    game = forms.HiddenInput()
 
     def clean_password2(self):
         """Heslo a zopakované heslo sa rovnajú"""
