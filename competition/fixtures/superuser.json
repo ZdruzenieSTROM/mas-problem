@@ -1,0 +1,20 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "admin@strom.sk",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

@@ -1,33 +1,28 @@
 {% extends "competition/base.html" %}
 
 {% block title %}{{game.name}}{% endblock %}
-
+{% load competition_tags %}
 {% block content %}
 <div class="tab">
-    {% for level in game.levels %}
+    {% for level in levels %}
     <button class="tablinks" onclick="openLevel(event, 'level-{{level.order}}')">
         Level {{level.order}} <br>
-        ({{level.solved}}/{{level}})
+        ({% number_of_solved level competitor %}/{{level.problems.count}})
     </button>
     {% endfor %}
 </div>
-{% for level in game.levels%}
+{% for level in levels %}
 <div id='level-{{level.order}}' class="tabcontent">
-    <p>London is the capital city of England.</p>
 
-    {% for problem in level.problems %}
+    {% for problem in level.problems.all %}
     {{problem.text}}
-    {{if }}
+
     <form action="" method="post">
         {% csrf_token %}
-        {% can_team_submit puzzle team as can_submit %}
+
         <input type="text" id="answer{{problem.id}}" name="answer" class="main-input">
         <input type="hidden" name="puzzle" value="{{problem.id}}">
         <input type="Submit" value="Odovzdať" class="main-button" />
-        {% if not can_submit %}
-        {% get_team_timeout puzzle team as timeout %}
-        Ďalšiu odpoveď je možné zadať o {{ timeout|date:'H:i:s' }}
-        {% endif %}
     </form>
     {% endfor %}
 </div>

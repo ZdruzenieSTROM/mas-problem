@@ -15,5 +15,6 @@ urlpatterns = [
     path('aktualne-vysledky', views.CurrentResultView.as_view(),
          name='current-results'),
     path('zmena-hesla', views.change_password, name='change-password'),
+    path('profil', views.EditProfileView.as_view(), name='profile'),
     path('', flatpage, {'url': '/pravidla/'}, name='pravidla'),
 ]

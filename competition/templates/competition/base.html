@@ -9,6 +9,8 @@
     {% load static %}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'competition/game.css' %}">
+    <!-- TODO: maybe we want to load this directly in game.html-->
+    <script src="{% static 'competition/game.js' %}"></script> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
@@ -46,7 +48,8 @@
                             <a class="nav-link" href="{% url 'competition:game' %}">Súťaž</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Profil {{user.username}}</a>
+                            <a class="nav-link" href="{% url 'competition:profile' %}">Profil
+                                {{user.username}}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'competition:logout' %}">Odhlásiť sa</a>

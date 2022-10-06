@@ -35,6 +35,7 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
     )
+    game = forms.HiddenInput()
 
     def clean_password2(self):
         """Heslo a zopakované heslo sa rovnajú"""
@@ -84,3 +85,31 @@ class AuthForm(AuthenticationForm):
 
 class EditCompetitorForm(forms.Form):
     """Form na úpravu tímových údajov"""
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Krstné meno')
+    last_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Priezvisko')
+    phone_number = forms.RegexField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Telefónne číslo (nepovinné)',
+        regex=r'^\+?1?\d{9,15}$', required=False)
+
+    grade = forms.ModelChoiceField(
+        widget=forms.Select(attrs={'class': 'main-input'}),
+        queryset=Grade.objects.all(),
+        label='Kategória'
+    )
+    school = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Škola'
+    )
+
+
+class UploadFileForm(forms.Form):
+    name = forms.CharField(max_length=50)
+    file = forms.FileField(
+        attrs={'class': 'form-control main-input'},
+        label='Zdroják brožúrky'
+    )

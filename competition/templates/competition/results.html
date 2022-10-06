@@ -17,16 +17,17 @@
         <th>Počet vyriešených úloh</th>
         <th>Čas poslednej odovzdanej úlohy</th>
     </tr>
-    {% for competitor in result.competitors %}
+    {% for competitor in result.results %}
     <tr>
         <td>{{ forloop.counter }}.</td>
-        <td>{{ competitor.name }}</td>
+        <td>{{ competitor }}</td>
         <td>{{ competitor.school }}</td>
         <td>{{ competitor.grade }}</td>
-        <td>{{ competitor.current_level }}</td>
-        <td>{{ competitor.number_of_solved }}</td>
-        <td>{%if competitor.last_correct_submission %}{{ competitor.last_correct_submission|date:'H:i:s' }}{% else
-            %}-{%endif%}</td>
+        <td>{{ competitor.current_level.level_letter }}</td>
+        <td>{{ competitor.solved_problems}}</td>
+        <td>{%if competitor.last_correct_submission %}
+            {{ competitor.last_correct_submission|date:'H:i:s' }}
+            {% else%}-{%endif%}</td>
     </tr>
     {% endfor %}
 </table>
