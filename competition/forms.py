@@ -38,7 +38,7 @@ class RegisterForm(forms.Form):
     )
     legal_representative = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Meno zákonného zástupcu:'
+        label='Meno a priezvisko zákonného zástupcu:'
     )
     address = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
