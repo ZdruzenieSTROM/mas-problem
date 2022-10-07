@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.utils.timezone import now
+from django.utils.safestring import mark_safe
 
 from competition.models import Game, Grade
 
@@ -45,8 +46,9 @@ class RegisterForm(forms.Form):
         required=False
     )
     gdpr = forms.CharField(
-        widget=forms.CheckboxInput(attrs={'class': 'form-control main-input'}),
-        label='Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: https://seminar.strom.sk/gdpr/',
+        widget=forms.CheckboxInput(attrs={'class': 'checkbox-input'}),
+        label=mark_safe(
+            'Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: <a href="https://seminar.strom.sk/gdpr/" target="_blank" class="main-link">https://seminar.strom.sk/gdpr/</a>'),
     )
     game = forms.HiddenInput()
 
