@@ -84,7 +84,7 @@ class AuthForm(AuthenticationForm):
 
 
 class EditCompetitorForm(forms.Form):
-    """Form na úpravu tímových údajov"""
+    """Form na úpravu údajov súťažiaceho"""
     first_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Krstné meno')

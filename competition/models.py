@@ -81,7 +81,7 @@ class Level(models.Model):
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
 
     def unlocked(self, competitor):
-        """Vráti či tím má odomknutý level"""
+        """Vráti či súťažiaci má odomknutý level"""
         if self.previous_level is None:
             return self.game == competitor.game
         level_settings = CompetitorGroupLevelSettings.get_settings(
@@ -119,7 +119,7 @@ class Problem(models.Model):
     solution = models.CharField(max_length=25)
 
     def correctly_submitted(self, competitor):
-        """Vráti či tím správne odovzdal daný príklad"""
+        """Vráti či súťažiaci správne odovzdal daný príklad"""
         return Submission.objects.filter(correct=True).exist()
 
     def can_submit(self, competitor):
