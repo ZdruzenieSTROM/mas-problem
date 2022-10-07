@@ -12,4 +12,10 @@
 
 <a href="{% url 'competition:change-password' %}" class="main-button mb-2">
     <span>Zmeniť heslo</span></a>
+
+{% if paid %}
+<span>Platba prijatá</span>
+{% else %}
+<span>Platbu za súťaž zatiaľ neevidujeme</span>
+{% endif %}
 {% endblock %}

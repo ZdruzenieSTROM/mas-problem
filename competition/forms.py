@@ -35,6 +35,19 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
     )
+    legal_representative = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Zákonný zástupca:'
+    )
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Adresa (údaj je nepovinný a bude použitý iba v prípade zaslania ocenenia)',
+        required=False
+    )
+    gdpr = forms.CharField(
+        widget=forms.CheckboxInput(attrs={'class': 'form-control main-input'}),
+        label='Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: https://seminar.strom.sk/gdpr/',
+    )
     game = forms.HiddenInput()
 
     def clean_password2(self):
@@ -104,4 +117,13 @@ class EditCompetitorForm(forms.Form):
     school = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
+    )
+    legal_representative = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Zákonný zástupca:'
+    )
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Adresa (údaj je nepovinný a bude použitý iba v prípade zaslania ocenenia)',
+        required=False
     )
