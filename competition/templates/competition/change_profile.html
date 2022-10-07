@@ -11,11 +11,11 @@
 </form>
 
 <a href="{% url 'competition:change-password' %}">
-    <button class="main-button mt-2">Zmeniť heslo</button></a>
+    <button class="main-button mt-2 mb-2">Zmeniť heslo</button></a>
 
 {% if paid %}
-<span>Platba prijatá</span>
+<div>Platba prijatá</div>
 {% else %}
-<span>Platbu za súťaž zatiaľ neevidujeme</span>
+<div>Platbu za súťaž zatiaľ neevidujeme</div>
 {% endif %}
 {% endblock %}
