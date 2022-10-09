@@ -10,6 +10,8 @@ urlpatterns = [
     path('registracia', views.SignUpView.as_view(), name='registration'),
     path('prihlasenie', views.LoginFormView.as_view(), name='login'),
     path('odhlasenie', views.logout_view, name='logout'),
+    path('pred-hrou/<int:pk>', views.BeforeGameView.as_view(), name='before-game'),
+    path('po-hre/<int:pk>', views.AfterGameView.as_view(), name='after-game'),
     path('sutaz', views.GameView.as_view(), name='game'),
     path('vysledky/<int:pk>', views.ResultView.as_view(), name='results'),
     path('aktualne-vysledky', views.CurrentResultView.as_view(),

@@ -3,10 +3,7 @@
 {% block title %}{{game.name}}{% endblock %}
 
 {% block content %}
-Šifrovačka skončila.
-<a href="{% url 'kos:results' pk=game.year.pk %}">Výsledky</a>
-Riešenia šifier budú zverejnené v <a href="{% url 'kos:archive' %}">Archíve</a>
-Pripomienky a dojmy nám môžete napísať <a
-    href="https://docs.google.com/forms/d/e/1FAIpQLSfOcB3C0zu_QGRPr3nF9pyMORvmhQnIFEqlzChlHl6Bs_ezTw/viewform"
-    target="_blank">tu</a>.
+<h1>Súťaž sa skončila.</h1>
+<p class="fs-2">Môžete si pozrieť <a href="{% url 'competition:results' pk=game.pk %}" class="main-link">výsledky</a>.</p>
+<!-- Zadania a riešenia príkladov budú zverejnené v <a href="#}">Archíve</a> -->
 {% endblock %}

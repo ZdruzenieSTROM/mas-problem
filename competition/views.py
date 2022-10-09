@@ -136,12 +136,53 @@ def logout_view(request):
     return redirect('competition:home')
 
 
+class BeforeGameView(LoginRequiredMixin, DetailView):
+    """Zobrazí sa súťažiacemu pred začiatkom hry"""
+    model = Game
+    template_name = 'competition/before_game.html'
+    login_url = reverse_lazy('competition:login')
+    context_object_name = 'game'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if self.object.start <= now():
+            # After game start
+            return redirect('competition:game')
+        return response
+
+
+class AfterGameView(LoginRequiredMixin, DetailView):
+    """Zobrazí sa súťažiacemu po konci hry"""
+    model = Game
+    template_name = 'competition/after_game.html'
+    login_url = reverse_lazy('competition:login')
+    context_object_name = 'game'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if self.object.end >= now():
+            # Before game end
+            return redirect('competition:game')
+        return response
+
+
 class GameView(DetailView, LoginRequiredMixin):
     """Náhľad súťaže"""
     model = Game
     template_name = 'competition/game.html'
     login_url = reverse_lazy('competition:login')
     context_object_name = 'game'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.start > now():
+            # Pred začatím hry
+            return redirect('competition:before-game', pk=self.object.pk)
+        if self.object.end < now():
+            # Po konci hry
+            return redirect('competition:after-game', pk=self.object.pk)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_object(self):
         return self.request.user.competitor.game
