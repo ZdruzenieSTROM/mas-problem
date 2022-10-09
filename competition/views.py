@@ -36,9 +36,13 @@ class SignUpView(FormView):
     def form_valid(self, form):
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-
-        user = User.objects.create_user(email, email, password)
-        # TODO: Get school from hidden input
+        try:
+            user = User.objects.create_user(email, email, password)
+        except IntegrityError:
+            messages.error(
+                self.request, 'Užívateľ s týmto emailom už existuje')
+            return super().form_invalid(form)
+        # TODO: Get game from hidden input
         game = Game.objects.filter(
             registration_start__lte=now(), registration_end__gte=now()).get()
 
