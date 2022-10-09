@@ -1,0 +1,13 @@
+{% extends "competition/base.html" %}
+
+{% block title %}Založenie súťaže{% endblock %}
+
+{% block content %}
+<h2>Založenie súťaže</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="main-button mb-2">Uložiť</button>
+</form>
+
+{% endblock %}

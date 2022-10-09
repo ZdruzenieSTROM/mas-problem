@@ -108,13 +108,15 @@ class EditCompetitorForm(forms.Form):
 
 
 class CreateCompetitionForm(forms.Form):
-    name = forms.CharField(max_length=50, label='Názov ročníka')
+    name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control main-input'}), label='Názov ročníka')
     file = forms.FileField(
-        attrs={'class': 'form-control main-input'},
-        label='Zdroják brožúrky'
+        #attrs={'class': 'form-control main-input'},
+        label='Zdroják brožúrky',
+        required=False
     )
-    start = forms.DateTimeField()
-    end = forms.DateTimeField()
-    registration_start = forms.DateTimeField()
-    registration_end = forms.DateTimeField()
-    max_session_duration = forms.DurationField()
+    # start = forms.DateTimeField()
+    # end = forms.DateTimeField()
+    # registration_start = forms.DateTimeField()
+    # registration_end = forms.DateTimeField()
+    # max_session_duration = forms.DurationField()

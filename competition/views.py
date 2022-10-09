@@ -216,7 +216,7 @@ class CurrentResultView(ResultView):
 @method_decorator(staff_member_required, name='dispatch')
 class CreateCompetitionView(FormView):
     form_class = CreateCompetitionForm
-    template_name = ''
+    template_name = 'competition/create_game.html'
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
