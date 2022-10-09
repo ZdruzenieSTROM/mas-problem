@@ -3,9 +3,5 @@
 {% block title %}{{game.name}}{% endblock %}
 
 {% block content %}
-Súťaž začne o
-{% else %}
-
-
-{% endif %}
+<p class="fs-2">Súťaž začne {{game.start|date:'d.m.Y'}} o {{game.start|date:'H:i'}}. Príklady budú sprístupnené na tejto stránke. Pokiaľ už súťaž začala, budú zobrazené po obnovení stránky.</p>
 {% endblock %}
