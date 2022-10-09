@@ -10,12 +10,12 @@
     <button type="submit" class="main-button mb-2">Uložiť</button>
 </form>
 
-<a href="{% url 'competition:change-password' %}" class="main-button mb-2">
-    <span>Zmeniť heslo</span></a>
+<a href="{% url 'competition:change-password' %}">
+    <button class="main-button mt-2 mb-2">Zmeniť heslo</button></a>
 
 {% if paid %}
-<span>Platba prijatá</span>
+<div>Platba prijatá</div>
 {% else %}
-<span>Platbu za súťaž zatiaľ neevidujeme</span>
+<div>Platbu za súťaž zatiaľ neevidujeme</div>
 {% endif %}
 {% endblock %}
