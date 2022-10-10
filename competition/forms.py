@@ -55,7 +55,8 @@ class RegisterForm(forms.Form):
         label=mark_safe(
             'Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: <a href="https://seminar.strom.sk/gdpr/" target="_blank" class="main-link">https://seminar.strom.sk/gdpr/</a>'),
     )
-    game = forms.HiddenInput()
+    game = forms.ModelChoiceField(
+        queryset=Game.objects.all(), widget=forms.HiddenInput())
 
     def clean_password2(self):
         """Heslo a zopakované heslo sa rovnajú"""
