@@ -33,7 +33,6 @@ class SignUpView(FormView):
             initial_data['game'] = Game.objects.filter(
                 registration_start__lte=now(), registration_end__gte=now()).get()
         except Game.DoesNotExist:
-            # TODO: Render no registration active
             pass
         return initial_data
 
@@ -46,9 +45,6 @@ class SignUpView(FormView):
             messages.error(
                 self.request, 'Užívateľ s týmto emailom už existuje')
             return super().form_invalid(form)
-        # TODO: Get game from hidden input
-        game = Game.objects.filter(
-            registration_start__lte=now(), registration_end__gte=now()).get()
 
         # Create competitor
         Competitor.objects.create(
@@ -57,12 +53,12 @@ class SignUpView(FormView):
             user=user,
             grade=form.cleaned_data['grade'],
             school=form.cleaned_data['school'],
-            game=game,
+            game=form.cleaned_data['game'],
             address=form.cleaned_data['address'],
             legal_representative=form.cleaned_data['legal_representative'],
             phone_number=form.cleaned_data['phone_number'],
             current_level=CompetitorGroup.objects.filter(
-                game=game, grades=form.cleaned_data['grade']).get().start_level,
+                game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
             paid=False
         )
         return super().form_valid(form)
