@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.forms import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
@@ -68,6 +69,12 @@ class RegisterForm(forms.Form):
         if password1 != password2:
             raise forms.ValidationError("Heslá sa musia zhodovať")
         return password2
+
+    def clean_game(self):
+        game = self.cleaned_data['game']
+        if game.registration_start > now() or game.registration_end < now():
+            raise ValidationError('Registrácia na túto súťaž nie je aktívna')
+        return game
 
 
 class ChangePasswordForm(PasswordChangeForm):
