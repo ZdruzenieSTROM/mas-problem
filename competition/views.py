@@ -141,7 +141,7 @@ def change_password(request):
 def logout_view(request):
     """Odhlásenie"""
     logout(request)
-    return redirect('competition:home')
+    return redirect('competition:login')
 
 
 class BeforeGameView(LoginRequiredMixin, DetailView):
