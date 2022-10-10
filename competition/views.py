@@ -148,7 +148,6 @@ class BeforeGameView(LoginRequiredMixin, DetailView):
     """Zobrazí sa súťažiacemu pred začiatkom hry"""
     model = Game
     template_name = 'competition/before_game.html'
-    login_url = reverse_lazy('competition:login')
     context_object_name = 'game'
 
     def get(self, request, *args, **kwargs):
@@ -164,7 +163,6 @@ class AfterGameView(LoginRequiredMixin, DetailView):
     """Zobrazí sa súťažiacemu po konci hry"""
     model = Game
     template_name = 'competition/after_game.html'
-    login_url = reverse_lazy('competition:login')
     context_object_name = 'game'
 
     def get(self, request, *args, **kwargs):
@@ -211,11 +209,10 @@ class GameFinishedView(LoginRequiredMixin, DetailView):
         return game_redirect(self.object, competitor)
 
 
-class GameView(DetailView, LoginRequiredMixin):
+class GameView(LoginRequiredMixin, DetailView):
     """Náhľad súťaže"""
     model = Game
     template_name = 'competition/game.html'
-    login_url = reverse_lazy('competition:login')
     context_object_name = 'game'
 
     def get(self, request, *args, **kwargs):
@@ -260,7 +257,7 @@ def game_redirect(game, competitor):
     return redirect('competition:game')
 
 
-class ProblemView(DetailView, LoginRequiredMixin):
+class ProblemView(LoginRequiredMixin, DetailView):
     model = Problem
 
     def post(self):
