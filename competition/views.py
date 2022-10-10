@@ -212,12 +212,6 @@ class GameView(DetailView, LoginRequiredMixin):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        # if self.object.start > now():
-        #     # Pred začatím hry
-        #     return redirect('competition:before-game', pk=self.object.pk)
-        # if self.object.end < now():
-        #     # Po konci hry
-        #     return redirect('competition:after-game', pk=self.object.pk)
         competitor = self.request.user.competitor
         if self.object.is_active() and competitor.started() and not competitor.finished():
             context = self.get_context_data(object=self.object)
