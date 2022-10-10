@@ -5,6 +5,7 @@
 {% block content %}
 
 <h1>Výsledky</h1>
+{% if results %}
 {% for result in results %}
 <h2>{{result.name}}</h2>
 <table>
@@ -32,4 +33,7 @@
     {% endfor %}
 </table>
 {% endfor %}
+{% else %}
+Súťaž práve prebieha. Výsledky budú zverejnené po súťaži.
+{% endif %}
 {% endblock %}
