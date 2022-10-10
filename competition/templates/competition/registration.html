@@ -3,10 +3,16 @@
 {% block title %}Registrácia{% endblock %}
 
 {% block content %}
+
+{% if form.initial.game %}
 <h2>Registrácia súťažiaceho na {{form.initial.game}}</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="main-button">Registruj</button>
 </form>
+{% else %}
+<h2>Registrácia</h2>
+Práve neprebieha registrácia na žiadnu súťaž.
+{% endif %}
 {% endblock %}
