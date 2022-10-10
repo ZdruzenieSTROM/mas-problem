@@ -29,8 +29,12 @@ class SignUpView(FormView):
 
     def get_initial(self):
         initial_data = super().get_initial()
-        initial_data['game'] = Game.objects.filter(
-            registration_start__lte=now(), registration_end__gte=now()).get()  # TODO: this fails if there are no such games
+        try:
+            initial_data['game'] = Game.objects.filter(
+                registration_start__lte=now(), registration_end__gte=now()).get()
+        except Game.DoesNotExist:
+            # TODO: Render no registration active
+            pass
         return initial_data
 
     def form_valid(self, form):

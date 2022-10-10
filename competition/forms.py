@@ -1,13 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
-from django.utils.timezone import now
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
 
 from competition.models import Game, Grade
 
 
 class RegisterForm(forms.Form):
     """Kos team registration form"""
+
+    class GradeModelChoiceField(forms.ModelChoiceField):
+        def label_from_instance(self, obj):
+            return obj.verbose_name
     first_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Krstné meno')
@@ -27,10 +31,11 @@ class RegisterForm(forms.Form):
         label='Telefónne číslo (nepovinné)',
         regex=r'^\+?1?\d{9,15}$', required=False)
 
-    grade = forms.ModelChoiceField(
+    grade = GradeModelChoiceField(
         widget=forms.Select(attrs={'class': 'main-input'}),
         queryset=Grade.objects.all(),
-        label='Kategória'
+        label='Kategória',
+        to_field_name='verbose_name'
     )
     school = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
