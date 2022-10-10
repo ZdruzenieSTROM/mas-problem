@@ -59,11 +59,14 @@ class Game(models.Model):
 
     def get_finish_time(self, competitor):
         """Čas kedy musí hráč hru ukončiť"""
-        return min(competitor.started_at+self.max_session_duration, self.end)
+        return min(competitor.started_at+self.max_session_duration, self.end)  # TODO: what if started_at is None
 
     def start_or_continue_game(self, competitor):
         if competitor.started_at is not None:
             competitor.started_at = now()
+
+    def is_active(self):
+        return self.start <= now() < self.end
 
     def __str__(self):
         return self.name
@@ -162,6 +165,16 @@ class Competitor(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+    def start(self):
+        self.started_at = now()
+        self.save()
+
+    def started(self):
+        return self.started_at is not None
+
+    def finished(self):
+        return self.game.is_active() and self.started() and self.game.get_finish_time(self) < now()
 
 
 class Submission(models.Model):
