@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
 from competition.models import Game, Grade
@@ -7,6 +8,10 @@ from competition.models import Game, Grade
 
 class RegisterForm(forms.Form):
     """Kos team registration form"""
+
+    class GradeModelChoiceField(forms.ModelChoiceField):
+        def label_from_instance(self, obj):
+            return obj.verbose_name
     first_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Krstné meno')
@@ -26,14 +31,29 @@ class RegisterForm(forms.Form):
         label='Telefónne číslo (nepovinné)',
         regex=r'^\+?1?\d{9,15}$', required=False)
 
-    grade = forms.ModelChoiceField(
+    grade = GradeModelChoiceField(
         widget=forms.Select(attrs={'class': 'main-input'}),
         queryset=Grade.objects.all(),
-        label='Kategória'
+        label='Kategória',
+        to_field_name='verbose_name'
     )
     school = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
+    )
+    legal_representative = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Meno a priezvisko zákonného zástupcu:'
+    )
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Adresa (údaj je nepovinný a bude použitý iba v prípade zaslania ocenenia)',
+        required=False
+    )
+    gdpr = forms.CharField(
+        widget=forms.CheckboxInput(attrs={'class': 'checkbox-input'}),
+        label=mark_safe(
+            'Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: <a href="https://seminar.strom.sk/gdpr/" target="_blank" class="main-link">https://seminar.strom.sk/gdpr/</a>'),
     )
     game = forms.HiddenInput()
 
@@ -84,7 +104,7 @@ class AuthForm(AuthenticationForm):
 
 
 class EditCompetitorForm(forms.Form):
-    """Form na úpravu tímových údajov"""
+    """Form na úpravu údajov súťažiaceho"""
     first_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Krstné meno')
@@ -104,6 +124,16 @@ class EditCompetitorForm(forms.Form):
     school = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Škola'
+    )
+
+    legal_representative = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Zákonný zástupca:'
+    )
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Adresa (údaj je nepovinný a bude použitý iba v prípade zaslania ocenenia)',
+        required=False
     )
 
 

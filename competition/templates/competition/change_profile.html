@@ -3,13 +3,19 @@
 {% block title %}Zmena profilu{% endblock %}
 
 {% block content %}
-<h2>Zmena údajov tímu</h2>
+<h2>Zmena údajov súťažiaceho</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="main-button mb-2">Uložiť</button>
 </form>
 
-<a href="{% url 'competition:change-password' %}" class="main-button mb-2">
-    <span>Zmeniť heslo</span></a>
+<a href="{% url 'competition:change-password' %}">
+    <button class="main-button mt-2 mb-2">Zmeniť heslo</button></a>
+
+{% if paid %}
+<div>Platba prijatá</div>
+{% else %}
+<div>Platbu za súťaž zatiaľ neevidujeme</div>
+{% endif %}
 {% endblock %}

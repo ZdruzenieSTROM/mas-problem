@@ -5,12 +5,13 @@
 {% block content %}
 
 <h1>Výsledky</h1>
+{% if results %}
 {% for result in results %}
 <h2>{{result.name}}</h2>
 <table>
     <tr>
         <th>Poradie</th>
-        <th>Názov tímu</th>
+        <th>Meno</th>
         <th>Škola</th>
         <th>Ročník</th>
         <th>Úroveň</th>
@@ -32,4 +33,7 @@
     {% endfor %}
 </table>
 {% endfor %}
+{% else %}
+Súťaž práve prebieha. Výsledky budú zverejnené po súťaži.
+{% endif %}
 {% endblock %}

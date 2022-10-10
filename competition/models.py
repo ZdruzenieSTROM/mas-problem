@@ -59,11 +59,14 @@ class Game(models.Model):
 
     def get_finish_time(self, competitor):
         """Čas kedy musí hráč hru ukončiť"""
-        return min(competitor.started_at+self.max_session_duration, self.end)
+        return min(competitor.started_at+self.max_session_duration, self.end)  # TODO: what if started_at is None
 
     def start_or_continue_game(self, competitor):
         if competitor.started_at is not None:
             competitor.started_at = now()
+
+    def is_active(self):
+        return self.start <= now() < self.end
 
     def __str__(self):
         return self.name
@@ -81,7 +84,7 @@ class Level(models.Model):
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
 
     def unlocked(self, competitor):
-        """Vráti či tím má odomknutý level"""
+        """Vráti či súťažiaci má odomknutý level"""
         if self.previous_level is None:
             return self.game == competitor.game
         level_settings = CompetitorGroupLevelSettings.get_settings(
@@ -119,7 +122,7 @@ class Problem(models.Model):
     solution = models.CharField(max_length=25)
 
     def correctly_submitted(self, competitor):
-        """Vráti či tím správne odovzdal daný príklad"""
+        """Vráti či súťažiaci správne odovzdal daný príklad"""
         return Submission.objects.filter(correct=True).exist()
 
     def can_submit(self, competitor):
@@ -157,9 +160,21 @@ class Competitor(models.Model):
         Level, on_delete=models.CASCADE, null=True)
     started_at = models.DateTimeField(null=True)
     paid = BooleanField()
+    address = models.CharField(max_length=256, blank=True)
+    legal_representative = models.CharField(max_length=128)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+    def start(self):
+        self.started_at = now()
+        self.save()
+
+    def started(self):
+        return self.started_at is not None
+
+    def finished(self):
+        return self.game.is_active() and self.started() and self.game.get_finish_time(self) < now()
 
 
 class Submission(models.Model):
