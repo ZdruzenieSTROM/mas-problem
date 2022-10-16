@@ -23,7 +23,7 @@ class InvoiceSession:
 
     def __init__(self):
         self.session = requests.Session()
-        self.send_request('init', {})
+        self.__send_request('init', {})
 
     def __send_request(self, method: str, data: dict):
         """Request to Faktury"""
@@ -42,8 +42,16 @@ class InvoiceSession:
             verify=True
         )
 
+    def download_invoice(self, code):
+        return self.__send_request(
+            'detail-subor',
+            params={'f': code}
+        ).content
+
     def get_invoice(self, code):
-        return self.__send_request('zf', {'code': code}).json()
+        invoice_url = self.__send_request('zf', {'code': code}).json()['url']
+        response = self.session.get(invoice_url)
+        return response.content
 
     def create_invoice(self, customer: Dict[str, str], items: Dict[List[InvoiceItem], int], delivery_date):
         items_compiled = []
@@ -52,9 +60,9 @@ class InvoiceSession:
                 continue
             items_compiled.append(
                 {
-                    'p_text': item.text,
+                    'p_text': item.name,
                     'p_unit': item.unit,
-                    'p_price': item.price,
+                    'p_price': str(item.price),
                     'p_quantity': quantity
                 }
             )
@@ -64,9 +72,9 @@ class InvoiceSession:
                 'd': {'d_id': self.STROM_ID},
                 'o': customer,
                 'f': {
-                    'f_date_issue': now(),
-                    'f_date_delivery': delivery_date,
-                    'f_date_due': delivery_date-timedelta(2),
+                    'f_date_issue': now().strftime("%d.%m.%Y"),
+                    'f_date_delivery': delivery_date.strftime("%d.%m.%Y"),
+                    'f_date_due': (delivery_date-timedelta(2)).strftime("%d.%m.%Y"),
                     'f_issued_by': settings.INVOICE_ISSUER,
                 },
                 'p': items_compiled
