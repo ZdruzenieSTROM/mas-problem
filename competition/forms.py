@@ -15,18 +15,19 @@ class RegisterForm(forms.Form):
             return obj.verbose_name
     first_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Krstné meno')
+        label='Krstné meno*')
     last_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Priezvisko')
+        label='Priezvisko*')
     email = forms.EmailField(widget=forms.EmailInput(
-        attrs={'class': 'form-control main-input'}))
+        attrs={'class': 'form-control main-input'}),
+        label='Email*')
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control main-input'}),
-        label='Heslo')
+        label='Heslo*')
     password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control main-input'}),
-        label='Zopakuj heslo',)
+        label='Zopakuj heslo*',)
     phone_number = forms.RegexField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Telefónne číslo (nepovinné)',
@@ -35,12 +36,12 @@ class RegisterForm(forms.Form):
     grade = GradeModelChoiceField(
         widget=forms.Select(attrs={'class': 'main-input'}),
         queryset=Grade.objects.all(),
-        label='Kategória',
+        label='Kategória*',
         to_field_name='verbose_name'
     )
     school = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Škola'
+        label='Škola*'
     )
     legal_representative = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
