@@ -130,4 +130,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ####### Faktury ##############
 FAKTURY_API_KEY = read_secret('faktury_api_key.txt')
-INOVICE_ISSUER = 'Mgr. Peter Kovács'
+INVOICE_ISSUER = 'Mgr. Peter Kovács'
