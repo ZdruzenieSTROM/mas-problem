@@ -200,9 +200,3 @@ tr:nth-child(even) {
     border: 1px solid #ccc;
     border-top: none;
 }
-
-input[type="checkbox"] {
-    float: left;
-    margin-right: 10px;
-    margin-top: 4px;
-}
