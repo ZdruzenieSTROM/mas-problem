@@ -5,6 +5,7 @@ from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.fields import BooleanField
+from django.template.loader import render_to_string
 from django.utils.timezone import now
 
 from competition.invoice_handler import InvoiceItem, InvoiceSession
@@ -279,7 +280,8 @@ class Payment(models.Model):
         invoice_content = invoice_session.get_invoice(self.invoice_code)
         mail = EmailMessage(
             subject=f'{self.competitor.game.name} - Informácie k platbe',
-            body=f'Faktura v prilohe',
+            body=render_to_string('competition/invoice_email.html', {
+                                  'competitor': self.competitor, 'game': self.competitor.game}),
             from_email='noreply@strom.sk',
             to=[self.competitor.user.email],
         )
