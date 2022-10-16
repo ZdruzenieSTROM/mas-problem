@@ -40,6 +40,8 @@ class Game(models.Model):
     registration_end = models.DateTimeField()
     max_session_duration = models.DurationField()
     results_public = models.BooleanField(default=False)
+    price = models.DecimalField(
+        verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
 
     def create_game(levels):
         game = Game.objects.create(
@@ -252,7 +254,8 @@ class Payment(models.Model):
         verbose_name = 'platba'
         verbose_name_plural = 'platby'
 
-    amount = models.FloatField(verbose_name='suma')
+    amount = models.DecimalField(
+        verbose_name='suma', decimal_places=2, max_digits=5)
     competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
     invoice_code = models.CharField(max_length=100, null=True, blank=True)
 
