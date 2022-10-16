@@ -1,8 +1,13 @@
+from tabnanny import verbose
+
 from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.fields import BooleanField
 from django.utils.timezone import now
+
+from competition.invoice_handler import InvoiceItem, InvoiceSession
 
 # Create your models here.
 
@@ -35,6 +40,8 @@ class Game(models.Model):
     registration_end = models.DateTimeField()
     max_session_duration = models.DurationField()
     results_public = models.BooleanField(default=False)
+    price = models.DecimalField(
+        verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
 
     def create_game(levels):
         game = Game.objects.create(
@@ -176,6 +183,12 @@ class Competitor(models.Model):
     def finished(self):
         return self.game.is_active() and self.started() and self.game.get_finish_time(self) < now()
 
+    def to_invoice_dict(self):
+        return {
+            'o_name': f'{self.first_name} {self.last_name}',
+            'o_email': self.user.email,
+        }
+
 
 class Submission(models.Model):
     """Odvozdanie riešenia"""
@@ -233,3 +246,43 @@ class CompetitorGroupLevelSettings(models.Model):
     @classmethod
     def get_settings(cls, competitor, level):
         return cls.objects.get(grade=competitor.grade, level=level)
+
+
+class Payment(models.Model):
+    """Platby"""
+    class Meta:
+        verbose_name = 'platba'
+        verbose_name_plural = 'platby'
+
+    amount = models.DecimalField(
+        verbose_name='suma', decimal_places=2, max_digits=5)
+    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
+    invoice_code = models.CharField(max_length=100, null=True, blank=True)
+
+    def create_invoice(self):
+        """Vytvorenie faktúry"""
+        invoice_session = InvoiceSession()
+        game = self.competitor.game
+        item = InvoiceItem(
+            f'Účastnícky poplatok za {game.name}',
+            'ks', game.price)
+        self.invoice_code = invoice_session.create_invoice(
+            self.competitor.to_invoice_dict(),
+            {item: 1},
+            game.start
+        )
+        self.save()
+
+    def send_invoice(self):
+        """Zaslanie informácií k platbe"""
+        invoice_session = InvoiceSession()
+        invoice_content = invoice_session.get_invoice(self.invoice_code)
+        mail = EmailMessage(
+            subject=f'{self.competitor.game.name} - Informácie k platbe',
+            body=f'Faktura v prilohe',
+            from_email='noreply@strom.sk',
+            to=[self.competitor.user.email],
+        )
+        mail.attach('faktura.pdf', invoice_content,
+                    mimetype='application/pdf')
+        mail.send()

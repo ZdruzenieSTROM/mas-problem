@@ -14,8 +14,8 @@ from django.views.generic import DetailView, FormView, ListView, UpdateView
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
-from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Problem,
-                     Submission, User)
+from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Payment,
+                     Problem, Submission, User)
 
 # Create your views here.
 
@@ -47,7 +47,7 @@ class SignUpView(FormView):
             return super().form_invalid(form)
 
         # Create competitor
-        Competitor.objects.create(
+        competitor = Competitor.objects.create(
             first_name=form.cleaned_data['first_name'],
             last_name=form.cleaned_data['last_name'],
             user=user,
@@ -61,6 +61,10 @@ class SignUpView(FormView):
                 game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
             paid=False
         )
+        payment = Payment.objects.create(
+            amount=form.cleaned_data['game'].price, competitor=competitor)
+        payment.create_invoice()
+        payment.send_invoice()
         return super().form_valid(form)
 
 
