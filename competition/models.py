@@ -1,8 +1,13 @@
+from tabnanny import verbose
+
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.fields import BooleanField
+from django.db.models.signals import post_save
 from django.utils.timezone import now
+
+from competition.invoice_handler import InvoiceItem, InvoiceSession
 
 # Create your models here.
 
@@ -176,6 +181,12 @@ class Competitor(models.Model):
     def finished(self):
         return self.game.is_active() and self.started() and self.game.get_finish_time(self) < now()
 
+    def to_invoice_dict(self):
+        return {
+            'o_name': f'{self.first_name} {self.last_name}',
+            'o_email': self.user.email,
+        }
+
 
 class Submission(models.Model):
     """Odvozdanie riešenia"""
@@ -233,3 +244,32 @@ class CompetitorGroupLevelSettings(models.Model):
     @classmethod
     def get_settings(cls, competitor, level):
         return cls.objects.get(grade=competitor.grade, level=level)
+
+
+class Payment(models.Model):
+    """Platby"""
+    class Meta:
+        verbose_name = 'platba'
+        verbose_name_plural = 'platby'
+
+    amount = models.FloatField(verbose_name='suma')
+    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
+    invoice_code = models.CharField(max_length=100, null=True, blank=True)
+
+    @classmethod
+    def post_create(cls, sender, instance, created, *args, **kwargs):
+        if not created:
+            return
+        invoice_session = InvoiceSession()
+        game = instance.competitor.game
+        item = InvoiceItem(
+            f'Účastnícky poplatok za {game.name}',
+            'ks', game.price)
+        instance.invoice_code = invoice_session.create_invoice(
+            instance.competitor.to_invoice_dict(),
+            {item: 1},
+            game.start
+        )
+
+
+post_save.connect(Payment.post_create, sender=Payment)
