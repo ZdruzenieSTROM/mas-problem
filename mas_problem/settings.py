@@ -131,3 +131,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ####### Faktury ##############
 FAKTURY_API_KEY = read_secret('faktury_api_key.txt')
 INVOICE_ISSUER = 'Mgr. Peter Kovács'
+
+
+####### Email ################
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'noreply@strom.sk'
+EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
