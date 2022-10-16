@@ -150,12 +150,14 @@ class CreateCompetitionForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control main-input'}), label='Názov ročníka')
     file = forms.FileField(
+        widget=forms.ClearableFileInput(),
         #attrs={'class': 'form-control main-input'},
         label='Zdroják brožúrky',
-        required=False
+        required=True
     )
-    # start = forms.DateTimeField()
-    # end = forms.DateTimeField()
-    # registration_start = forms.DateTimeField()
-    # registration_end = forms.DateTimeField()
-    # max_session_duration = forms.DurationField()
+    # start = forms.DateTimeField(widget=forms.DateTimeInput())
+    # end = forms.DateTimeField(widget=forms.DateTimeInput())
+    # registration_start = forms.DateTimeField(widget=forms.DateTimeInput())
+    # registration_end = forms.DateTimeField(widget=forms.DateTimeInput())
+    # max_session_duration = forms.DurationField(widget=forms.TimeInput())
+    # price = forms.DecimalField(decimal_places=2, max_digits=5)
