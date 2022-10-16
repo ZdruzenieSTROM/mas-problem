@@ -10,14 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def read_secret(secret_name: str) -> str:
+    with open(os.path.join(BASE_DIR, '.secrets', secret_name)) as secret_file:
+        return secret_file.readline()
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-i26a%-vwf9_dfqkw@rc4#q$bb4$u%qzplnh%a3qtiu-a3dzv%)'
@@ -121,3 +127,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+####### Faktury ##############
+FAKTURY_API_KEY = read_secret('faktury_api_key.txt')
+INOVICE_ISSUER = 'Mgr. Peter Kovács'
