@@ -1,10 +1,10 @@
 from tabnanny import verbose
 
 from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.fields import BooleanField
-from django.db.models.signals import post_save
 from django.utils.timezone import now
 
 from competition.invoice_handler import InvoiceItem, InvoiceSession
@@ -259,20 +259,30 @@ class Payment(models.Model):
     competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
     invoice_code = models.CharField(max_length=100, null=True, blank=True)
 
-    @classmethod
-    def post_create(cls, sender, instance, created, *args, **kwargs):
-        if not created:
-            return
+    def create_invoice(self):
+        """Vytvorenie faktúry"""
         invoice_session = InvoiceSession()
-        game = instance.competitor.game
+        game = self.competitor.game
         item = InvoiceItem(
             f'Účastnícky poplatok za {game.name}',
             'ks', game.price)
-        instance.invoice_code = invoice_session.create_invoice(
-            instance.competitor.to_invoice_dict(),
+        self.invoice_code = invoice_session.create_invoice(
+            self.competitor.to_invoice_dict(),
             {item: 1},
             game.start
         )
+        self.save()
 
-
-post_save.connect(Payment.post_create, sender=Payment)
+    def send_invoice(self):
+        """Zaslanie informácií k platbe"""
+        invoice_session = InvoiceSession()
+        invoice_content = invoice_session.get_invoice(self.invoice_code)
+        mail = EmailMessage(
+            subject=f'{self.competitor.game.name} - Informácie k platbe',
+            body=f'Faktura v prilohe',
+            from_email='noreply@strom.sk',
+            to=[self.competitor.user.email],
+        )
+        mail.attach('faktura.pdf', invoice_content,
+                    mimetype='application/pdf')
+        mail.send()
