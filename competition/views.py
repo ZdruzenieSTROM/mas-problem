@@ -329,10 +329,25 @@ class CurrentResultView(ResultView):
 class CreateCompetitionView(FormView):
     form_class = CreateCompetitionForm
     template_name = 'competition/create_game.html'
+    success_url = reverse_lazy('competition:change-details')
 
+    def get_success_url(self) -> str:
+        return reverse('competition:change-details',kwargs={'pk':self.created_id})
+    
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
+        file = request.FILES.getlist('file')
+        created_game = Game.objects.create(
+            name=form.cleaned_data['name'],
+            start=form.cleaned_data['start'],
+            end=form.cleaned_data['end'],
+            registration_start=form.cleaned_data['registration_start'],
+            registration_end=form.cleaned_data['registration_end'],
+            max_session_duration=form.cleaned_data['max_session_duration'],
+            price=form.cleaned_data['price']
+        )
+        self.created_id = created_game.pk
         file = request.FILES.get('file')
         if form.is_valid():
             print(file)
