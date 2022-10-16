@@ -9,7 +9,8 @@
             "registration_start": "2022-06-01T00:00:00.000Z",
             "registration_end": "2022-10-10T00:00:00.000Z",
             "max_session_duration": "60:00.000",
-            "results_public": false
+            "results_public": false,
+            "price": "3"
         }
     },
     {

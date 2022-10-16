@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.forms import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
@@ -14,18 +15,19 @@ class RegisterForm(forms.Form):
             return obj.verbose_name
     first_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Krstné meno')
+        label='Krstné meno*')
     last_name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Priezvisko')
+        label='Priezvisko*')
     email = forms.EmailField(widget=forms.EmailInput(
-        attrs={'class': 'form-control main-input'}))
+        attrs={'class': 'form-control main-input'}),
+        label='Email*')
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control main-input'}),
-        label='Heslo')
+        label='Heslo*')
     password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control main-input'}),
-        label='Zopakuj heslo',)
+        label='Zopakuj heslo*',)
     phone_number = forms.RegexField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Telefónne číslo (nepovinné)',
@@ -34,16 +36,16 @@ class RegisterForm(forms.Form):
     grade = GradeModelChoiceField(
         widget=forms.Select(attrs={'class': 'main-input'}),
         queryset=Grade.objects.all(),
-        label='Kategória',
+        label='Kategória*',
         to_field_name='verbose_name'
     )
     school = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Škola'
+        label='Škola*'
     )
     legal_representative = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
-        label='Meno a priezvisko zákonného zástupcu:'
+        label='Meno a priezvisko zákonného zástupcu*'
     )
     address = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
@@ -55,7 +57,8 @@ class RegisterForm(forms.Form):
         label=mark_safe(
             'Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: <a href="https://seminar.strom.sk/gdpr/" target="_blank" class="main-link">https://seminar.strom.sk/gdpr/</a>'),
     )
-    game = forms.HiddenInput()
+    game = forms.ModelChoiceField(
+        queryset=Game.objects.all(), widget=forms.HiddenInput())
 
     def clean_password2(self):
         """Heslo a zopakované heslo sa rovnajú"""
@@ -67,6 +70,12 @@ class RegisterForm(forms.Form):
         if password1 != password2:
             raise forms.ValidationError("Heslá sa musia zhodovať")
         return password2
+
+    def clean_game(self):
+        game = self.cleaned_data['game']
+        if game.registration_start > now() or game.registration_end < now():
+            raise ValidationError('Registrácia na túto súťaž nie je aktívna')
+        return game
 
 
 class ChangePasswordForm(PasswordChangeForm):

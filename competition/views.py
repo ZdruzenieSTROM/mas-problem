@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
 from django.db.models import Count, Max, Q
@@ -12,14 +12,14 @@ from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView, ListView, UpdateView
+from django.views.generic import DetailView, FormView
 
 from competition.parsers import MasProblemCurrentParser
 
 from .forms import (AuthForm, ChangePasswordForm, CreateCompetitionForm,
                     EditCompetitorForm, RegisterForm)
-from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Problem,
-                     Submission, User)
+from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
+                     Problem, Submission, User)
 
 # Create your views here.
 
@@ -37,7 +37,6 @@ class SignUpView(FormView):
             initial_data['game'] = Game.objects.filter(
                 registration_start__lte=now(), registration_end__gte=now()).get()
         except Game.DoesNotExist:
-            # TODO: Render no registration active
             pass
         return initial_data
 
@@ -50,25 +49,26 @@ class SignUpView(FormView):
             messages.error(
                 self.request, 'Užívateľ s týmto emailom už existuje')
             return super().form_invalid(form)
-        # TODO: Get game from hidden input
-        game = Game.objects.filter(
-            registration_start__lte=now(), registration_end__gte=now()).get()
 
         # Create competitor
-        Competitor.objects.create(
+        competitor = Competitor.objects.create(
             first_name=form.cleaned_data['first_name'],
             last_name=form.cleaned_data['last_name'],
             user=user,
             grade=form.cleaned_data['grade'],
             school=form.cleaned_data['school'],
-            game=game,
+            game=form.cleaned_data['game'],
             address=form.cleaned_data['address'],
             legal_representative=form.cleaned_data['legal_representative'],
             phone_number=form.cleaned_data['phone_number'],
             current_level=CompetitorGroup.objects.filter(
-                game=game, grades=form.cleaned_data['grade']).get().start_level,
+                game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
             paid=False
         )
+        payment = Payment.objects.create(
+            amount=form.cleaned_data['game'].price, competitor=competitor)
+        payment.create_invoice()
+        payment.send_invoice()
         return super().form_valid(form)
 
 
