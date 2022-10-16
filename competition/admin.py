@@ -57,3 +57,8 @@ class CompetitorGroupAdmin(admin.ModelAdmin):
 @admin.register(models.CompetitorGroupLevelSettings)
 class CompetitorGroupLevelSettings(admin.ModelAdmin):
     list_display = ('level', 'competitor_group', 'num_to_unlock')
+
+
+@admin.register(models.Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('competitor',)
