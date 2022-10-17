@@ -276,6 +276,8 @@ class Payment(models.Model):
 
     def send_invoice(self):
         """Zaslanie informácií k platbe"""
+        if self.invoice_code is None:
+            self.create_invoice()
         invoice_session = InvoiceSession()
         invoice_content = invoice_session.get_invoice(self.invoice_code)
         mail = EmailMessage(

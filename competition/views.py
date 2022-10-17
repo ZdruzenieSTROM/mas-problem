@@ -1,4 +1,8 @@
 
+from allauth.account import signals
+from allauth.account.models import EmailAddress
+from allauth.account.signals import email_confirmed
+from allauth.account.utils import send_email_confirmation
 from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -6,6 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
 from django.db.models import Count, Max, Q
+from django.dispatch import receiver
 from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -17,7 +22,16 @@ from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
 from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Payment,
                      Problem, Submission, User)
 
-# Create your views here.
+
+# Signal sent to activate user upon confirmation
+@receiver(email_confirmed)
+def email_confirmed_(request, email_address, **kwargs):
+    user = User.objects.get(email=email_address.email)
+    user.is_active = True
+    user.save()
+    payment = Payment.objects.create(
+            amount=user.competitor.game.price, competitor=user.competitor)
+    payment.send_invoice()
 
 
 class SignUpView(FormView):
@@ -41,6 +55,9 @@ class SignUpView(FormView):
         password = form.cleaned_data['password']
         try:
             user = User.objects.create_user(email, email, password)
+            user.is_active=False
+            user.save()
+            EmailAddress.objects.create(user=user,email=email,primary=True,verified=False)
         except IntegrityError:
             messages.error(
                 self.request, 'Užívateľ s týmto emailom už existuje')
@@ -61,10 +78,8 @@ class SignUpView(FormView):
                 game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
             paid=False
         )
-        payment = Payment.objects.create(
-            amount=form.cleaned_data['game'].price, competitor=competitor)
-        payment.create_invoice()
-        payment.send_invoice()
+        send_email_confirmation(self.request, user, True)
+        
         return super().form_valid(form)
 
 
