@@ -23,6 +23,10 @@ from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Payment,
                      Problem, Submission, User)
 
 
+def view_404(request, exception=None):  # pylint: disable=unused-argument
+    """Presmerovanie 404 na homepage"""
+    return redirect('competition:pravidla')
+
 # Signal sent to activate user upon confirmation
 @receiver(email_confirmed)
 def email_confirmed_(request, email_address, **kwargs):
