@@ -82,7 +82,8 @@ class InvoiceSession:
 
         )
         code = response.json()['code']
-        return code
+        number = response.json()['number']
+        return code, number
 
     @staticmethod
     def create_empty_template(file_name):

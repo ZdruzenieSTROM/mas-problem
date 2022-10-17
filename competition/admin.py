@@ -34,8 +34,8 @@ class ProblemAdmin(admin.ModelAdmin):
 
 @admin.register(models.Competitor)
 class CompetitorAdmin(admin.ModelAdmin):
-    list_display = ('grade', 'school', 'current_level', 'started_at', 'paid')
-    list_filter = ('grade', 'paid')
+    list_display = ('grade', 'school', 'current_level', 'started_at')
+    list_filter = ('grade',)
 
 
 @admin.register(models.Submission)
@@ -61,4 +61,7 @@ class CompetitorGroupLevelSettings(admin.ModelAdmin):
 
 @admin.register(models.Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('competitor',)
+    list_display = ('competitor','payment_reference_number','paid')
+    list_editable=('paid',)
+    list_filter = ('paid',)
+    search_fields = ('payment_reference_number',)

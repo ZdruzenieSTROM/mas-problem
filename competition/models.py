@@ -167,7 +167,6 @@ class Competitor(models.Model):
     current_level = models.ForeignKey(
         Level, on_delete=models.CASCADE, null=True)
     started_at = models.DateTimeField(null=True)
-    paid = BooleanField()
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
 
@@ -257,8 +256,10 @@ class Payment(models.Model):
 
     amount = models.DecimalField(
         verbose_name='suma', decimal_places=2, max_digits=5)
-    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
+    competitor = models.OneToOneField(Competitor, on_delete=models.CASCADE)
     invoice_code = models.CharField(max_length=100, null=True, blank=True)
+    payment_reference_number = models.CharField(max_length=32, null=True, blank=True)
+    paid = models.BooleanField(default=False)
 
     def create_invoice(self):
         """Vytvorenie faktúry"""
@@ -267,7 +268,7 @@ class Payment(models.Model):
         item = InvoiceItem(
             f'Účastnícky poplatok za {game.name}',
             'ks', game.price)
-        self.invoice_code = invoice_session.create_invoice(
+        self.invoice_code, self.payment_reference_number = invoice_session.create_invoice(
             self.competitor.to_invoice_dict(),
             {item: 1},
             game.start
@@ -276,6 +277,8 @@ class Payment(models.Model):
 
     def send_invoice(self):
         """Zaslanie informácií k platbe"""
+        if self.invoice_code is None:
+            self.create_invoice()
         invoice_session = InvoiceSession()
         invoice_content = invoice_session.get_invoice(self.invoice_code)
         mail = EmailMessage(
