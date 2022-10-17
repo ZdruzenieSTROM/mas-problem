@@ -1,8 +1,9 @@
+from allauth.account.views import confirm_email
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('competition.urls', namespace='competition')),
-    path('accounts/', include('allauth.urls')),
+    re_path(r'^accounts/confirm-email/(?P<key>[-:\w]+)/$', confirm_email, name='account_confirm_email'),
 ]
