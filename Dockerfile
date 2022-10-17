@@ -12,7 +12,7 @@ RUN ["pip", "install", "daphne"]
 COPY . /app/
 
 # TODO: change to prod_settings after test
-ENV DJANGO_SETTINGS_MODULE mas_problem.settings.settings
+ENV DJANGO_SETTINGS_MODULE mas_problem.settings.prod_settings
 
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 
