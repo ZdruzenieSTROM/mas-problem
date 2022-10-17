@@ -112,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LOGIN_URL = '/prihlasenie'
+LOGIN_REDIRECT_URL = '/prihlasenie'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
