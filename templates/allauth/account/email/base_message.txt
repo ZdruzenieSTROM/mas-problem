@@ -4,5 +4,6 @@
 <br>
 {% blocktrans with site_name=current_site.name site_domain=current_site.domain %}S pozdravom,
 <br>
-organizátori súťaže Máš problém?!{% endblocktrans %}
+organizátori súťaže Máš problém?!
+{% endblocktrans %}
 {% endautoescape %}
