@@ -56,7 +56,7 @@ class RegisterForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class': 'checkbox-input'}),
         label="",
         help_text=mark_safe(
-            'Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: <a href="https://seminar.strom.sk/gdpr/" target="_blank" class="main-link">https://seminar.strom.sk/gdpr/</a>'),
+            '*Beriem na vedomie, že osobné údaje môjho dieťaťa budú spracovávané podľa: <a href="https://seminar.strom.sk/gdpr/" target="_blank" class="main-link">https://seminar.strom.sk/gdpr/</a>'),
     )
     game = forms.ModelChoiceField(
         queryset=Game.objects.all(), widget=forms.HiddenInput())
