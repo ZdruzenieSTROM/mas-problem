@@ -27,14 +27,14 @@ def view_404(request, exception=None):  # pylint: disable=unused-argument
     """Presmerovanie 404 na homepage"""
     return redirect('competition:pravidla')
 
-# Signal sent to activate user upon confirmation
-@receiver(email_confirmed)
+
+@receiver(email_confirmed)  # Signal sent to activate user upon confirmation
 def email_confirmed_(request, email_address, **kwargs):
     user = User.objects.get(email=email_address.email)
     user.is_active = True
     user.save()
     payment = Payment.objects.create(
-            amount=user.competitor.game.price, competitor=user.competitor)
+        amount=user.competitor.game.price, competitor=user.competitor)
     payment.send_invoice()
 
 
@@ -59,9 +59,10 @@ class SignUpView(FormView):
         password = form.cleaned_data['password']
         try:
             user = User.objects.create_user(email, email, password)
-            user.is_active=False
+            user.is_active = False
             user.save()
-            EmailAddress.objects.create(user=user,email=email,primary=True,verified=False)
+            EmailAddress.objects.create(
+                user=user, email=email, primary=True, verified=False)
         except IntegrityError:
             messages.error(
                 self.request, 'Užívateľ s týmto emailom už existuje')
@@ -82,7 +83,7 @@ class SignUpView(FormView):
                 game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
         )
         send_email_confirmation(self.request, user, True)
-        
+
         return super().form_valid(form)
 
 
@@ -208,7 +209,6 @@ class GameReadyView(LoginRequiredMixin, DetailView):
         return game_redirect(self.object, competitor)
 
     def post(self, request, *args, **kwargs):
-        print('a')
         self.request.user.competitor.start()
         return game_redirect(self.get_object(), self.request.user.competitor)
 
