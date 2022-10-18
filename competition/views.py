@@ -132,7 +132,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self.request.user.competitor.payment)
         context['payment'] = (
             self.request.user.competitor.payment
             if hasattr(self.request.user, 'competitor') else False
