@@ -125,6 +125,8 @@ class EditProfileView(LoginRequiredMixin, FormView):
             competitor.phone_number = form.cleaned_data['phone_number']
             competitor.legal_representative = form.cleaned_data['legal_representative']
             competitor.address = form.cleaned_data['address']
+            competitor.current_level = CompetitorGroup.objects.filter(
+                game=competitor.game, grades=form.cleaned_data['grade']).get().start_level
             competitor.save()
         return super().form_valid(form)
 
@@ -137,15 +139,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
         )
         return context
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            competitor = self.request.user.competitor
-            competitor.current_level = CompetitorGroup.objects.filter(
-                game=competitor.game, grades=form.cleaned_data['grade']).get().start_level
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 
 @login_required
