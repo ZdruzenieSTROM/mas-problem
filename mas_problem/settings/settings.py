@@ -31,11 +31,11 @@ SECRET_KEY = 'django-insecure-i26a%-vwf9_dfqkw@rc4#q$bb4$u%qzplnh%a3qtiu-a3dzv%)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mas-problem.strom.sk',
+ALLOWED_HOSTS = ['masproblem.strom.sk',
                  'masproblemtest.strom.sk', 'localhost']
 
-CSRF_TRUSTED_ORIGINS = ['https://mas-problem.strom.sk',
-                        'https://www.mas-problem.strom.sk',
+CSRF_TRUSTED_ORIGINS = ['https://masproblem.strom.sk',
+                        'https://www.masproblem.strom.sk',
                         'http://masproblemtest.strom.sk',
                         'http://www.masproblemtest.strom.sk'
                         ]
