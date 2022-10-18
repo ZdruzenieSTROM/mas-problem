@@ -125,6 +125,8 @@ class EditProfileView(LoginRequiredMixin, FormView):
             competitor.phone_number = form.cleaned_data['phone_number']
             competitor.legal_representative = form.cleaned_data['legal_representative']
             competitor.address = form.cleaned_data['address']
+            competitor.current_level = CompetitorGroup.objects.filter(
+                game=competitor.game, grades=form.cleaned_data['grade']).get().start_level
             competitor.save()
         return super().form_valid(form)
 
@@ -136,6 +138,7 @@ class EditProfileView(LoginRequiredMixin, FormView):
             if hasattr(self.request.user, 'competitor') else False
         )
         return context
+
 
 
 @login_required
