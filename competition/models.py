@@ -118,7 +118,17 @@ class Level(models.Model):
     
     def next_level(self):
         """Vráti následujúci level"""
-        return Level.objects.get(previous_level=self)
+        try:
+            return Level.objects.get(previous_level=self)
+        except Level.DoesNotExist:
+            return None
+        
+    def is_available_for_competitor(self,competitor):
+        try:
+            CompetitorGroupLevelSettings.get_settings(competitor,self)
+            return self.game == competitor.game
+        except CompetitorGroupLevelSettings.DoesNotExist:
+            return False
 
     def __str__(self):
         return f'{self.game} - Úroveň {self.level_letter()}.'
