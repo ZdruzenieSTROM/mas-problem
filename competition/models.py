@@ -120,8 +120,6 @@ class Level(models.Model):
     def __str__(self):
         return f'{self.game} - Úroveň {self.level_letter()}.'
     
-    def __eq__(self,other):
-        return self.order==other.order
     
     def __lt__(self,other):
         return self.order<other.order
@@ -140,7 +138,7 @@ class Problem(models.Model):
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
-        return Submission.objects.filter(correct=True).exist()
+        return Submission.objects.filter(problem=self,competitor=competitor,correct=True).exists()
     
     def check_answer(self,answer):
         """Skontroluje odpoveď"""
@@ -149,7 +147,7 @@ class Problem(models.Model):
         return normalize_answer(self.solution) == normalize_answer(answer)
 
     def can_submit(self, competitor):
-        return self.level.unlocked(competitor)
+        return self.level.unlocked(competitor) and not self.correctly_submitted(competitor)
 
     def get_timeout(self, competitor):
         """Return timeout"""
