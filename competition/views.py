@@ -11,7 +11,7 @@ from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
 from django.db.models import Count, Max, Q
 from django.dispatch import receiver
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
@@ -281,12 +281,14 @@ def game_redirect(game, competitor):
 class ProblemView(LoginRequiredMixin, DetailView):
     model = Problem
 
-    def post(self):
+    def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
         competitor = self.request.user.competitor
-        if not self.can_submit(competitor):
-            raise
-        answer = ''
+        self.object = self.get_object()
+        if not self.object.can_submit(competitor):
+            return HttpResponseNotAllowed()
+        answer = self.request.POST['answer']
+
         Submission.objects.create(
             problem=self.object,
             competitor=competitor,
@@ -296,7 +298,7 @@ class ProblemView(LoginRequiredMixin, DetailView):
         )
         if Level.objects.get(previous_level=self.object.level).unlocked(competitor):
             competitor.current_level = max(
-                competitor.current_level, self.object.level+1)
+                competitor.current_level, self.object.level.next_level())
         return redirect('competition:game')
 
 

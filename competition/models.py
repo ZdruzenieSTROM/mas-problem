@@ -1,5 +1,3 @@
-from tabnanny import verbose
-
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
@@ -7,6 +5,7 @@ from django.db import models
 from django.db.models.fields import BooleanField
 from django.template.loader import render_to_string
 from django.utils.timezone import now
+from unidecode import unidecode
 
 from competition.invoice_handler import InvoiceItem, InvoiceSession
 
@@ -113,9 +112,19 @@ class Level(models.Model):
     def level_letter(self):
         """Converts order to letter"""
         return chr(ord('A')-1+self.order)
+    
+    def next_level(self):
+        """Vráti následujúci level"""
+        return Level.objects.get(previous_level=self)
 
     def __str__(self):
         return f'{self.game} - Úroveň {self.level_letter()}.'
+    
+    def __eq__(self,other):
+        return self.order==other.order
+    
+    def __lt__(self,other):
+        return self.order<other.order
 
 
 class Problem(models.Model):
@@ -132,6 +141,12 @@ class Problem(models.Model):
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
         return Submission.objects.filter(correct=True).exist()
+    
+    def check_answer(self,answer):
+        """Skontroluje odpoveď"""
+        def normalize_answer(text:str)->str:
+            return unidecode(text).lower().strip()
+        return normalize_answer(self.solution) == normalize_answer(answer)
 
     def can_submit(self, competitor):
         return self.level.unlocked(competitor)
@@ -229,7 +244,7 @@ class CompetitorGroup(models.Model):
 
     @classmethod
     def get_group_from_competitor(cls, competitor: Competitor):
-        return cls.objects.get(grade=competitor.grade)
+        return cls.objects.get(grades=competitor.grade)
 
 
 class CompetitorGroupLevelSettings(models.Model):
@@ -245,7 +260,10 @@ class CompetitorGroupLevelSettings(models.Model):
 
     @classmethod
     def get_settings(cls, competitor, level):
-        return cls.objects.get(grade=competitor.grade, level=level)
+        return cls.objects.get(
+            competitor_group=CompetitorGroup.get_group_from_competitor(competitor),
+            level=level
+        )
 
 
 class Payment(models.Model):

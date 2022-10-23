@@ -27,7 +27,7 @@
     {% for problem in level.problems.all %}
     {{problem.text}}
 
-    <form action="" method="post">
+    <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
         {% csrf_token %}
 
         <input type="text" id="answer{{problem.id}}" name="answer" class="main-input">
