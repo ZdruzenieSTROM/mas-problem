@@ -15,9 +15,14 @@
 {% block content %}
 <div class="tab">
     {% for level in levels %}
-    <button class="tablinks" onclick="openLevel(event, 'level-{{level.order}}')">
+    {% level_unlocked level competitor as unlocked %}
+    
+    <button class="tablinks" {% if unlocked %} onclick="openLevel(event, 'level-{{level.order}}')" {% endif %}>
         Level {{level.order}} <br>
         ({% number_of_solved level competitor %}/{{level.problems.count}})
+        {% if not unlocked %}
+        ZAMKNUTÝ
+        {% endif %}
     </button>
     {% endfor %}
 </div>

@@ -11,3 +11,7 @@ def number_of_solved(level, competitor):
 @register.simple_tag
 def can_submit(problem, competitor):
     return problem.can_submit(competitor)
+
+@register.simple_tag
+def level_unlocked(level,competitor):
+    return level.unlocked(competitor)
