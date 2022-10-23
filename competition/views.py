@@ -11,7 +11,8 @@ from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
 from django.db.models import Count, Max, Q
 from django.dispatch import receiver
-from django.http import FileResponse, HttpResponseNotAllowed
+from django.http import (FileResponse, HttpResponseForbidden,
+                         HttpResponseNotAllowed)
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
@@ -19,8 +20,8 @@ from django.views.generic import DetailView, FormView, ListView, UpdateView
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
-from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Payment,
-                     Problem, Submission, User)
+from .models import (Competitor, CompetitorGroup, CompetitorGroupLevelSettings,
+                     Game, Grade, Level, Payment, Problem, Submission, User)
 
 
 def view_404(request, exception=None):  # pylint: disable=unused-argument
@@ -257,6 +258,10 @@ class GameView(LoginRequiredMixin, DetailView):
             order__lte=group.end_level.order
         ).order_by('order')
         context['competitor'] = self.request.user.competitor
+        if 'level' in self.request.GET:
+            context['show_level'] = Level.objects.get(pk=int(self.request.GET['level']))
+        else:
+            context['show_level'] = context['levels'][0]
         return context
 
 
@@ -286,7 +291,7 @@ class ProblemView(LoginRequiredMixin, DetailView):
         competitor = self.request.user.competitor
         self.object = self.get_object()
         if not self.object.can_submit(competitor):
-            return HttpResponseNotAllowed()
+            return HttpResponseForbidden()
         answer = self.request.POST['answer']
 
         Submission.objects.create(
@@ -296,10 +301,11 @@ class ProblemView(LoginRequiredMixin, DetailView):
             submitted_at=now(),
             correct=self.object.check_answer(answer)
         )
-        if Level.objects.get(previous_level=self.object.level).unlocked(competitor):
+        next_level = self.object.level.next_level()
+        if next_level is not None and next_level.is_available_for_competitor(competitor) and next_level.unlocked(competitor):
             competitor.current_level = max(
-                competitor.current_level, self.object.level.next_level())
-        return redirect('competition:game')
+                competitor.current_level, next_level)
+        return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
 
 class UploadGameView():
