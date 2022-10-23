@@ -21,33 +21,36 @@
         Level {{level.order}} <br>
         ({% number_of_solved level competitor %}/{{level.problems.count}})
         {% if not unlocked %}
-        ZAMKNUTÝ
+        <i class="icon-lock"></i>
         {% endif %}
     </button>
     {% endfor %}
 </div>
 {% for level in levels %}
-    <div id='level-{{level.order}}' class="tabcontent">
+    {% level_unlocked level competitor as unlocked %}
+    {% if unlocked %}
+        <div id='level-{{level.order}}' class="tabcontent">
 
-    {% for problem in level.problems.all %}
-        {{problem.text}}
-        {%can_submit problem competitor as can_competitor_submit%}
-        {% if can_competitor_submit %}
-        <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
-            {% csrf_token %}
+        {% for problem in level.problems.all %}
+            {{problem.text}}
+            {%can_submit problem competitor as can_competitor_submit%}
+            {% if can_competitor_submit %}
+            <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
+                {% csrf_token %}
 
-            <input type="text" id="answer{{problem.id}}" name="answer" class="main-input">
-            <input type="hidden" name="puzzle" value="{{problem.id}}">
-            <input type="Submit" value="Odovzdať" class="main-button" />
-        </form>
-        {% endif %}
-        {% for submission in problem.submission_set.all %}
-            <div class="answer-alert {% if submission.correct %}success{% endif %}">
-                {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNA ODPOVEĎ {% else %}
-                NESPRÁVNE {% endif %}
-            </div>
+                <input type="text" id="answer{{problem.id}}" name="answer" class="main-input">
+                <input type="hidden" name="puzzle" value="{{problem.id}}">
+                <input type="Submit" value="Odovzdať" class="main-button" />
+            </form>
+            {% endif %}
+            {% for submission in problem.submission_set.all %}
+                <div class="answer-alert {% if submission.correct %}success{% endif %}">
+                    {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNA ODPOVEĎ {% else %}
+                    NESPRÁVNE {% endif %}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    </div>
+        </div>
+    {% endif %}
 {% endfor %}
 {% endblock %}
