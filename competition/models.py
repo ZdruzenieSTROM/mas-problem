@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Count, Q
 from django.db.models.fields import BooleanField
 from django.template.loader import render_to_string
 from django.utils.timezone import now
@@ -104,10 +105,12 @@ class Level(models.Model):
 
     def number_of_solved(self, competitor):
         """Počet vyriešených úloh"""
-        return Problem.objects.filter(
+        return Problem.objects.annotate(
+            num_correct=Count('submission',filter=Q(submission__competitor=competitor,submission__correct=True))
+        ).filter(
             level=self,
-            submission__competitor=competitor,
-            submission__correct=True).count()
+            num_correct__gte=1
+        ).count()
 
     def level_letter(self):
         """Converts order to letter"""
