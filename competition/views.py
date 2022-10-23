@@ -1,27 +1,25 @@
 
-from allauth.account import signals
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from allauth.account.utils import send_email_confirmation
 from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
 from django.db.models import Count, Max, Q
 from django.dispatch import receiver
-from django.http import (FileResponse, HttpResponseForbidden,
-                         HttpResponseNotAllowed)
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView, ListView, UpdateView
+from django.views.generic import DetailView, FormView
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
-from .models import (Competitor, CompetitorGroup, CompetitorGroupLevelSettings,
-                     Game, Grade, Level, Payment, Problem, Submission, User)
+from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
+                     Problem, Submission, User)
 
 
 def view_404(request, exception=None):  # pylint: disable=unused-argument
