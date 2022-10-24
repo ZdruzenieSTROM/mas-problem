@@ -32,23 +32,25 @@
         <div id='level-{{level.order}}' class="tabcontent">
 
         {% for problem in level.problems.all %}
-            {{problem.text}}
-            {%can_submit problem competitor as can_competitor_submit%}
-            {% if can_competitor_submit %}
-            <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
-                {% csrf_token %}
-
-                <input type="text" id="answer{{problem.id}}" name="answer" class="main-input">
-                <input type="hidden" name="puzzle" value="{{problem.id}}">
-                <input type="Submit" value="Odovzdať" class="main-button" />
-            </form>
-            {% endif %}
-            {% for submission in problem.submission_set.all %}
-                <div class="answer-alert {% if submission.correct %}success{% endif %}">
-                    {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNA ODPOVEĎ {% else %}
-                    NESPRÁVNE {% endif %}
-                </div>
-            {% endfor %}
+            <div class="mt-4">
+                {{problem.text}}
+                {%can_submit problem competitor as can_competitor_submit%}
+                {% if can_competitor_submit %}
+                <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
+                    {% csrf_token %}
+                    
+                    <input type="text" id="answer{{problem.id}}" name="answer" class="main-input mb-2">
+                    <input type="hidden" name="puzzle" value="{{problem.id}}">
+                    <input type="Submit" value="Odovzdať" class="main-button" />
+                </form>
+                {% endif %}
+                {% for submission in problem.submission_set.all %}
+                    <div class="answer-alert {% if submission.correct %}success{% endif %}">
+                        {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNA ODPOVEĎ {% else %}
+                        NESPRÁVNE {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
         {% endfor %}
         </div>
     {% endif %}
