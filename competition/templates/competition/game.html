@@ -18,7 +18,7 @@
     {% level_unlocked level competitor as unlocked %}
     
     <button class="tablinks" {% if unlocked %} onclick="openLevel(event, 'level-{{level.order}}')" {% endif %}>
-        Level {{level.order}} <br>
+        Úroveň {{level.level_letter}} <br>
         ({% number_of_solved level competitor %}/{{level.problems.count}})
         {% if not unlocked %}
         <i class="icon-lock"></i>
