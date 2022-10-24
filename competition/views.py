@@ -244,14 +244,20 @@ class GameView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        competitor = self.request.user.competitor
         group = CompetitorGroup.objects.filter(
-            game=self.request.user.competitor.game, grades=self.request.user.competitor.grade).get()
+            game=competitor.game, grades=competitor.grade).get()
         context['levels'] = Level.objects.filter(
             game=self.object,
             order__gte=group.start_level.order,
             order__lte=group.end_level.order
         ).order_by('order')
-        context['competitor'] = self.request.user.competitor
+        for level in context['levels']:
+            level.problems_with_submissions = []
+            for problem in level.problems.all():
+                problem.competitor_submissions = problem.submission_set.filter(competitor=competitor).order_by('-submitted_at')
+                level.problems_with_submissions.append(problem)
+        context['competitor'] = competitor
         if 'level' in self.request.GET:
             context['show_level'] = Level.objects.get(pk=int(self.request.GET['level']))
         else:

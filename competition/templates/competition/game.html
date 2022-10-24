@@ -33,8 +33,8 @@
     {% if unlocked %}
         <div id='level-{{level.order}}' class="tabcontent">
 
-        {% for problem in level.problems.all %}
-            {{problem.text}}
+        {% for problem in level.problems_with_submissions %}
+            <div>{{problem.text}}</div>
             {%can_submit problem competitor as can_competitor_submit%}
             {% if can_competitor_submit %}
             <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
@@ -45,7 +45,7 @@
                 <input type="Submit" value="Odovzdať" class="main-button" />
             </form>
             {% endif %}
-            {% for submission in problem.submission_set.all %}
+            {% for submission in problem.competitor_submissions.all %}
                 <div class="answer-alert {% if submission.correct %}success{% endif %}">
                     {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNE {% else %}
                     NESPRÁVNE {% endif %}
