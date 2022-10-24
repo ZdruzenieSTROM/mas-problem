@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
-from django.db.models import Count, Max, Q
+from django.db.models import Count, Max, OuterRef, Q, Subquery
 from django.dispatch import receiver
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
@@ -77,9 +77,7 @@ class SignUpView(FormView):
             game=form.cleaned_data['game'],
             address=form.cleaned_data['address'],
             legal_representative=form.cleaned_data['legal_representative'],
-            phone_number=form.cleaned_data['phone_number'],
-            current_level=CompetitorGroup.objects.filter(
-                game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
+            phone_number=form.cleaned_data['phone_number']
         )
         send_email_confirmation(self.request, user, True)
 
@@ -124,8 +122,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
             competitor.phone_number = form.cleaned_data['phone_number']
             competitor.legal_representative = form.cleaned_data['legal_representative']
             competitor.address = form.cleaned_data['address']
-            competitor.current_level = CompetitorGroup.objects.filter(
-                game=competitor.game, grades=form.cleaned_data['grade']).get().start_level
             competitor.save()
         return super().form_valid(form)
 
@@ -299,10 +295,6 @@ class ProblemView(LoginRequiredMixin, DetailView):
             submitted_at=now(),
             correct=self.object.check_answer(answer)
         )
-        next_level = self.object.level.next_level()
-        if next_level is not None and next_level.is_visible_for_competitor(competitor) and next_level.unlocked(competitor):
-            competitor.current_level = max(
-                competitor.current_level, next_level)
         return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
 
@@ -317,7 +309,7 @@ class ResultView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.object.start < now() and self.object.end > now():
+        if (self.object.start < now() and self.object.end > now()) and not self.object.results_public:
             return context
         result_groups = self.object.result_groups.all()
         results = []
@@ -325,10 +317,13 @@ class ResultView(DetailView):
             result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
                 solved_problems=Count(
                     'submission', filter=Q(submission__correct=True)),
-
+                max_level = Subquery(
+                    Submission.objects.filter(competitor=OuterRef('pk'),correct=True).order_by('-problem__level__order').values('problem__level__order')[:1]
+                ),
                 last_correct_submission=Max(
                     'submission__submitted_at', filter=Q(submission__correct=True))
-            ).order_by('-current_level', 'solved_problems', 'last_correct_submission')
+            ).order_by('-max_level', 'solved_problems', 'last_correct_submission')
+
             results.append(
                 {
                     'name': result_group.name,

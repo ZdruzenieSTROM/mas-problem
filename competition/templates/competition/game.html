@@ -9,10 +9,12 @@
 </script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% load competition_tags %}
 {% endblock %}
 {% block title %}{{game.name}}{% endblock %}
-{% load competition_tags %}
+
 {% block content %}
+
 <div class="tab">
     {% for level in levels %}
     {% level_unlocked level competitor as unlocked %}

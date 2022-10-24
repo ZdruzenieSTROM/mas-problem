@@ -1,6 +1,8 @@
 from django import template
 from django.utils.timezone import now
 
+from competition.models import Level
+
 register = template.Library()
 
 
@@ -15,3 +17,7 @@ def can_submit(problem, competitor):
 @register.simple_tag
 def level_unlocked(level,competitor):
     return level.unlocked(competitor)
+
+@register.filter
+def to_letter(level_number):
+    return Level.number_to_letter(level_number)

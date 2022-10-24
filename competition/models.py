@@ -111,10 +111,14 @@ class Level(models.Model):
             level=self,
             num_correct__gte=1
         ).count()
+    
+    @staticmethod
+    def number_to_letter(number:int)->str:
+        return chr(ord('A')-1+number)
 
     def level_letter(self):
         """Converts order to letter"""
-        return chr(ord('A')-1+self.order)
+        return self.number_to_letter(self.order)
     
     def next_level(self):
         """Vráti následujúci level"""
@@ -161,6 +165,9 @@ class Problem(models.Model):
 
     def can_submit(self, competitor):
         return self.level.unlocked(competitor) and not self.correctly_submitted(competitor)
+    
+    def competitor_submissions(self,competitor):
+        return self.submissions.filter(competitor=competitor)
 
     def get_timeout(self, competitor):
         """Return timeout"""
@@ -190,8 +197,6 @@ class Competitor(models.Model):
     )
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, blank=True)  # Validators should be a list
-    current_level = models.ForeignKey(
-        Level, on_delete=models.CASCADE, null=True)
     started_at = models.DateTimeField(null=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
