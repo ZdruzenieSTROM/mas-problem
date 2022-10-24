@@ -97,7 +97,7 @@ class Level(models.Model):
             return self.game == competitor.game
         level_settings = CompetitorGroupLevelSettings.get_settings(
             competitor, self)
-        return (
+        return level_settings.is_starting_level() or (
             self.previous_level.number_of_solved(
                 competitor) > level_settings.num_to_unlock
             and self.game == competitor.game
@@ -268,6 +268,10 @@ class CompetitorGroupLevelSettings(models.Model):
     competitor_group = models.ForeignKey(
         CompetitorGroup, on_delete=models.CASCADE, related_name='setting_groups')
     num_to_unlock = models.PositiveSmallIntegerField()
+
+    def is_starting_level(self)->bool:
+        """Level je začiatočný pre danú skupinu"""
+        return self.level == self.competitor_group.start_level
 
     @classmethod
     def get_settings(cls, competitor, level):
