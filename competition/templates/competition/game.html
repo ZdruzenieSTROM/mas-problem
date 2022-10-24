@@ -45,7 +45,7 @@
             {% endif %}
             {% for submission in problem.submission_set.all %}
                 <div class="answer-alert {% if submission.correct %}success{% endif %}">
-                    {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNA ODPOVEĎ {% else %}
+                    {{submission.competitor_answer}} - {% if submission.correct %} SPRÁVNE {% else %}
                     NESPRÁVNE {% endif %}
                 </div>
             {% endfor %}
