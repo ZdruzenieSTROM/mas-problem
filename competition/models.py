@@ -123,7 +123,7 @@ class Level(models.Model):
         except Level.DoesNotExist:
             return None
         
-    def is_available_for_competitor(self,competitor):
+    def is_visible_for_competitor(self,competitor):
         try:
             CompetitorGroupLevelSettings.get_settings(competitor,self)
             return self.game == competitor.game

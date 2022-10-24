@@ -300,7 +300,7 @@ class ProblemView(LoginRequiredMixin, DetailView):
             correct=self.object.check_answer(answer)
         )
         next_level = self.object.level.next_level()
-        if next_level is not None and next_level.is_available_for_competitor(competitor) and next_level.unlocked(competitor):
+        if next_level is not None and next_level.is_visible_for_competitor(competitor) and next_level.unlocked(competitor):
             competitor.current_level = max(
                 competitor.current_level, next_level)
         return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
