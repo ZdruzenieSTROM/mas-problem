@@ -1,0 +1,30 @@
+version: "3.3"
+
+services:
+  website:
+    build: .
+    ports:
+      - "8630:8000"
+    volumes:
+      - "staticfiles:/app/static:ro"
+      - type: "bind"
+        source: "./db.sqlite3"
+        target: "/app/db.sqlite3"
+      - type: "bind"
+        source: "./media"
+        target: "/app/media"
+    args:
+      SETTINGS_MODULE: mas_problem.settings.settings
+
+
+  static:
+    image: "nginx:1.23"
+    depends_on:
+      - "website"
+    ports:
+      - "8631:80"
+    volumes:
+      - "staticfiles:/usr/share/nginx/html:ro"
+
+volumes:
+  staticfiles:
