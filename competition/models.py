@@ -106,7 +106,8 @@ class Level(models.Model):
     def number_of_solved(self, competitor):
         """Počet vyriešených úloh"""
         return Problem.objects.annotate(
-            num_correct=Count('submission',filter=Q(submission__competitor=competitor,submission__correct=True))
+            num_correct=Count('submission', filter=Q(
+                submission__competitor=competitor, submission__correct=True))
         ).filter(
             level=self,
             num_correct__gte=1
@@ -129,17 +130,16 @@ class Level(models.Model):
         
     def is_visible_for_competitor(self,competitor):
         try:
-            CompetitorGroupLevelSettings.get_settings(competitor,self)
+            CompetitorGroupLevelSettings.get_settings(competitor, self)
             return self.game == competitor.game
         except CompetitorGroupLevelSettings.DoesNotExist:
             return False
 
     def __str__(self):
         return f'{self.game} - Úroveň {self.level_letter()}.'
-    
-    
-    def __lt__(self,other):
-        return self.order<other.order
+
+    def __lt__(self, other):
+        return self.order < other.order
 
 
 class Problem(models.Model):
@@ -155,11 +155,11 @@ class Problem(models.Model):
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
-        return Submission.objects.filter(problem=self,competitor=competitor,correct=True).exists()
-    
-    def check_answer(self,answer):
+        return Submission.objects.filter(problem=self, competitor=competitor, correct=True).exists()
+
+    def check_answer(self, answer):
         """Skontroluje odpoveď"""
-        def normalize_answer(text:str)->str:
+        def normalize_answer(text: str) -> str:
             return unidecode(text).lower().strip()
         return normalize_answer(self.solution) == normalize_answer(answer)
 
@@ -281,7 +281,8 @@ class CompetitorGroupLevelSettings(models.Model):
     @classmethod
     def get_settings(cls, competitor, level):
         return cls.objects.get(
-            competitor_group=CompetitorGroup.get_group_from_competitor(competitor),
+            competitor_group=CompetitorGroup.get_group_from_competitor(
+                competitor),
             level=level
         )
 
@@ -296,7 +297,8 @@ class Payment(models.Model):
         verbose_name='suma', decimal_places=2, max_digits=5)
     competitor = models.OneToOneField(Competitor, on_delete=models.CASCADE)
     invoice_code = models.CharField(max_length=100, null=True, blank=True)
-    payment_reference_number = models.CharField(max_length=32, null=True, blank=True)
+    payment_reference_number = models.CharField(
+        max_length=32, null=True, blank=True)
     paid = models.BooleanField(default=False)
 
     def create_invoice(self):
