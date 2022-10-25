@@ -134,7 +134,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
         return context
 
 
-
 @login_required
 def change_password(request):
     """Zmena hesla"""
@@ -255,11 +254,13 @@ class GameView(LoginRequiredMixin, DetailView):
         for level in context['levels']:
             level.problems_with_submissions = []
             for problem in level.problems.all():
-                problem.competitor_submissions = problem.submission_set.filter(competitor=competitor).order_by('-submitted_at')
+                problem.competitor_submissions = problem.submission_set.filter(
+                    competitor=competitor).order_by('-submitted_at')
                 level.problems_with_submissions.append(problem)
         context['competitor'] = competitor
         if 'level' in self.request.GET:
-            context['show_level'] = Level.objects.get(pk=int(self.request.GET['level']))
+            context['show_level'] = Level.objects.get(
+                pk=int(self.request.GET['level']))
         else:
             context['show_level'] = context['levels'][0]
         return context
@@ -323,12 +324,13 @@ class ResultView(DetailView):
             result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
                 solved_problems=Count(
                     'submission', filter=Q(submission__correct=True)),
-                max_level = Subquery(
-                    Submission.objects.filter(competitor=OuterRef('pk'),correct=True).order_by('-problem__level__order').values('problem__level__order')[:1]
+                max_level=Subquery(
+                    Submission.objects.filter(competitor=OuterRef('pk'), correct=True).order_by(
+                        '-problem__level__order').values('problem__level__order')[:1]
                 ),
                 last_correct_submission=Max(
                     'submission__submitted_at', filter=Q(submission__correct=True))
-            ).order_by('-max_level', 'solved_problems', 'last_correct_submission')
+            ).order_by('-max_level', '-solved_problems', 'last_correct_submission')
 
             results.append(
                 {
