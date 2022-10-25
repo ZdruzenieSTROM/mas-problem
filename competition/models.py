@@ -242,10 +242,11 @@ class ResultGroup(models.Model):
     """Skupina pre tvorbu výsledkov. 
     Výsledkovky budú zoskupená opodľa týchto skupín ročníkov"""
     class Meta:
-        verbose_name = 'výsledkové skupina'
+        verbose_name = 'výsledková skupina'
         verbose_name_plural = 'výsledkové skupiny'
 
-    name = models.CharField(max_length=128,verbose_name='Názov skupiny (vo výsledkovke)')
+    name = models.CharField(
+        max_length=128, verbose_name='Názov skupiny (vo výsledkovke)')
     game = models.ForeignKey(
         Game, on_delete=models.CASCADE, related_name='result_groups')
     grades = models.ManyToManyField(Grade)
@@ -279,7 +280,8 @@ class CompetitorGroupLevelSettings(models.Model):
         Level, on_delete=models.CASCADE, related_name='setting_groups')
     competitor_group = models.ForeignKey(
         CompetitorGroup, on_delete=models.CASCADE, related_name='setting_groups')
-    num_to_unlock = models.PositiveSmallIntegerField(verbose_name='Počet úloh z predhádzajúceho levelu na odomknutie')
+    num_to_unlock = models.PositiveSmallIntegerField(
+        verbose_name='Počet úloh z predhádzajúceho levelu na odomknutie')
 
     def is_starting_level(self) -> bool:
         """Level je začiatočný pre danú skupinu"""
