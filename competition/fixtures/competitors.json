@@ -1,0 +1,188 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 101,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "user_z4",
+            "first_name": "Jozef",
+            "last_name": "Mrkva",
+            "email": "user_z4@strom.sk",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "competition.Competitor",
+        "pk": 101,
+        "fields": {
+            "user": 101,
+            "first_name": "Jozef",
+            "last_name": "Mrkva",
+            "school": "Základná škola Mrkvovo",
+            "grade": 0,
+            "game": 1,
+            "legal_representative": "Mamka Mrkvová"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 102,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "user_z5",
+            "first_name": "Martin",
+            "last_name": "Slivka",
+            "email": "user_z5@strom.sk",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "competition.Competitor",
+        "pk": 102,
+        "fields": {
+            "user": 102,
+            "first_name": "Martin",
+            "last_name": "Slivka",
+            "school": "Základná škola Slivkovo",
+            "grade": 1,
+            "game": 1,
+            "legal_representative": "Mamka Slivková"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 103,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "user_z6",
+            "first_name": "Michal",
+            "last_name": "Hrozno",
+            "email": "user_z6@strom.sk",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "competition.Competitor",
+        "pk": 103,
+        "fields": {
+            "user": 103,
+            "first_name": "Michal",
+            "last_name": "Hrozno",
+            "school": "Základná škola Hroznovo",
+            "grade": 2,
+            "game": 1,
+            "legal_representative": "Mamka Hroznová"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 104,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "user_z7",
+            "first_name": "Juraj",
+            "last_name": "Orech",
+            "email": "user_z7@strom.sk",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "competition.Competitor",
+        "pk": 104,
+        "fields": {
+            "user": 104,
+            "first_name": "Juraj",
+            "last_name": "Orech",
+            "school": "Základná škola Orechovo",
+            "grade": 3,
+            "game": 1,
+            "legal_representative": "Mamka Orechová"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 105,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "user_z8",
+            "first_name": "Patrik",
+            "last_name": "Pomelo",
+            "email": "user_z8@strom.sk",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "competition.Competitor",
+        "pk": 105,
+        "fields": {
+            "user": 105,
+            "first_name": "Patrik",
+            "last_name": "Pomelo",
+            "school": "Základná škola Pomelovo",
+            "grade": 4,
+            "game": 1,
+            "legal_representative": "Otec Pomelo"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 106,
+        "fields": {
+            "password": "pbkdf2_sha256$390000$vU4GT21gJaOPWrFz4SuVOJ$w1Z5MXExPeWr+Jqw8GBefjOoYPgXvqtO6MbwNPX/VRk=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "user_z9",
+            "first_name": "Sandra",
+            "last_name": "Jablko",
+            "email": "user_z9@strom.sk",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-10-03T18:26:28.877Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "competition.Competitor",
+        "pk": 106,
+        "fields": {
+            "user": 106,
+            "first_name": "Sandra",
+            "last_name": "Jablko",
+            "school": "Základná škola Jablkovo",
+            "grade": 5,
+            "game": 1,
+            "legal_representative": "Otec Jablko"
+        }
+    }
+]
