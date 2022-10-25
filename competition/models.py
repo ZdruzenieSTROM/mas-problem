@@ -1,3 +1,4 @@
+from typing import Optional
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
@@ -112,23 +113,25 @@ class Level(models.Model):
             level=self,
             num_correct__gte=1
         ).count()
-    
+
     @staticmethod
-    def number_to_letter(number:int)->str:
+    def number_to_letter(number: Optional[int]) -> str:
+        if number is None:
+            return '-'
         return chr(ord('A')-1+number)
 
     def level_letter(self):
         """Converts order to letter"""
         return self.number_to_letter(self.order)
-    
+
     def next_level(self):
         """Vráti následujúci level"""
         try:
             return Level.objects.get(previous_level=self)
         except Level.DoesNotExist:
             return None
-        
-    def is_visible_for_competitor(self,competitor):
+
+    def is_visible_for_competitor(self, competitor):
         try:
             CompetitorGroupLevelSettings.get_settings(competitor, self)
             return self.game == competitor.game
@@ -165,8 +168,8 @@ class Problem(models.Model):
 
     def can_submit(self, competitor):
         return self.level.unlocked(competitor) and not self.correctly_submitted(competitor)
-    
-    def competitor_submissions(self,competitor):
+
+    def competitor_submissions(self, competitor):
         return self.submissions.filter(competitor=competitor)
 
     def get_timeout(self, competitor):
@@ -274,7 +277,7 @@ class CompetitorGroupLevelSettings(models.Model):
         CompetitorGroup, on_delete=models.CASCADE, related_name='setting_groups')
     num_to_unlock = models.PositiveSmallIntegerField()
 
-    def is_starting_level(self)->bool:
+    def is_starting_level(self) -> bool:
         """Level je začiatočný pre danú skupinu"""
         return self.level == self.competitor_group.start_level
 
