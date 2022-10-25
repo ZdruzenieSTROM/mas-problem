@@ -314,6 +314,18 @@ class ResultView(DetailView):
     model = Game
     template_name = 'competition/results.html'
 
+    def add_places(self, results):
+        current_place = 1
+        previous_last_correct_submission = None
+        results_list = []
+        for i, result_row in enumerate(results):
+            if previous_last_correct_submission != result_row.last_correct_submission:
+                current_place = i+1
+                previous_last_correct_submission = result_row.last_correct_submission
+            result_row.place = current_place
+            results_list.append(result_row)
+        return results_list
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if (self.object.start < now() and self.object.end > now()) and not self.object.results_public:
@@ -335,7 +347,7 @@ class ResultView(DetailView):
             results.append(
                 {
                     'name': result_group.name,
-                    'results': result
+                    'results': self.add_places(result)
                 }
             )
         context['results'] = results
