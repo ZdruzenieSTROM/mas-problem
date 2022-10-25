@@ -188,7 +188,7 @@ class Competitor(models.Model):
         verbose_name_plural = 'Súťažiaci'
 
     user = models.OneToOneField(
-        User, on_delete=models.SET_NULL, null=True, related_name='competitor')
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='competitor')
     # Nechajme zatial ako text, časom prepojíme asi v backendom stránky
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
