@@ -1,4 +1,5 @@
 from typing import Optional
+
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
@@ -241,9 +242,10 @@ class ResultGroup(models.Model):
     """Skupina pre tvorbu výsledkov. 
     Výsledkovky budú zoskupená opodľa týchto skupín ročníkov"""
     class Meta:
-        verbose_name = 'výsledkové skupiny'
+        verbose_name = 'výsledkové skupina'
+        verbose_name_plural = 'výsledkové skupiny'
 
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128,verbose_name='Názov skupiny (vo výsledkovke)')
     game = models.ForeignKey(
         Game, on_delete=models.CASCADE, related_name='result_groups')
     grades = models.ManyToManyField(Grade)
@@ -253,6 +255,7 @@ class CompetitorGroup(models.Model):
     """Skupina ročníkov pre nastavenie hry"""
     class Meta:
         verbose_name = 'Skupina ročníkov pre hru'
+        verbose_name_plural = 'Skupiny ročníkov pre hru'
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     grades = models.ManyToManyField(Grade)
@@ -270,12 +273,13 @@ class CompetitorGroupLevelSettings(models.Model):
     """Nastavenie postupových podmienok z levelu"""
     class Meta:
         verbose_name = 'postupové podmienky'
+        verbose_name_plural = 'postupové podmienky'
 
     level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='setting_groups')
     competitor_group = models.ForeignKey(
         CompetitorGroup, on_delete=models.CASCADE, related_name='setting_groups')
-    num_to_unlock = models.PositiveSmallIntegerField()
+    num_to_unlock = models.PositiveSmallIntegerField(verbose_name='Počet úloh z predhádzajúceho levelu na odomknutie')
 
     def is_starting_level(self) -> bool:
         """Level je začiatočný pre danú skupinu"""
