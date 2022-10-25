@@ -5,9 +5,9 @@
         "fields": {
             "name": "Testovací máš problém",
             "start": "2022-10-20T10:00:00.000Z",
-            "end": "2022-10-20T20:00:00.000Z",
+            "end": "2022-11-07T20:00:00.000Z",
             "registration_start": "2022-06-01T00:00:00.000Z",
-            "registration_end": "2022-10-20T00:00:00.000Z",
+            "registration_end": "2022-11-07T00:00:00.000Z",
             "max_session_duration": "60:00.000",
             "results_public": false,
             "price": "3"
