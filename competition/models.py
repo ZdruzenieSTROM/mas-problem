@@ -1,12 +1,13 @@
-from tabnanny import verbose
-
+from typing import Optional
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Count, Q
 from django.db.models.fields import BooleanField
 from django.template.loader import render_to_string
 from django.utils.timezone import now
+from unidecode import unidecode
 
 from competition.invoice_handler import InvoiceItem, InvoiceSession
 
@@ -97,7 +98,7 @@ class Level(models.Model):
             return self.game == competitor.game
         level_settings = CompetitorGroupLevelSettings.get_settings(
             competitor, self)
-        return (
+        return level_settings.is_starting_level() or (
             self.previous_level.number_of_solved(
                 competitor) > level_settings.num_to_unlock
             and self.game == competitor.game
@@ -105,17 +106,43 @@ class Level(models.Model):
 
     def number_of_solved(self, competitor):
         """Počet vyriešených úloh"""
-        return Problem.objects.filter(
+        return Problem.objects.annotate(
+            num_correct=Count('submission', filter=Q(
+                submission__competitor=competitor, submission__correct=True))
+        ).filter(
             level=self,
-            submission__competitor=competitor,
-            submission__correct=True).count()
+            num_correct__gte=1
+        ).count()
+
+    @staticmethod
+    def number_to_letter(number: Optional[int]) -> str:
+        if number is None:
+            return '-'
+        return chr(ord('A')-1+number)
 
     def level_letter(self):
         """Converts order to letter"""
-        return chr(ord('A')-1+self.order)
+        return self.number_to_letter(self.order)
+
+    def next_level(self):
+        """Vráti následujúci level"""
+        try:
+            return Level.objects.get(previous_level=self)
+        except Level.DoesNotExist:
+            return None
+
+    def is_visible_for_competitor(self, competitor):
+        try:
+            CompetitorGroupLevelSettings.get_settings(competitor, self)
+            return self.game == competitor.game
+        except CompetitorGroupLevelSettings.DoesNotExist:
+            return False
 
     def __str__(self):
         return f'{self.game} - Úroveň {self.level_letter()}.'
+
+    def __lt__(self, other):
+        return self.order < other.order
 
 
 class Problem(models.Model):
@@ -131,10 +158,19 @@ class Problem(models.Model):
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
-        return Submission.objects.filter(correct=True).exist()
+        return Submission.objects.filter(problem=self, competitor=competitor, correct=True).exists()
+
+    def check_answer(self, answer):
+        """Skontroluje odpoveď"""
+        def normalize_answer(text: str) -> str:
+            return unidecode(text).lower().strip()
+        return normalize_answer(self.solution) == normalize_answer(answer)
 
     def can_submit(self, competitor):
-        return self.level.unlocked(competitor)
+        return self.level.unlocked(competitor) and not self.correctly_submitted(competitor)
+
+    def competitor_submissions(self, competitor):
+        return self.submissions.filter(competitor=competitor)
 
     def get_timeout(self, competitor):
         """Return timeout"""
@@ -164,8 +200,6 @@ class Competitor(models.Model):
     )
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, blank=True)  # Validators should be a list
-    current_level = models.ForeignKey(
-        Level, on_delete=models.CASCADE, null=True)
     started_at = models.DateTimeField(null=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
@@ -229,7 +263,7 @@ class CompetitorGroup(models.Model):
 
     @classmethod
     def get_group_from_competitor(cls, competitor: Competitor):
-        return cls.objects.get(grade=competitor.grade)
+        return cls.objects.get(grades=competitor.grade)
 
 
 class CompetitorGroupLevelSettings(models.Model):
@@ -243,9 +277,17 @@ class CompetitorGroupLevelSettings(models.Model):
         CompetitorGroup, on_delete=models.CASCADE, related_name='setting_groups')
     num_to_unlock = models.PositiveSmallIntegerField()
 
+    def is_starting_level(self) -> bool:
+        """Level je začiatočný pre danú skupinu"""
+        return self.level == self.competitor_group.start_level
+
     @classmethod
     def get_settings(cls, competitor, level):
-        return cls.objects.get(grade=competitor.grade, level=level)
+        return cls.objects.get(
+            competitor_group=CompetitorGroup.get_group_from_competitor(
+                competitor),
+            level=level
+        )
 
 
 class Payment(models.Model):
@@ -258,7 +300,8 @@ class Payment(models.Model):
         verbose_name='suma', decimal_places=2, max_digits=5)
     competitor = models.OneToOneField(Competitor, on_delete=models.CASCADE)
     invoice_code = models.CharField(max_length=100, null=True, blank=True)
-    payment_reference_number = models.CharField(max_length=32, null=True, blank=True)
+    payment_reference_number = models.CharField(
+        max_length=32, null=True, blank=True)
     paid = models.BooleanField(default=False)
 
     def create_invoice(self):

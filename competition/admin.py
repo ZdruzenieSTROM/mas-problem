@@ -34,7 +34,7 @@ class ProblemAdmin(admin.ModelAdmin):
 
 @admin.register(models.Competitor)
 class CompetitorAdmin(admin.ModelAdmin):
-    list_display = ('grade', 'school', 'current_level', 'started_at')
+    list_display = ('grade', 'school', 'started_at')
     list_filter = ('grade',)
 
 

@@ -1,25 +1,24 @@
 
-from allauth.account import signals
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from allauth.account.utils import send_email_confirmation
 from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
-from django.db.models import Count, Max, Q
+from django.db.models import Count, Max, OuterRef, Q, Subquery
 from django.dispatch import receiver
-from django.http import FileResponse
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView, ListView, UpdateView
+from django.views.generic import DetailView, FormView
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
-from .models import (Competitor, CompetitorGroup, Game, Grade, Level, Payment,
+from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
                      Problem, Submission, User)
 
 
@@ -78,9 +77,7 @@ class SignUpView(FormView):
             game=form.cleaned_data['game'],
             address=form.cleaned_data['address'],
             legal_representative=form.cleaned_data['legal_representative'],
-            phone_number=form.cleaned_data['phone_number'],
-            current_level=CompetitorGroup.objects.filter(
-                game=form.cleaned_data['game'], grades=form.cleaned_data['grade']).get().start_level,
+            phone_number=form.cleaned_data['phone_number']
         )
         send_email_confirmation(self.request, user, True)
 
@@ -125,8 +122,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
             competitor.phone_number = form.cleaned_data['phone_number']
             competitor.legal_representative = form.cleaned_data['legal_representative']
             competitor.address = form.cleaned_data['address']
-            competitor.current_level = CompetitorGroup.objects.filter(
-                game=competitor.game, grades=form.cleaned_data['grade']).get().start_level
             competitor.save()
         return super().form_valid(form)
 
@@ -137,7 +132,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
             if hasattr(self.request.user, 'competitor') else False
         )
         return context
-
 
 
 @login_required
@@ -249,14 +243,26 @@ class GameView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        competitor = self.request.user.competitor
         group = CompetitorGroup.objects.filter(
-            game=self.request.user.competitor.game, grades=self.request.user.competitor.grade).get()
+            game=competitor.game, grades=competitor.grade).get()
         context['levels'] = Level.objects.filter(
             game=self.object,
             order__gte=group.start_level.order,
             order__lte=group.end_level.order
         ).order_by('order')
-        context['competitor'] = self.request.user.competitor
+        for level in context['levels']:
+            level.problems_with_submissions = []
+            for problem in level.problems.all():
+                problem.competitor_submissions = problem.submission_set.filter(
+                    competitor=competitor).order_by('-submitted_at')
+                level.problems_with_submissions.append(problem)
+        context['competitor'] = competitor
+        if 'level' in self.request.GET:
+            context['show_level'] = Level.objects.get(
+                pk=int(self.request.GET['level']))
+        else:
+            context['show_level'] = context['levels'][0]
         return context
 
 
@@ -281,12 +287,14 @@ def game_redirect(game, competitor):
 class ProblemView(LoginRequiredMixin, DetailView):
     model = Problem
 
-    def post(self):
+    def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
         competitor = self.request.user.competitor
-        if not self.can_submit(competitor):
-            raise
-        answer = ''
+        self.object = self.get_object()
+        if not self.object.can_submit(competitor):
+            return HttpResponseForbidden()
+        answer = self.request.POST['answer']
+
         Submission.objects.create(
             problem=self.object,
             competitor=competitor,
@@ -294,10 +302,7 @@ class ProblemView(LoginRequiredMixin, DetailView):
             submitted_at=now(),
             correct=self.object.check_answer(answer)
         )
-        if Level.objects.get(previous_level=self.object.level).unlocked(competitor):
-            competitor.current_level = max(
-                competitor.current_level, self.object.level+1)
-        return redirect('competition:game')
+        return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
 
 class UploadGameView():
@@ -311,7 +316,7 @@ class ResultView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.object.start < now() and self.object.end > now():
+        if (self.object.start < now() and self.object.end > now()) and not self.object.results_public:
             return context
         result_groups = self.object.result_groups.all()
         results = []
@@ -319,10 +324,14 @@ class ResultView(DetailView):
             result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
                 solved_problems=Count(
                     'submission', filter=Q(submission__correct=True)),
-
+                max_level=Subquery(
+                    Submission.objects.filter(competitor=OuterRef('pk'), correct=True).order_by(
+                        '-problem__level__order').values('problem__level__order')[:1]
+                ),
                 last_correct_submission=Max(
                     'submission__submitted_at', filter=Q(submission__correct=True))
-            ).order_by('-current_level', 'solved_problems', 'last_correct_submission')
+            ).order_by('-max_level', '-solved_problems', 'last_correct_submission')
+
             results.append(
                 {
                     'name': result_group.name,

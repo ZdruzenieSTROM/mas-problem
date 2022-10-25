@@ -3,7 +3,7 @@
 {% block title %}Poradie - {{game.name}}{% endblock %}
 
 {% block content %}
-
+{% load competition_tags %}
 <h1>Výsledky</h1>
 {% if results %}
 {% for result in results %}
@@ -24,7 +24,7 @@
         <td>{{ competitor }}</td>
         <td>{{ competitor.school }}</td>
         <td>{{ competitor.grade }}</td>
-        <td>{{ competitor.current_level.level_letter }}</td>
+        <td>{{ competitor.max_level|to_letter }}</td>
         <td>{{ competitor.solved_problems}}</td>
         <td>{%if competitor.last_correct_submission %}
             {{ competitor.last_correct_submission|date:'H:i:s' }}
