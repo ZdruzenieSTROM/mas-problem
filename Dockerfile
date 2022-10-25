@@ -1,5 +1,7 @@
 FROM python:3.8.2
 
+ARG SETTINGS_MODULE=mas_problem.settings.prod_settings
+
 EXPOSE 8000
 
 WORKDIR /app
@@ -12,7 +14,7 @@ RUN ["pip", "install", "daphne"]
 COPY . /app/
 
 # TODO: change to prod_settings after test
-ENV DJANGO_SETTINGS_MODULE mas_problem.settings.prod_settings
+ENV DJANGO_SETTINGS_MODULE SETTINGS_MODULE
 
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 
