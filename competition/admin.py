@@ -11,7 +11,7 @@ class GradeAdmin(admin.ModelAdmin):
 
 @admin.register(models.Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('name', 'start', 'registration_start',
+    list_display = ('name', 'start','end', 'registration_start',
                     'registration_end', 'results_public')
     list_filter = ('results_public',)
 
@@ -34,8 +34,9 @@ class ProblemAdmin(admin.ModelAdmin):
 
 @admin.register(models.Competitor)
 class CompetitorAdmin(admin.ModelAdmin):
-    list_display = ('grade', 'school', 'started_at')
+    list_display = ('first_name','last_name','grade', 'school', 'started_at')
     list_filter = ('grade',)
+    search_fields = ('first_name','last_name')
 
 
 @admin.register(models.Submission)
