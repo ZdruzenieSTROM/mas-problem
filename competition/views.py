@@ -263,6 +263,8 @@ class GameView(LoginRequiredMixin, DetailView):
                 pk=int(self.request.GET['level']))
         else:
             context['show_level'] = context['levels'][0]
+        context['endDateTimeString'] = (competitor.started_at +
+                                        competitor.game.max_session_duration).isoformat()
         return context
 
 
