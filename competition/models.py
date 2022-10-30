@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Optional
 
 from django.contrib.auth import get_user_model
@@ -168,14 +169,24 @@ class Problem(models.Model):
         return normalize_answer(self.solution) == normalize_answer(answer)
 
     def can_submit(self, competitor):
-        return self.level.unlocked(competitor) and not self.correctly_submitted(competitor)
+        return (
+            self.level.unlocked(competitor)
+            and not self.correctly_submitted(competitor)
+            and not self.competitor_timeout(competitor) > timedelta(0)
+        )
 
     def competitor_submissions(self, competitor):
         return self.submissions.filter(competitor=competitor)
 
     def get_timeout(self, competitor):
         """Return timeout"""
-        return
+        submission = self.competitor_submissions(competitor).filter(
+            correct=False, is_submitted_as_unlock_code=False)
+        if submission.count() < 3:
+            return timedelta(0)
+        time_of_last_submission = submission.order_by(
+            '-submitted_at')[0].submitted_at
+        return time_of_last_submission + timedelta(seconds=60) - now()
 
     def __str__(self):
         return self.text
