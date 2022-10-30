@@ -10,16 +10,15 @@ body {
 .footer {
     position: absolute;
     bottom: 0;
-    height: 6vh;
+    min-height: fit-content;
     width: 100%;
     background-color: black;
     color: #9d9d9d;
     text-align: center;
-    line-height: 6vh;
 }
 
 .content {
-    padding: 0 10% 0 10%;
+    padding: 0 10% 10% 10%;
 }
 
 .logo {
@@ -54,6 +53,20 @@ body {
 
 .main-link:visited {
     color: #555555;
+    text-decoration: none;
+}
+
+.secondary-link {
+    color: #666666;
+}
+
+.secondary-link:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.secondary-link:visited {
+    color: #666666;
     text-decoration: none;
 }
 
@@ -171,8 +184,12 @@ tr:nth-child(even) {
 }
 
 @media screen and (max-width: 768px) {
+    .footer {
+        font-size: 1rem;
+    }
+
     .content {
-        padding: 0 5% 5% 5%;
+        padding: 0 5% 25% 5%;
     }
 
     .logo {
@@ -202,6 +219,12 @@ tr:nth-child(even) {
 
     h3 {
         font-size: 20px
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .footer {
+        display: none;
     }
 }
 
