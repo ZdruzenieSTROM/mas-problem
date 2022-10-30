@@ -20,7 +20,7 @@ def level_unlocked(level,competitor):
 
 @register.simple_tag
 def get_timeout(problem,competitor):
-    return problem.get_timeout(competitor)
+    return now() + problem.get_timeout(competitor)
 
 @register.filter
 def to_letter(level_number):

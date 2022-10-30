@@ -172,16 +172,15 @@ class Problem(models.Model):
         return (
             self.level.unlocked(competitor)
             and not self.correctly_submitted(competitor)
-            and not self.competitor_timeout(competitor) > timedelta(0)
+            and not self.get_timeout(competitor) > timedelta(0)
         )
 
     def competitor_submissions(self, competitor):
-        return self.submissions.filter(competitor=competitor)
+        return self.submission_set.filter(competitor=competitor)
 
     def get_timeout(self, competitor):
         """Return timeout"""
-        submission = self.competitor_submissions(competitor).filter(
-            correct=False, is_submitted_as_unlock_code=False)
+        submission = self.submission_set.filter(competitor=competitor,correct=False)
         if submission.count() < 3:
             return timedelta(0)
         time_of_last_submission = submission.order_by(
