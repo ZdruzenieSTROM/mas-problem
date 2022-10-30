@@ -45,6 +45,11 @@
                 <input type="hidden" name="puzzle" value="{{problem.id}}">
                 <input type="Submit" value="Odovzdať" class="main-button" />
             </form>
+            {% else %}
+            {% get_timeout problem competitor as timeout %}
+            {% if timeout %}
+            Ďalšiu odpoveď je možné zadať o {{ timeout|date:'H:i:s' }}
+            {% endif %}
             {% endif %}
             {% for submission in problem.competitor_submissions.all %}
                 <div class="answer-alert {% if submission.correct %}success{% endif %}">
