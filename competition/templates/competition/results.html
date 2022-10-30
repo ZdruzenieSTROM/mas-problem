@@ -5,6 +5,14 @@
 {% block content %}
 {% load competition_tags %}
 <h1>Výsledky</h1>
+
+<div class="dropdown">
+    {% for game in games%}
+        <a href="{% url 'competition:results' pk=game.pk %}">{{game.name}}</a>
+      {% endfor %}
+
+</div>
+
 {% if results %}
 {% for result in results %}
 <h2>{{result.name}}</h2>

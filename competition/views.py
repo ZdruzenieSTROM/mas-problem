@@ -351,6 +351,7 @@ class ResultView(DetailView):
                 }
             )
         context['results'] = results
+        context['games'] = Game.objects.all()
         return context
 
 
