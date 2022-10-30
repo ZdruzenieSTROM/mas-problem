@@ -18,6 +18,10 @@ def can_submit(problem, competitor):
 def level_unlocked(level,competitor):
     return level.unlocked(competitor)
 
+@register.simple_tag
+def get_timeout(problem,competitor):
+    return now() + problem.get_timeout(competitor)
+
 @register.filter
 def to_letter(level_number):
     return Level.number_to_letter(level_number)
