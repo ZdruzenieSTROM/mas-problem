@@ -161,5 +161,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'noreply@strom.sk'
+SERVER_EMAIL = 'noreply@strom.sk'
 EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
 DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
+
+ADMINS = ['kovacs@strom.sk', 'michal.masrna@strom.sk']
