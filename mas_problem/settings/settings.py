@@ -149,6 +149,10 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 LOGIN_URL='competition:login'
 LOGIN_REDIRECT_URL='competition:login'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL='competition:login'
+ACCOUNT_FORMS = {
+    'reset_password': 'competition.forms.CustomResetPasswordForm',
+    'reset_password_from_key':'competition.forms.CustomResetPasswordFromKey'
+}
 
 ####### Faktury ##############
 FAKTURY_API_KEY = read_secret('faktury_api_key.txt')
