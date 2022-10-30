@@ -9,5 +9,7 @@
     {{ form.as_p }}
     <button type="submit" class="main-button">Prihlásiť</button>
 </form>
-<a href="{% url 'account_reset_password' %}">Resetovať heslo</a>
+<p class="mt-2">
+    <a href="{% url 'account_reset_password' %}" class="main-link">Obnoviť heslo</a>
+</p>
 {% endblock %}
