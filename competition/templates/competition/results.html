@@ -1,4 +1,10 @@
 {% extends "competition/base.html" %}
+{% block header %}
+{% load static %}
+<script src="{% static 'competition/results.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'competition/results.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
 
 {% block title %}Poradie - {{game.name}}{% endblock %}
 
@@ -7,10 +13,15 @@
 <h1>Výsledky</h1>
 
 <div class="dropdown">
-    {% for game in games%}
-        <a href="{% url 'competition:results' pk=game.pk %}">{{game.name}}</a>
-      {% endfor %}
-
+    <button class="dropdown__button main-button" onclick="toggle()">
+        {{game.name}}
+        <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="dropdown-content" id="dropdown-content">
+        {% for game in games %}
+            <a href="{% url 'competition:results' pk=game.pk %}">{{game.name}}</a>
+        {% endfor %}
+    </div>
 </div>
 
 {% if results %}
@@ -42,6 +53,6 @@
 </table>
 {% endfor %}
 {% else %}
-Súťaž práve prebieha. Výsledky budú zverejnené po súťaži.
+<p class="mt-2">Súťaž práve prebieha. Výsledky budú zverejnené po súťaži.</p>
 {% endif %}
 {% endblock %}
