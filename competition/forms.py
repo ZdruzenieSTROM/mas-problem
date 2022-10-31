@@ -71,7 +71,7 @@ class RegisterForm(forms.Form):
         password2 = self.cleaned_data.get('password2')
 
         if not password2:
-            raise forms.ValidationError("Musíte potvrdiť svoje heslo")
+            raise forms.ValidationError("Je potrebné potvrdiť heslo")
         if password1 != password2:
             raise forms.ValidationError("Heslá sa musia zhodovať")
         return password2

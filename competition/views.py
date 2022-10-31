@@ -144,7 +144,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(
-                request, 'Heslo bolo zmenené!')
+                request, 'Heslo bolo zmenené.')
             return redirect('competition:change-password')
         messages.error(request, 'Chyba pri zmene hesla')
     else:
