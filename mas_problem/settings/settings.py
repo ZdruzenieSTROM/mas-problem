@@ -73,7 +73,7 @@ ROOT_URLCONF = 'mas_problem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates', 'allauth' )],
+        'DIRS': [os.path.join(BASE_DIR, 'templates', 'allauth')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'mas_problem.wsgi.application'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-     'allauth.account.auth_backends.AuthenticationBackend'
+    'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
 # Database
@@ -142,16 +142,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ####### Allauth #############
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_CONFIRM_EMAIL_ON_GET=True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_PREVENT_ENUMERATION = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-LOGIN_URL='competition:login'
-LOGIN_REDIRECT_URL='competition:login'
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL='competition:login'
+LOGIN_URL = 'competition:login'
+LOGIN_REDIRECT_URL = 'competition:login'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'competition:login'
 ACCOUNT_FORMS = {
     'reset_password': 'competition.forms.CustomResetPasswordForm',
-    'reset_password_from_key':'competition.forms.CustomResetPasswordFromKey'
+    'reset_password_from_key': 'competition.forms.CustomResetPasswordFromKey'
 }
 
 ####### Faktury ##############

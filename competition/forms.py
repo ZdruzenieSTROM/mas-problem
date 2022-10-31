@@ -1,4 +1,7 @@
 from allauth.account.forms import ResetPasswordForm, ResetPasswordKeyForm
+from allauth.account.utils import filter_users_by_email
+from allauth.account.adapter import get_adapter
+from allauth.account import app_settings
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.forms import ValidationError
@@ -89,11 +92,23 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['old_password'].widget = forms.PasswordInput(
             attrs={'autofocus': True, 'class': 'main-input'})
 
+
 class CustomResetPasswordForm(ResetPasswordForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['email'].label = 'Email'
         self.fields['email'].widget.attrs['placeholder'] = 'Email'
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        email = get_adapter().clean_email(email)
+        self.users = filter_users_by_email(email, is_active=True)
+        if not self.users and not app_settings.PREVENT_ENUMERATION:
+            raise forms.ValidationError(
+                ("Na tento email nie je registrovaný žiaden účet alebo tento email ešte nebol potvrdený.")
+            )
+        return self.cleaned_data["email"]
+
 
 class CustomResetPasswordFromKey(ResetPasswordKeyForm):
     def __init__(self, *args, **kwargs):
@@ -102,6 +117,7 @@ class CustomResetPasswordFromKey(ResetPasswordKeyForm):
         self.fields['password2'].label = 'Nové heslo (znova)'
         self.fields['password1'].widget.attrs['placeholder'] = 'Nové heslo'
         self.fields['password2'].widget.attrs['placeholder'] = 'Nové heslo (znova)'
+
 
 class AuthForm(AuthenticationForm):
     """Lokalizovaný prihlasovací formulár"""
