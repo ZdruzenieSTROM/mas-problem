@@ -129,7 +129,8 @@ class EditProfileView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['payment'] = (
             self.request.user.competitor.payment
-            if hasattr(self.request.user, 'competitor') else False
+            if hasattr(self.request.user, 'competitor')
+            and hasattr(self.request.user.competitor, 'payment') else False
         )
         return context
 
@@ -143,7 +144,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(
-                request, 'Heslo bolo zmenené!')
+                request, 'Heslo bolo zmenené.')
             return redirect('competition:change-password')
         messages.error(request, 'Chyba pri zmene hesla')
     else:
@@ -263,6 +264,8 @@ class GameView(LoginRequiredMixin, DetailView):
                 pk=int(self.request.GET['level']))
         else:
             context['show_level'] = context['levels'][0]
+        context['endDateTimeString'] = (competitor.started_at +
+                                        competitor.game.max_session_duration).isoformat()
         return context
 
 
@@ -328,12 +331,13 @@ class ResultView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['games'] = Game.objects.all()
         if (self.object.start < now() and self.object.end > now()) and not self.object.results_public:
             return context
         result_groups = self.object.result_groups.all()
         results = []
         for result_group in result_groups:
-            result = self.object.competitor_set.filter(grade__in=result_group.grades.all()).annotate(
+            result = self.object.competitor_set.filter(grade__in=result_group.grades.all(), user__is_active=True).annotate(
                 solved_problems=Count(
                     'submission', filter=Q(submission__correct=True)),
                 max_level=Subquery(
@@ -342,7 +346,7 @@ class ResultView(DetailView):
                 ),
                 last_correct_submission=Max(
                     'submission__submitted_at', filter=Q(submission__correct=True))
-            ).order_by('-max_level', '-solved_problems', 'last_correct_submission')
+            ).order_by('-max_level', '-solved_problems', 'last_correct_submission', 'grade')
 
             results.append(
                 {

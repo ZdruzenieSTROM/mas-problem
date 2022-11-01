@@ -1,12 +1,7 @@
 {% extends "competition/base.html" %}
 {% block header %}
-<script>
-    MathJax = {
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']]
-        }
-    };
-</script>
+{% load static %}
+<script src="{% static 'competition/game.js' %}"></script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 {% load competition_tags %}
@@ -16,17 +11,19 @@
 {% block content %}
 
 <div class="tab">
-    {% for level in levels %}
-    {% level_unlocked level competitor as unlocked %}
-    
-    <button class="tablinks" {% if unlocked %} onclick="openLevel(event, 'level-{{level.order}}')" {% endif %}>
-        Úroveň {{level.level_letter}} <br>
-        ({% number_of_solved level competitor %}/{{level.problems.count}})
-        {% if not unlocked %}
-        <i class="icon-lock"></i>
-        {% endif %}
-    </button>
-    {% endfor %}
+    <div class="tab__buttons">    
+        {% for level in levels %}
+            {% level_unlocked level competitor as unlocked %}        
+            <button class="tablinks" {% if unlocked %} onclick="openLevel(event, 'level-{{level.order}}')" {% endif %}>
+                Úroveň {{level.level_letter}} <br>
+                ({% number_of_solved level competitor %}/{{level.problems.count}})
+                {% if not unlocked %}
+                <i class="icon-lock"></i>
+                {% endif %}
+            </button>
+        {% endfor %}
+    </div>
+    <div id="countdown"></div>
 </div>
 {% for level in levels %}
     {% level_unlocked level competitor as unlocked %}
@@ -45,6 +42,11 @@
                 <input type="hidden" name="puzzle" value="{{problem.id}}">
                 <input type="Submit" value="Odovzdať" class="main-button" />
             </form>
+            {% else %}
+            {% get_timeout problem competitor as timeout %}
+            {% if timeout %}
+            Ďalšiu odpoveď je možné zadať o {{ timeout|date:'H:i:s' }}
+            {% endif %}
             {% endif %}
             {% for submission in problem.competitor_submissions.all %}
                 <div class="answer-alert {% if submission.correct %}success{% endif %}">
@@ -58,6 +60,8 @@
     {% endif %}
 {% endfor %}
 <script>
-    openLevel(event, 'level-{{show_level.order}}')
+    openLevel(event, 'level-{{show_level.order}}')  // this has to be a part of the html template to use context
+    var countdownTime = new Date('{{ endDateTimeString }}').getTime();  // this has to be a part of the html template to use context
+    setCountdown();
 </script>
 {% endblock %}
