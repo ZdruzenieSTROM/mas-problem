@@ -3,7 +3,7 @@
 {% block title %}{{game.name}}{% endblock %}
 
 {% block content %}
-<p class="fs-2">Súťaž je možné spustiť. Ak si pripravený, stlač tlačidlo a hra sa pre teba začne. Veľa šťastia!</p>
+<p class="fs-2">Súťaž je možné spustiť. Ak chceš začať súťažiť, stlač tlačidlo a hra sa pre teba začne. Veľa šťastia!</p>
 <form method="post">
     {% csrf_token %} <!-- no idea if we need this -->
     <button class="main-button">Spustiť hru</button>
