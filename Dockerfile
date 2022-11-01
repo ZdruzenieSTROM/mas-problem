@@ -14,7 +14,7 @@ RUN ["pip", "install", "daphne"]
 COPY . /app/
 
 # TODO: change to prod_settings after test
-ENV DJANGO_SETTINGS_MODULE SETTINGS_MODULE
+ENV DJANGO_SETTINGS_MODULE=$SETTINGS_MODULE
 
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 
