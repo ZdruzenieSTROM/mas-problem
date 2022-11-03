@@ -33,21 +33,21 @@
         {% for problem in level.problems_with_submissions %}
             <div class="mt-4">
             {{problem.text}}
-            {%can_submit problem competitor as can_competitor_submit%}
+            {% can_submit problem competitor as can_competitor_submit %}
             {% if can_competitor_submit %}
-            <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
-                {% csrf_token %}
+                <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
+                    {% csrf_token %}
 
-                <input type="text" id="answer{{problem.id}}" name="answer" class="main-input mb-2">
-                <input type="hidden" name="puzzle" value="{{problem.id}}">
-                <input type="Submit" value="Odovzdať" class="main-button" />
-            </form>
+                    <input type="text" id="answer{{problem.id}}" name="answer" class="main-input mb-2">
+                    <input type="hidden" name="puzzle" value="{{problem.id}}">
+                    <input type="Submit" value="Odovzdať" class="main-button" />
+                </form>
             {% else %}
-            {% has_timeout problem competitor as competitor_has_timeout %}
-            {% if competitor_has_timeout %}
-            {% get_timeout problem competitor as timeout %}
-            Ďalšiu odpoveď je možné zadať o {{ timeout|date:'H:i:s' }}
-            {% endif %}
+                {% has_timeout problem competitor as competitor_has_timeout %}
+                {% if competitor_has_timeout %}
+                {% get_timeout problem competitor as timeout %}
+                    Ďalšiu odpoveď je možné zadať o {{ timeout|date:'H:i:s' }}
+                {% endif %}
             {% endif %}
             {% for submission in problem.competitor_submissions.all %}
                 <div class="answer-alert {% if submission.correct %}success{% endif %}">
