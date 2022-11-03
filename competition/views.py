@@ -294,17 +294,16 @@ class ProblemView(LoginRequiredMixin, DetailView):
         """Odovzdanie úlohy"""
         competitor = self.request.user.competitor
         self.object = self.get_object()
-        if not self.object.can_submit(competitor):
-            return HttpResponseForbidden()
-        answer = self.request.POST['answer']
+        if self.object.can_submit(competitor):
+            answer = self.request.POST['answer']
 
-        Submission.objects.create(
-            problem=self.object,
-            competitor=competitor,
-            competitor_answer=answer,
-            submitted_at=now(),
-            correct=self.object.check_answer(answer)
-        )
+            Submission.objects.create(
+                problem=self.object,
+                competitor=competitor,
+                competitor_answer=answer,
+                submitted_at=now(),
+                correct=self.object.check_answer(answer)
+            )
         return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
 
