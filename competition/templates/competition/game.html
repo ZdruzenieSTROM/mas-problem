@@ -43,8 +43,9 @@
                 <input type="Submit" value="Odovzdať" class="main-button" />
             </form>
             {% else %}
+            {% has_timeout problem competitor as competitor_has_timeout %}
+            {% if competitor_has_timeout %}
             {% get_timeout problem competitor as timeout %}
-            {% if timeout %}
             Ďalšiu odpoveď je možné zadať o {{ timeout|date:'H:i:s' }}
             {% endif %}
             {% endif %}

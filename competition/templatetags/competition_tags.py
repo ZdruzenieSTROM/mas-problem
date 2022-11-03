@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import template
 from django.utils.timezone import now
 
@@ -21,6 +23,10 @@ def level_unlocked(level,competitor):
 @register.simple_tag
 def get_timeout(problem,competitor):
     return now() + problem.get_timeout(competitor)
+
+@register.simple_tag
+def has_timeout(problem,competitor):
+    return problem.get_timeout(competitor) > timedelta(0)
 
 @register.filter
 def to_letter(level_number):
