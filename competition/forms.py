@@ -91,6 +91,17 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['old_password'].label = 'Staré heslo'
         self.fields['old_password'].widget = forms.PasswordInput(
             attrs={'autofocus': True, 'class': 'main-input'})
+        self.fields['new_password1'].label = 'Nové heslo'
+        self.fields['new_password1'].widget = forms.PasswordInput(
+            attrs={'class': 'main-input'})
+        self.fields['new_password2'].label = 'Nové heslo (znova)'
+        self.fields['new_password2'].widget = forms.PasswordInput(
+            attrs={'class': 'main-input'})
+
+        self.error_messages = {
+            "password_incorrect": "Zadané heslo bolo nesprávne",
+            "password_mismatch": "Heslá sa musia zhodovať"
+        }
 
 
 class CustomResetPasswordForm(ResetPasswordForm):
