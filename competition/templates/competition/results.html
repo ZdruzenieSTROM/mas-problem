@@ -46,7 +46,7 @@
         <td>{{ competitor.max_level|to_letter }}</td>
         <td>{{ competitor.solved_problems}}</td>
         <td>{%if competitor.last_correct_submission %}
-            {{ competitor.last_correct_submission|date:'H:i:s' }}
+            {{ competitor.last_correct_submission|format_timedelta }}
             {% else%}-{%endif%}</td>
     </tr>
     {% endfor %}
