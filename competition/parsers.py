@@ -17,7 +17,7 @@ class CompetitionParser:
 
 class MasProblemUntil2021Parse(CompetitionParser):
 
-    def parse():
+    def parse(self):
         text = super().parse()
         problems = re.findall(r'(\\. .*)', text)
         levels = {}
@@ -59,3 +59,5 @@ class MasProblemCurrentParser(CompetitionParser):
                     'results': results
                 }
             )
+        return levels
+
