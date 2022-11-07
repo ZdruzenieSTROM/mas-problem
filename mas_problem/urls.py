@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
+from django.views.static import serve
 
 from competition.views import LoginFormView
 
@@ -34,7 +35,7 @@ urlpatterns = [
 # if settings.DEBUG:
 #     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # else:
-# urlpatterns.append(
-#             path(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
-#              )
+urlpatterns.append(
+            re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+             )
 handler404 = 'competition.views.view_404'
