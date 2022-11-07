@@ -156,7 +156,7 @@ class Problem(models.Model):
     level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='problems')
     text = models.TextField()
-    image_filename = models.CharField(max_length=255, null=True)
+    image = models.ImageField(null=True,blank=True)
     solution = models.CharField(max_length=25)
 
     def correctly_submitted(self, competitor):
