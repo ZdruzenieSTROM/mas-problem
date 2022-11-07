@@ -207,7 +207,8 @@ class GameReadyView(LoginRequiredMixin, DetailView):
         return game_redirect(self.object, competitor)
 
     def post(self, request, *args, **kwargs):
-        self.request.user.competitor.start()
+        if not self.request.user.competitor.started():
+            self.request.user.competitor.start()
         return game_redirect(self.get_object(), self.request.user.competitor)
 
 
