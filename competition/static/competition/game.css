@@ -151,6 +151,10 @@ tr:nth-child(even) {
     accent-color: black;
 }
 
+.problem-image {
+    max-height: 200px;
+}
+
 .mb-2 {
     margin-bottom: 0.5rem;
 }
