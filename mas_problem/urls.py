@@ -30,6 +30,7 @@ urlpatterns = [
     ),
     path('login',LoginFormView.as_view(),name='account_login')
 ]
-if settings.DEBUG:
-     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# TODO: Not serve in production
+# if settings.DEBUG:
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 handler404 = 'competition.views.view_404'
