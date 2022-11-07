@@ -12,7 +12,6 @@ from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
 from django.db.models import Count, F, Max, OuterRef, Q, Subquery
 from django.dispatch import receiver
-from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
@@ -202,7 +201,7 @@ class GameReadyView(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         competitor = self.request.user.competitor
-        if self.object.is_active() and not competitor.started():
+        if self.object.is_active() and not competitor.started() and competitor.paid:
             response = super().get(request, *args, **kwargs)
             return response
         return game_redirect(self.object, competitor)
@@ -266,13 +265,19 @@ class GameView(LoginRequiredMixin, DetailView):
                 pk=int(self.request.GET['level']))
         else:
             context['show_level'] = context['levels'][0]
+        # TODO: Naming convension
         context['endDateTimeString'] = (competitor.started_at +
                                         competitor.game.max_session_duration).isoformat()
         return context
 
+@login_required
+def not_paid(request):
+    return render(request,'competition/not_paid.html')
 
 # This should probably be defined in another file
 def game_redirect(game, competitor):
+    if not competitor.paid:
+        return redirect('competition:not-paid')
     if now() < game.start:
         # Pred začatím hry
         return redirect('competition:before-game', pk=game.pk)

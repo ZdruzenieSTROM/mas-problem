@@ -235,6 +235,10 @@ class Competitor(models.Model):
             'o_name': f'{self.first_name} {self.last_name}',
             'o_email': self.user.email,
         }
+    
+    @property
+    def paid(self):
+        return hasattr(self, 'payment') and self.payment.paid
 
 
 class Submission(models.Model):
