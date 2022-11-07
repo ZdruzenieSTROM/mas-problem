@@ -131,3 +131,5 @@ dmypy.json
 
 .secrets/*
 !.secrets/.gitkeep
+media/*
+!media/.gitkeep
