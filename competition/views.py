@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from allauth.account.utils import send_email_confirmation
@@ -8,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
-from django.db.models import Count, Max, OuterRef, Q, Subquery
+from django.db.models import Count, Max, OuterRef, Q, F, Subquery
 from django.dispatch import receiver
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
@@ -343,8 +344,8 @@ class ResultView(DetailView):
                     Submission.objects.filter(competitor=OuterRef('pk'), correct=True).order_by(
                         '-problem__level__order').values('problem__level__order')[:1]
                 ),
-                last_correct_submission=Max(
-                    'submission__submitted_at', filter=Q(submission__correct=True))
+                last_correct_submission=(datetime(2022, 11, 8, 0, 0, 0) + (Max(
+                    'submission__submitted_at', filter=Q(submission__correct=True)) - F('started_at')))
             ).order_by('-max_level', '-solved_problems', 'last_correct_submission', 'grade')
 
             results.append(
