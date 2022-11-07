@@ -36,3 +36,9 @@ def has_timeout(problem, competitor):
 @register.filter
 def to_letter(level_number):
     return Level.number_to_letter(level_number)
+
+@register.filter
+def format_timedelta(delta:timedelta)->str:
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
