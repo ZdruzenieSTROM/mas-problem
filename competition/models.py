@@ -102,7 +102,7 @@ class Level(models.Model):
             competitor, self)
         return level_settings.is_starting_level() or (
             self.previous_level.number_of_solved(
-                competitor) > level_settings.num_to_unlock
+                competitor) >= level_settings.num_to_unlock
             and self.game == competitor.game
         )
 
@@ -156,6 +156,7 @@ class Problem(models.Model):
     level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='problems')
     text = models.TextField()
+    image = models.ImageField(null=True,blank=True)
     solution = models.CharField(max_length=25)
 
     def correctly_submitted(self, competitor):
@@ -180,7 +181,8 @@ class Problem(models.Model):
 
     def get_timeout(self, competitor):
         """Return timeout"""
-        submission = self.submission_set.filter(competitor=competitor,correct=False)
+        submission = self.submission_set.filter(
+            competitor=competitor, correct=False)
         if submission.count() < 3:
             return timedelta(0)
         time_of_last_submission = submission.order_by(

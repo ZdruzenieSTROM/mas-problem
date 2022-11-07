@@ -34,12 +34,18 @@
             <div class="mt-4">
             {{ problem.text }}
 
+            {% if problem.image %}
+                <div class="problem-image-container">
+                    <img class="problem-image mt-2 mb-2" alt="{{ problem.image.url }}" src="{{ problem.image.url }}"/>
+                </div>
+            {% endif %}
+
             {% correctly_submitted problem competitor as correctly_submitted %}
             {% if not correctly_submitted %}
-                <form action="{% url 'competition:problem' pk=problem.id %}" method="post">
+                <form class="mt-2 mb-2" action="{% url 'competition:problem' pk=problem.id %}" method="post">
                     {% csrf_token %}
 
-                    <input type="text" id="answer{{problem.id}}" name="answer" class="main-input mb-2">
+                    <input type="text" id="answer{{problem.id}}" name="answer" class="main-input">
                     <input type="hidden" name="puzzle" value="{{problem.id}}">
                     <input type="Submit" value="Odovzdať" class="main-button" />
                 </form>
