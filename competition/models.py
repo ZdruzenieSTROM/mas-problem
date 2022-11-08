@@ -213,7 +213,7 @@ class Competitor(models.Model):
     )
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, blank=True)  # Validators should be a list
-    started_at = models.DateTimeField(null=True)
+    started_at = models.DateTimeField(null=True,blank=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
 
