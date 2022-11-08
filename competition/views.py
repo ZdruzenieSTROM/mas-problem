@@ -339,7 +339,7 @@ class ResultView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['games'] = Game.objects.all()
-        if (self.object.start < now() and self.object.end > now()) and not self.object.results_public:
+        if self.object.start < now() and not self.object.results_public:
             return context
         result_groups = self.object.result_groups.all()
         results = []
