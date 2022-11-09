@@ -70,7 +70,7 @@ class Game(models.Model):
         return game
 
     def number_of_participants(self):
-        return self.competitor_set.count()
+        return self.competitor_set.filter(started_at__isnull=False).count()
 
     def get_finish_time(self, competitor):
         """Čas kedy musí hráč hru ukončiť"""
@@ -193,6 +193,10 @@ class Problem(models.Model):
             '-submitted_at')[0].submitted_at
         return time_of_last_submission + timedelta(seconds=60) - now()
 
+    def average_correct_submission(self):
+        correct_submissions = self.submissions.filter(correct=True).all()
+        return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
+
     def __str__(self):
         return self.text
 
@@ -256,6 +260,9 @@ class Submission(models.Model):
     competitor_answer = models.CharField(max_length=25)
     submitted_at = models.DateTimeField()
     correct = models.BooleanField()
+
+    def time_after_start(self):
+        return self.submitted_at-self.competitor.started_at
 
 
 class ResultGroup(models.Model):
