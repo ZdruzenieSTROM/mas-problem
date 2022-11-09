@@ -46,6 +46,7 @@ class Game(models.Model):
     results_public = models.BooleanField(default=False)
     price = models.DecimalField(
         verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
+    publication = models.FileField(null=True,blank=True)
 
     def create_game(levels):
         game = Game.objects.create(
@@ -67,6 +68,9 @@ class Game(models.Model):
                 )
 
         return game
+
+    def number_of_participants(self):
+        return self.competitor_set.count()
 
     def get_finish_time(self, competitor):
         """Čas kedy musí hráč hru ukončiť"""
