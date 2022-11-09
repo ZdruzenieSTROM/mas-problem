@@ -10,12 +10,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db import IntegrityError
-from django.db.models import Count, F, Max, OuterRef, Q, Subquery
+from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
+                              OuterRef, Q, Subquery)
+from django.db.models.functions import Cast
 from django.dispatch import receiver
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView
+from django.views.generic import DetailView, FormView, ListView
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
@@ -318,6 +320,31 @@ class ProblemView(LoginRequiredMixin, DetailView):
 class UploadGameView():
     pass
 
+# class GameStatisticsView(DetailView):
+#     """Štatistika hry"""
+#     model = Game
+#     template_name = 'competition/game_statistics.html'
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['problems'] = Problem.objects.filter(
+#             level__game=self.object
+#         ).annotate(
+#             num_correctly_submitted=Count('submissions',filter=Q(submissions__correct=True)),
+#             average_time=Count('submissions',filter=Q(submissions__correct=True))/Count('submissions')
+
+#         )
+#         context['grades'] = Competitor.objects.filter(started_at__isnull=False).values('grade').annotate(
+#             correct=Count('submissions',filter=Q(submissions__correct=True),output_filed=FloatField()),
+#             competitors=Count('pk',output_filed=FloatField())
+#         )
+#         return context
+
+class ArchiveView(ListView):
+    model=Game
+    template_name='competition/archive.html'
+    context_object_name = 'games'
+    queryset = Game.objects.filter(results_public=True).order_by('-end')
 
 class ResultView(DetailView):
     """Náhľad súťaže"""

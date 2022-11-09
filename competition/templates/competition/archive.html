@@ -1,0 +1,27 @@
+{% extends "competition/base.html" %}
+
+{% block title %}Archív{% endblock %}
+
+{% block content %}
+<h1>Minulé ročníky</h1>
+<table>
+    <tr>
+        <th>Ročník</th>
+        <th>Zadania a riešenia</th>
+        <th>Výsledky</th>
+        <!-- <th>Štatistiky úloh</th> -->
+        <th>Počet riešiteľov</th>
+    </tr>
+    {% for game in games %}
+    <tr>
+        <td>{{ game.name }}</td>
+        <td>{%if game.publication %}<a href="{{ game.publication.url}}">Zadania a riešenia</a>{% else %}-{% endif %}</td>
+        <td><a href="{% url 'competition:results' pk=game.pk %}">Výsledky</a></td>
+        <!-- <td><a href="">Štatistiky</a></td> -->
+        <td>{{game.number_of_participants}}</td>
+
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
