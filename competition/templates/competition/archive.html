@@ -17,7 +17,7 @@
         <td>{{ game.name }}</td>
         <td>{%if game.publication %}<a href="{{ game.publication.url}}">Zadania a riešenia</a>{% else %}-{% endif %}</td>
         <td><a href="{% url 'competition:results' pk=game.pk %}">Výsledky</a></td>
-        <!-- <td><a href="{% url 'competition:statistics' pk=game.pk %}">Štatistiky</a></td> -->
+        <!-- <td><a href="">Štatistiky</a></td> -->
         <td>{{game.number_of_participants}}</td>
 
     </tr>
