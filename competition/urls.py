@@ -16,6 +16,8 @@ urlpatterns = [
          views.GameFinishedView.as_view(), name='game-finished'),
     path('po-hre/<int:pk>', views.AfterGameView.as_view(), name='after-game'),
     path('neuhradene',views.not_paid,name='not-paid'),
+    path('archiv',views.ArchiveView.as_view(),name='archive'),
+#     path('statistiky/<int:pk>',views.GameStatisticsView.as_view(),name='statistics'),
     path('sutaz', views.GameView.as_view(), name='game'),
     path('vysledky/<int:pk>', views.ResultView.as_view(), name='results'),
     path('aktualne-vysledky', views.CurrentResultView.as_view(),
