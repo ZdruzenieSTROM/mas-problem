@@ -1,0 +1,18 @@
+{% extends "competition/base.html" %}
+
+{% block title %}{{game.name}}{% endblock %}
+
+{% block content %}
+<h1>Súťaž sa skončila.</h1>
+{% for certificate in certificates %}
+{{certificate}}<br>
+{% endfor %}
+<form action="{% url 'competition:certificates' pk=1 %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" id="myFile" name="filename">
+    {% for id in user_ids %}
+        <input hidden type="text" name="competitor_ids" value="{{id}}">
+    {% endfor %}
+    <input type="submit">
+  </form>
+{% endblock %}
