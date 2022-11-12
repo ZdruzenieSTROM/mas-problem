@@ -16,6 +16,8 @@ COPY . /app/
 # TODO: change to prod_settings after test
 ENV DJANGO_SETTINGS_MODULE=$SETTINGS_MODULE
 
+RUN ["python", "manage.py", "migrate"]
+
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "mas_problem.asgi:application"]
