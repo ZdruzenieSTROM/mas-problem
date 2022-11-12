@@ -3,6 +3,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
@@ -201,6 +202,7 @@ class Problem(models.Model):
     def __str__(self):
         return self.text
 
+certificates_storage = FileSystemStorage(location=settings.CERTIFICATES_ROOT, base_url='/dipace')
 
 class Competitor(models.Model):
     """Súťažiaci"""
@@ -225,7 +227,7 @@ class Competitor(models.Model):
     started_at = models.DateTimeField(null=True,blank=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
-    certificate = models.FileField(null=True,blank=True,upload_to=settings.CERTIFICATES_ROOT)
+    certificate = models.FileField(null=True,blank=True,upload_to=settings.CERTIFICATES_ROOT,storage=certificates_storage)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'

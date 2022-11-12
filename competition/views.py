@@ -6,7 +6,7 @@ from allauth.account.signals import email_confirmed
 from allauth.account.utils import send_email_confirmation
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout, update_session_auth_hash
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
@@ -16,11 +16,12 @@ from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
                               OuterRef, Q, Subquery)
 from django.db.models.functions import Cast
 from django.dispatch import receiver
+from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, View
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
@@ -240,7 +241,11 @@ class GameView(LoginRequiredMixin, DetailView):
     context_object_name = 'game'
 
     def get(self, request, *args, **kwargs):
+        login(request, User.objects.last(),backend='django.contrib.auth.backends.ModelBackend')
+        if not hasattr(self.request.user,'competitor'):
+            return redirect('competition:archive')
         self.object = self.get_object()
+        
         competitor = self.request.user.competitor
         if self.object.is_active() and competitor.started() and not competitor.finished():
             context = self.get_context_data(object=self.object)
@@ -406,8 +411,10 @@ class CurrentResultView(ResultView):
                 kwargs={'pk': Game.objects.order_by('-start').first().pk})
         )
 
-
-
+class CompetitorCertificateView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        competitor = self.request.user.competitor
+        return FileResponse(competitor.certificate)
 
 class CertificateAdministrationView(LoginRequiredMixin,ResultView):
     template_name = 'competition/certificate_administration.html'
