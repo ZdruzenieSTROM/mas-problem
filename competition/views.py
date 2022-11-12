@@ -433,10 +433,11 @@ class CertificateAdministrationView(LoginRequiredMixin,ResultView):
             output = PdfFileWriter()
             output.addPage(inputpdf.getPage(i))
             competitor = Competitor.objects.get(pk=competitor_id)
-            certificate_path = f"diplom_{slugify(competitor.game)}_{competitor_id}.pdf"
-            with open(settings.,certificate_path, "wb") as outputStream:
+            certificate_name = f"diplom_{slugify(competitor.game)}_{competitor_id}.pdf"
+            certificate_path = settings.CERTIFICATES_ROOT / certificate_name
+            with open(certificate_path, "wb") as outputStream:
                 output.write(outputStream)
             with open(certificate_path, "rb") as fs:
-                competitor.certificate = File(fs,name=certificate_path)
+                competitor.certificate = File(fs,name=certificate_name)
                 competitor.save()
         
