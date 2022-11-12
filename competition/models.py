@@ -224,6 +224,7 @@ class Competitor(models.Model):
     started_at = models.DateTimeField(null=True,blank=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
+    certificate = models.FileField(null=True,blank=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
