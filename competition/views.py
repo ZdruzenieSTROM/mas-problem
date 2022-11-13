@@ -451,4 +451,6 @@ class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,Resul
             with open(certificate_path, "rb") as fs:
                 competitor.certificate = File(fs,name=certificate_name)
                 competitor.save()
+        messages.add_message(request,level=1,message='Diplomy nahraté')
+        return redirect('competition:certificates',pk=self.get_object().pk)
         
