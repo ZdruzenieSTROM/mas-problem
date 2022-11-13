@@ -255,11 +255,11 @@ class Submission(models.Model):
         verbose_name = 'Odpoveď na úlohu'
         verbose_name_plural = 'Odpovede na úlohy'
 
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
-    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
-    competitor_answer = models.CharField(max_length=25)
-    submitted_at = models.DateTimeField()
-    correct = models.BooleanField()
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE,verbose_name='Úloha')
+    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE,verbose_name='Súťažiaci')
+    competitor_answer = models.CharField(max_length=25,verbose_name='Odovzdaná odpoveď')
+    submitted_at = models.DateTimeField(verbose_name='Odovzdané o')
+    correct = models.BooleanField(verbose_name='Správne')
 
     def time_after_start(self):
         return self.submitted_at-self.competitor.started_at
