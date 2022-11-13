@@ -40,13 +40,14 @@ class Game(models.Model):
     name = models.CharField(max_length=128)
     start = models.DateTimeField()
     end = models.DateTimeField()
-    registration_start = models.DateTimeField()
-    registration_end = models.DateTimeField()
-    max_session_duration = models.DurationField()
-    results_public = models.BooleanField(default=False)
+    registration_start = models.DateTimeField(verbose_name='Začiatok registrácie')
+    registration_end = models.DateTimeField(verbose_name='Koniec registrácie')
+    max_session_duration = models.DurationField(verbose_name='Maximálny čas riešenia')
+    results_public = models.BooleanField(default=False,verbose_name='Zverejniť výsledky')
     price = models.DecimalField(
         verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
-    publication = models.FileField(null=True,blank=True)
+    publication = models.FileField(null=True,blank=True,verbose_name='Brožúra')
+    pdf_results = models.FileField(null=True,blank=True,verbose_name='PDF výsledkovka')
 
     def create_game(levels):
         game = Game.objects.create(
