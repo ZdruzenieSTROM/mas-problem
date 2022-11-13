@@ -23,6 +23,9 @@
         {% endfor %}
     </div>
 </div>
+{% if pdf_results %}
+Výsledky tohto ročníka nájdete v <a href="{{pdf_results.url}}">tomto dokumente</a>
+{% endif %}
 
 {% if results %}
 
