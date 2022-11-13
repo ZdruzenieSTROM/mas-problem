@@ -3,10 +3,7 @@
 {% block title %}{{game.name}}{% endblock %}
 
 {% block content %}
-<h1>Súťaž sa skončila.</h1>
-{% for certificate in certificates %}
-{{certificate}}<br>
-{% endfor %}
+<h1>Nahrávanie diplomov</h1>
 <form action="{% url 'competition:certificates' pk=1 %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" id="myFile" name="filename">
@@ -15,4 +12,10 @@
     {% endfor %}
     <input type="submit">
   </form>
+
+Skopíruj nasledujúci text do overleafu, pre výrobu diplomov. Vznikne jedno pdf, ktoré následne nahraj cez nahrávač vyššie.
+{% for certificate in certificates %}
+{{certificate}}<br>
+{% endfor %}
+
 {% endblock %}

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView
 from django.core.files import File
 from django.db import IntegrityError
@@ -416,8 +416,11 @@ class CompetitorCertificateView(LoginRequiredMixin,View):
         competitor = self.request.user.competitor
         return FileResponse(competitor.certificate)
 
-class CertificateAdministrationView(LoginRequiredMixin,ResultView):
+class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
     template_name = 'competition/certificate_administration.html'
+
+    def test_func(self):
+        return self.request.user.is_staff
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
