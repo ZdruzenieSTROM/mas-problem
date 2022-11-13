@@ -50,8 +50,8 @@ class Game(models.Model):
         verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
     number_of_competitor_with_certificate = models.PositiveSmallIntegerField(
         verbose_name='Počet prvých miest s diplomom s miestom',default=3)
-    publication = models.FileField(null=True,blank=True,verbose_name='Brožúra')
-    pdf_results = models.FileField(null=True,blank=True,verbose_name='PDF výsledkovka')
+    publication = models.FileField(null=True,blank=True,verbose_name='Brožúra',upload_to='public')
+    pdf_results = models.FileField(null=True,blank=True,verbose_name='PDF výsledkovka',upload_to='public')
 
     def create_game(levels):
         game = Game.objects.create(
@@ -165,7 +165,7 @@ class Problem(models.Model):
     level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='problems')
     text = models.TextField()
-    image = models.ImageField(null=True,blank=True)
+    image = models.ImageField(null=True,blank=True,upload_to='public')
     solution = models.CharField(max_length=25)
 
     def correctly_submitted(self, competitor):
@@ -205,8 +205,6 @@ class Problem(models.Model):
     def __str__(self):
         return self.text
 
-certificates_storage = FileSystemStorage(location=settings.CERTIFICATES_ROOT, base_url='/diplomy')
-
 class Competitor(models.Model):
     """Súťažiaci"""
     class Meta:
@@ -230,7 +228,7 @@ class Competitor(models.Model):
     started_at = models.DateTimeField(null=True,blank=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
-    certificate = models.FileField(null=True,blank=True,upload_to=settings.CERTIFICATES_ROOT,storage=certificates_storage)
+    certificate = models.FileField(null=True,blank=True,upload_to='diplomy')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
