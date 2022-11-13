@@ -379,6 +379,9 @@ class ResultView(DetailView):
         context['games'] = Game.objects.all()
         if self.object.start < now() and not self.object.results_public:
             return context
+        if self.object.pdf_results:
+            context['pdf_results'] = self.object.pdf_results
+            return context
         result_groups = self.object.result_groups.all()
         results = []
         for result_group in result_groups:
