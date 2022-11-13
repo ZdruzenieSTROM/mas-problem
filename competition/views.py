@@ -433,7 +433,7 @@ class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,Resul
         user_ids = []
         for results in context['results']:
             for row in results['results']:
-                if row.place>=self.object.number_of_competitor_with_certificate:
+                if row.place<=self.object.number_of_competitor_with_certificate:
                     list_of_certificates.append(r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
                 else:
                     list_of_certificates.append(r'\diplomucast{'+str(row)+r'}{'+results['name']+r'}')
