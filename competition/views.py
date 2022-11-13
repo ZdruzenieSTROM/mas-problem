@@ -430,7 +430,6 @@ class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,Resul
         user_ids = []
         for results in context['results']:
             for row in results['results']:
-                print(row)
                 list_of_certificates.append(r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
                 user_ids.append(str(row.pk))
         context['certificates'] = list_of_certificates
