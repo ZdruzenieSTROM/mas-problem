@@ -241,11 +241,7 @@ class GameView(LoginRequiredMixin, DetailView):
     context_object_name = 'game'
 
     def get(self, request, *args, **kwargs):
-        login(request, User.objects.last(),backend='django.contrib.auth.backends.ModelBackend')
-        if not hasattr(self.request.user,'competitor'):
-            return redirect('competition:archive')
         self.object = self.get_object()
-        
         competitor = self.request.user.competitor
         if self.object.is_active() and competitor.started() and not competitor.finished():
             context = self.get_context_data(object=self.object)
