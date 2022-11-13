@@ -49,6 +49,8 @@ class Game(models.Model):
     price = models.DecimalField(
         verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
     publication = models.FileField(null=True,blank=True)
+    number_of_competitor_with_certificate = models.PositiveSmallIntegerField(
+        verbose_name='Počet prvých miest s diplomom s miestom',default=3)
 
     def create_game(levels):
         game = Game.objects.create(
