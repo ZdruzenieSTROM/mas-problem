@@ -17,7 +17,7 @@ from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
 from django.db.models.functions import Cast
 from django.dispatch import receiver
 from django.http import FileResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, resolve_url
 from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
@@ -97,6 +97,12 @@ class LoginFormView(LoginView):
     authentication_form = AuthForm
     next_page = reverse_lazy('competition:game')
     template_name = 'competition/login.html'
+
+    def get_default_redirect_url(self):
+        """Return the default redirect URL."""
+        if self.request.user.is_staff:
+            return resolve_url(reverse('competition:pravidla'))
+        return super().get_default_redirect_url()
 
 
 class EditProfileView(LoginRequiredMixin, FormView):
