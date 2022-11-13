@@ -173,4 +173,4 @@ SERVER_EMAIL = 'noreply@strom.sk'
 EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
 DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
 
-ADMINS = ['kovacs@strom.sk', 'michal.masrna@strom.sk']
+ADMINS = [('Kovacs','kovacs@strom.sk'), ('Masrna','michal.masrna@strom.sk')]
