@@ -156,12 +156,14 @@ class Problem(models.Model):
     class Meta:
         verbose_name = 'Úloha'
         verbose_name_plural = 'Úlohy'
+        ordering = ['level','order']
 
     level = models.ForeignKey(
-        Level, on_delete=models.CASCADE, related_name='problems')
-    text = models.TextField()
-    image = models.ImageField(null=True,blank=True)
-    solution = models.CharField(max_length=25)
+        Level, on_delete=models.CASCADE, related_name='problems',verbose_name='Level')
+    text = models.TextField(verbose_name='Zadanie')
+    order = models.PositiveSmallIntegerField(null=True,verbose_name='Poradie úlohy v leveli')
+    image = models.ImageField(null=True,blank=True,verbose_name='Obrázok')
+    solution = models.CharField(max_length=25,verbose_name='Správna odpoveď')
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
@@ -254,6 +256,8 @@ class Submission(models.Model):
     class Meta:
         verbose_name = 'Odpoveď na úlohu'
         verbose_name_plural = 'Odpovede na úlohy'
+        ordering = ['submitted_at']
+        get_latest_by = 'submitted_at'
 
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE,verbose_name='Úloha')
     competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE,verbose_name='Súťažiaci')
