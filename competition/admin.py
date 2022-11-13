@@ -65,4 +65,4 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('competitor','payment_reference_number','paid')
     list_editable=('paid',)
     list_filter = ('paid',)
-    search_fields = ('payment_reference_number',)
+    search_fields = ('payment_reference_number','competitor__first_name','competitor__last_name')
