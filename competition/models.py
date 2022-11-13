@@ -202,7 +202,7 @@ class Problem(models.Model):
     def __str__(self):
         return self.text
 
-certificates_storage = FileSystemStorage(location=settings.CERTIFICATES_ROOT, base_url='/dipace')
+certificates_storage = FileSystemStorage(location=settings.CERTIFICATES_ROOT, base_url='/diplomy')
 
 class Competitor(models.Model):
     """Súťažiaci"""
