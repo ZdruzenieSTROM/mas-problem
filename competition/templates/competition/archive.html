@@ -24,7 +24,7 @@
             {% endif %}
         </td>
         <!-- <td><a href="">Štatistiky</a></td> -->
-        <td>{{game.number_of_participants}}</td>
+        <td>{% if not game.pdf_results %}{{game.number_of_participants}}{% endif %}</td>
 
     </tr>
     {% endfor %}
