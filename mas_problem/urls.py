@@ -37,5 +37,6 @@ urlpatterns = [
 # else:
 urlpatterns.append(
             re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT / 'public'}),
+            re_path(r'^media/public/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT / 'public'}),
              )
 handler404 = 'competition.views.view_404'
