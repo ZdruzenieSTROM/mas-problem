@@ -4,7 +4,11 @@
 
 {% block content %}
 <h1>Súťaž sa skončila.</h1>
-<p class="fs-2">Môžeš si pozrieť <a href="{% url 'competition:results' pk=game.pk %}" class="main-link">výsledky</a>. Zadania a riešenia príkladov budú zverejnené v <a href="{%% url 'competition:archive'}">Archíve</a></p>
-<p class="fs-2">Tvoj diplom si môžeš stiahnuť tu:<br>
-<a class="main-button" href="{% url 'competition:my-certificate' %}">Stiahnuť diplom</a></p>
+<p class="fs-2">Môžeš si pozrieť <a href="{% url 'competition:results' pk=game.pk %}" class="main-link">výsledky</a>. Zadania a riešenia príkladov budú zverejnené v <a href="{%% url 'competition:archive'}" class="main-link">Archíve</a>.</p>
+<p class="fs-2">Tvoj diplom si môžeš stiahnuť tu:</p>
+<a href="{% url 'competition:my-certificate' %}" target="_blank">
+    <button class="main-button">
+        Stiahnuť diplom
+    </button>
+</a>
 {% endblock %}
