@@ -16,9 +16,15 @@
     <tr>
         <td>{{ game.name }}</td>
         <td>{%if game.publication %}<a href="{{ game.publication.url}}">Zadania a riešenia</a>{% else %}-{% endif %}</td>
-        <td><a href="{% url 'competition:results' pk=game.pk %}">Výsledky</a></td>
+        <td>
+            {% if game.pdf_results %}
+            <a href="{{game.pdf_results.url}}">Výsledky</a>
+            {% else %}
+            <a href="{% url 'competition:results' pk=game.pk %}">Výsledky</a>
+            {% endif %}
+        </td>
         <!-- <td><a href="">Štatistiky</a></td> -->
-        <td>{{game.number_of_participants}}</td>
+        <td>{% if not game.pdf_results %}{{game.number_of_participants}}{% endif %}</td>
 
     </tr>
     {% endfor %}

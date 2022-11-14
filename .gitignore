@@ -133,3 +133,5 @@ dmypy.json
 !.secrets/.gitkeep
 media/*
 !media/.gitkeep
+diplomy/*
+!diplomy/.gitkeep

@@ -23,6 +23,11 @@
         {% endfor %}
     </div>
 </div>
+{% if pdf_results %}
+    <p class="mt-2">
+        Výsledky tohto ročníka nájdete v <a href="{{pdf_results.url}}" class="main-link">tomto dokumente</a>.
+    </p>
+{% else %}
 
 {% if results %}
 
@@ -61,5 +66,6 @@
 {% else %}
 <p class="mt-2">
     Súťaž práve prebieha. Výsledky budú zverejnené po súťaži.</p>
+{% endif %}
 {% endif %}
 {% endblock %}
