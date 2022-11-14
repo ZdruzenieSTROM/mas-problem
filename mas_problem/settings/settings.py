@@ -134,6 +134,8 @@ STATIC_ROOT = BASE_DIR / 'static'
 MEDIA_URL = 'media/' 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+CERTIFICATES_ROOT = BASE_DIR / 'diplomy'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -171,4 +173,4 @@ SERVER_EMAIL = 'noreply@strom.sk'
 EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
 DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
 
-ADMINS = ['kovacs@strom.sk', 'michal.masrna@strom.sk']
+ADMINS = [('Kovacs','kovacs@strom.sk'), ('Masrna','michal.masrna@strom.sk')]

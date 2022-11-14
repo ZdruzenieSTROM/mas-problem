@@ -26,4 +26,6 @@ urlpatterns = [
     path('profil', views.EditProfileView.as_view(), name='profile'),
     path('problem/<int:pk>',views.ProblemView.as_view(),name='problem'),
     path('', flatpage, {'url': '/pravidla/'}, name='pravidla'),
+    path('diplomy/<int:pk>',views.CertificateAdministrationView.as_view(),name='certificates'),
+    path('moj-diplom',view=views.CompetitorCertificateView.as_view(),name='my-certificate')
 ]

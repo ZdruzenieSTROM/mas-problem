@@ -4,20 +4,25 @@ from datetime import datetime
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from allauth.account.utils import send_email_confirmation
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout, update_session_auth_hash
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView
+from django.core.files import File
 from django.db import IntegrityError
 from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
                               OuterRef, Q, Subquery)
 from django.db.models.functions import Cast
 from django.dispatch import receiver
-from django.shortcuts import redirect, render
+from django.http import FileResponse
+from django.shortcuts import redirect, render, resolve_url
+from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, View
+from PyPDF2 import PdfFileReader, PdfFileWriter
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
@@ -92,6 +97,12 @@ class LoginFormView(LoginView):
     authentication_form = AuthForm
     next_page = reverse_lazy('competition:game')
     template_name = 'competition/login.html'
+
+    def get_default_redirect_url(self):
+        """Return the default redirect URL."""
+        if self.request.user.is_staff:
+            return resolve_url(reverse('competition:pravidla'))
+        return super().get_default_redirect_url()
 
 
 class EditProfileView(LoginRequiredMixin, FormView):
@@ -404,3 +415,48 @@ class CurrentResultView(ResultView):
                 'competition:results',
                 kwargs={'pk': Game.objects.order_by('-start').first().pk})
         )
+
+class CompetitorCertificateView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        competitor = self.request.user.competitor
+        return FileResponse(competitor.certificate)
+
+class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
+    template_name = 'competition/certificate_administration.html'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        list_of_certificates = []
+        user_ids = []
+        for results in context['results']:
+            for row in results['results']:
+                if row.place<=self.object.number_of_competitor_with_certificate:
+                    list_of_certificates.append(r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
+                else:
+                    list_of_certificates.append(r'\diplomucast{'+str(row)+r'}{'+results['name']+r'}')
+                user_ids.append(str(row.pk))
+        context['certificates'] = list_of_certificates
+        context['user_ids'] = user_ids
+        return context
+
+    def post(self, request, *args, **kwargs):
+        file = request.FILES['filename']
+        competitor_ids = request.POST.getlist('competitor_ids')
+        inputpdf = PdfFileReader(file)
+        for i, competitor_id in enumerate(competitor_ids):
+            output = PdfFileWriter()
+            output.addPage(inputpdf.getPage(i))
+            competitor = Competitor.objects.get(pk=competitor_id)
+            certificate_name = f"diplom_{slugify(competitor.game)}_{competitor_id}.pdf"
+            certificate_path = settings.CERTIFICATES_ROOT / certificate_name
+            with open(certificate_path, "wb") as outputStream:
+                output.write(outputStream)
+            with open(certificate_path, "rb") as fs:
+                competitor.certificate = File(fs,name=certificate_name)
+                competitor.save()
+        messages.add_message(request,level=1,message='Diplomy nahraté')
+        return redirect('competition:certificates',pk=self.get_object().pk)
+        
