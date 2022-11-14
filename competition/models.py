@@ -205,7 +205,10 @@ class Problem(models.Model):
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
 
     def __str__(self):
-        return self.text
+        if self.order is not None:
+            return f'{self.game} - {self.level.level_letter()} - {self.order}'
+        else:
+            return f'{self.game} - {self.level.level_letter()} - {self.text[:min(20,len(self.text))]}'
 
 class Competitor(models.Model):
     """Súťažiaci"""
