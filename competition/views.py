@@ -204,6 +204,11 @@ class AfterGameView(LoginRequiredMixin, DetailView):
             return response
         return game_redirect(self.object, competitor)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_certificate'] = self.request.user.competitor.certificate is not None
+        return context
+
 
 class GameReadyView(LoginRequiredMixin, DetailView):
     """Súťaž už začala ale užívateľ si ju ešte nespustil"""
@@ -418,8 +423,11 @@ class CurrentResultView(ResultView):
 
 class CompetitorCertificateView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
+        
         competitor = self.request.user.competitor
-        return FileResponse(competitor.certificate)
+        if competitor.certificate is not None:
+            return FileResponse(competitor.certificate)
+        return redirect('competition:after-game')
 
 class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
     template_name = 'competition/certificate_administration.html'
