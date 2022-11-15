@@ -42,7 +42,11 @@ class CompetitorAdmin(admin.ModelAdmin):
 @admin.register(models.Submission)
 class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('problem', 'competitor', 'competitor_answer', 'correct')
-    list_filter = ('correct', 'problem')
+    list_filter = ('correct', 'problem','get_game')
+
+    @admin.display(ordering='problem__level__game', description='Súťaž')
+    def get_game(self, obj):
+        return obj.problem.level.game
 
 
 @admin.register(models.ResultGroup)
