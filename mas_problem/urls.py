@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.static import serve
 
-from competition.views import LoginFormView
+from competition.views import LoginFormView, SignUpView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,7 +29,8 @@ urlpatterns = [
         allauth_views.password_reset_from_key_done,
         name="account_reset_password_from_key_done",
     ),
-    path('login',LoginFormView.as_view(),name='account_login')
+    path('login',LoginFormView.as_view(),name='account_login'),
+    path('register',SignUpView.as_view(),name='account_signup')
 ]
 # TODO: Not serve in production
 # if settings.DEBUG:
