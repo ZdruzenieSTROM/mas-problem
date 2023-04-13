@@ -1,0 +1,16 @@
+{% extends "competition/base.html" %}
+
+{% block title %}Registrácia - {{game.name}} {% endblock %}
+
+{% block content %}
+<h2>Registrácia - {{game.name}}</h2>
+Skontrolujte si údaje z vášho profilu.
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="main-button mb-2">Registrovať na {{game.name}}</button>
+</form>
+
+
+
+{% endblock %}
