@@ -26,6 +26,8 @@ urlpatterns = [
     path('profil', views.EditProfileView.as_view(), name='profile'),
     path('problem/<int:pk>',views.ProblemView.as_view(),name='problem'),
     path('', flatpage, {'url': '/pravidla/'}, name='pravidla'),
-    path('diplomy/<int:pk>',views.CertificateAdministrationView.as_view(),name='certificates'),
+    path('sprava-hry/<int:pk>',views.GameAdministrationView.as_view(),name='game-admin'),
+    path('sprava-hry',views.current_administration_view,name='current-game-admin'),
+    path('export-sutaziacich/<int:pk>',views.ExportCompetitorsView.as_view(),name='export-competitors'),
     path('moj-diplom',view=views.CompetitorCertificateView.as_view(),name='my-certificate')
 ]
