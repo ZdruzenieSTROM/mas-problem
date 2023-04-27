@@ -4,13 +4,15 @@
 
 {% block content %}
 <h2>Registrácia - {{game.name}}</h2>
+{% if game.is_registration_active %}
 Skontrolujte si údaje z vášho profilu.
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="main-button mb-2">Registrovať na {{game.name}}</button>
 </form>
-
-
+{% else %}
+<p>Na túto súťaž nie je možné sa registrovať</p>
+{% endif %}
 
 {% endblock %}

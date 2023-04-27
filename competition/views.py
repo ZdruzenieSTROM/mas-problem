@@ -200,14 +200,12 @@ class BeforeGameView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        try:
-            competitor = Competitor.get_competitor(self.request.user,self.object)
-        except Competitor.DoesNotExist:
-            return redirect('competition:register-to-game',pk=self.object.pk)
+        if not self.object.is_user_registered(self.request.user):
+            return game_redirect(self.object,self.request.user)
         if now() < self.object.start:
             response = super().get(request, *args, **kwargs)
             return response
-        return game_redirect(self.object, competitor)
+        return game_redirect(self.request.user)
 
 
 class AfterGameView(LoginRequiredMixin, DetailView):
@@ -218,14 +216,12 @@ class AfterGameView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        try:
-            competitor = Competitor.get_competitor(self.request.user,self.object)
-        except Competitor.DoesNotExist:
-            return redirect('competition:register-to-game',pk=self.object.pk)
+        if not self.object.is_user_registered(self.request.user):
+            return game_redirect(self.object,self.request.user)
         if self.object.end < now():
             response = super().get(request, *args, **kwargs)
             return response
-        return game_redirect(self.object, competitor)
+        return game_redirect(self.object,self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -248,21 +244,21 @@ class GameReadyView(LoginRequiredMixin, DetailView):
         try:
             competitor = Competitor.get_competitor(self.request.user,self.object)
         except Competitor.DoesNotExist:
-            return redirect('competition:register-to-game',pk=self.object.pk)
+            return game_redirect(self.object,self.request.user)
         if self.object.is_active() and not competitor.started() and competitor.paid:
             response = super().get(request, *args, **kwargs)
             return response
-        return game_redirect(self.object, competitor)
+        return game_redirect(self.object,self.request.user)
 
     def post(self, request, *args, **kwargs):
         self.object=self.get_object()
         try:
             competitor = Competitor.get_competitor(self.request.user,self.object)
         except Competitor.DoesNotExist:
-            return redirect('competition:register-to-game',pk=self.object.pk)
+            return game_redirect(self.object,self.request.user)
         if not competitor.started():
             competitor.start()
-        return game_redirect(self.get_object(), competitor)
+        return game_redirect(self.get_object(), self.request.user)
 
 
 class GameFinishedView(LoginRequiredMixin, DetailView):
@@ -276,11 +272,11 @@ class GameFinishedView(LoginRequiredMixin, DetailView):
         try:
             competitor = Competitor.get_competitor(self.request.user,self.object)
         except Competitor.DoesNotExist:
-            return redirect('competition:register-to-game',pk=self.object.pk)
+            return game_redirect(self.object,self.request.user)
         if self.object.is_active() and competitor.finished():
             response = super().get(request, *args, **kwargs)
             return response
-        return game_redirect(self.object, competitor)
+        return game_redirect(self.object,self.request.user)
 
 
 class GameView(LoginRequiredMixin, DetailView):
@@ -294,12 +290,13 @@ class GameView(LoginRequiredMixin, DetailView):
         if self.object.is_user_registered(self.request.user):
             competitor = Competitor.get_competitor(self.request.user,self.object)
         else:
-            return redirect('competition:register-to-game',pk=self.object.pk)
+            if self.object.is_registration_active():
+                return game_redirect(self.object,self.request.user)
 
         if self.object.is_active() and competitor.started() and not competitor.finished():
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)
-        return game_redirect(self.object, competitor)
+        return game_redirect(self.object,self.request.user)
 
     def get_object(self):
         return Game.get_current()
@@ -384,15 +381,16 @@ def not_paid(request):
     return render(request,'competition/not_paid.html')
 
 # This should probably be defined in another file
-def game_redirect(game:Game, competitor:Competitor):
+def game_redirect(game:Game, user:Competitor):
+    if not game.is_user_registered(user):
+        return redirect('competition:register-to-game',pk=game.pk)
+
+    competitor = Competitor.get_competitor(user,game)
+    if now() < game.start:
+        return redirect('competition:',)
+
     if not competitor.paid:
         return redirect('competition:not-paid')
-    if now() < game.start:
-        if not game.is_user_registered(competitor.user):
-            # Užívateľ nie je registrovaný do hry
-            return redirect('competition:register-to-game',pk=game.pk)
-        # Pred začatím hry
-        return redirect('competition:before-game', pk=game.pk)
     if game.end < now():
         # Po konci hry
         return redirect('competition:after-game', pk=game.pk)
