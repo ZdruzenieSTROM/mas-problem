@@ -206,9 +206,9 @@ class Problem(models.Model):
 
     def __str__(self):
         if self.order is not None:
-            return f'{self.game} - {self.level.level_letter()} - {self.order}'
+            return f'{self.level.game} - {self.level.level_letter()} - {self.order}'
         else:
-            return f'{self.game} - {self.level.level_letter()} - {self.text[:min(20,len(self.text))]}'
+            return f'{self.level.game} - {self.level.level_letter()} - {self.text[:min(20,len(self.text))]}'
 
 class Competitor(models.Model):
     """Súťažiaci"""

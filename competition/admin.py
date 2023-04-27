@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 from competition import models
 
@@ -25,7 +26,8 @@ class LevelAdmin(admin.ModelAdmin):
 @admin.register(models.Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('level', 'get_game', 'text')
-    list_filter = ('level',)
+    list_filter = ('level',
+                   ('level__game',RelatedDropdownFilter))
 
     @admin.display(ordering='level__game', description='Súťaž')
     def get_game(self, obj):
@@ -42,11 +44,12 @@ class CompetitorAdmin(admin.ModelAdmin):
 @admin.register(models.Submission)
 class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('problem', 'competitor', 'competitor_answer', 'correct')
-    list_filter = ('correct', 'problem','get_game')
+    list_filter = ('correct', 
+                   ('problem',RelatedDropdownFilter),
+                   ('competitor',RelatedDropdownFilter),
+                   ('problem__level',RelatedDropdownFilter),
+                   ('problem__level__game',RelatedDropdownFilter))
 
-    @admin.display(ordering='problem__level__game', description='Súťaž')
-    def get_game(self, obj):
-        return obj.problem.level.game
 
 
 @admin.register(models.ResultGroup)
