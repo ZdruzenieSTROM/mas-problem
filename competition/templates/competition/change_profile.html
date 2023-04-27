@@ -4,6 +4,12 @@
 
 {% block content %}
 <h2>Zmena údajov súťažiaceho</h2>
+{% if not_registered %}
+<div>
+<p>Do aktuálnej súťaže nie si prihlásený/á. Ak sa chceš zapojiť registruj sa.</p>
+<a href="{% url 'competition:register-to-game' pk=current_game.pk %}" class="main-button">Registruj</a>
+</div>
+{% else %}
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -17,5 +23,6 @@
 <div class="answer-alert success">Platba prijatá</div>
 {% else %}
 <div class="answer-alert error">Platbu za súťaž zatiaľ neevidujeme</div>
+{% endif %}
 {% endif %}
 {% endblock %}

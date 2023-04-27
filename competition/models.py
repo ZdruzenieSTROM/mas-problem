@@ -36,6 +36,7 @@ class Grade(models.Model):
 class Game(models.Model):
     """Hra"""
     class Meta:
+        get_latest_by = 'end'
         verbose_name = 'Súťaž'
         verbose_name_plural = 'Súťaže'
 
@@ -91,7 +92,7 @@ class Game(models.Model):
     
     @classmethod
     def get_current(cls):
-        return cls.objects.filter(registration_start__lte=now(), end__gte=now()).get()
+        return cls.objects.filter(registration_start__lte=now()).latest()
     
     def is_user_registered(self,user):
         return self.competitor_set.filter(user=user).exists()
