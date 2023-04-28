@@ -166,7 +166,7 @@ class Problem(models.Model):
     level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='problems',verbose_name='Level')
     text = models.TextField(verbose_name='Zadanie')
-    order = models.PositiveSmallIntegerField(null=True,verbose_name='Poradie úlohy v leveli')
+    order = models.PositiveSmallIntegerField(null=True,verbose_name='Poradie úlohy v úrovni')
     image = models.ImageField(null=True,blank=True,verbose_name='Obrázok')
     solution = models.CharField(max_length=25,verbose_name='Správna odpoveď')
 
