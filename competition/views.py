@@ -386,11 +386,12 @@ def game_redirect(game:Game, user:Competitor):
         return redirect('competition:register-to-game',pk=game.pk)
 
     competitor = Competitor.get_competitor(user,game)
-    if now() < game.start:
-        return redirect('competition:',)
 
     if not competitor.paid:
         return redirect('competition:not-paid')
+    if now() < game.start:
+        # Pred začatím hry
+        return redirect('competition:before-game', pk=game.pk)
     if game.end < now():
         # Po konci hry
         return redirect('competition:after-game', pk=game.pk)
