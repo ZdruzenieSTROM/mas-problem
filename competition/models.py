@@ -36,6 +36,7 @@ class Grade(models.Model):
 class Game(models.Model):
     """Hra"""
     class Meta:
+        get_latest_by = 'end'
         verbose_name = 'Súťaž'
         verbose_name_plural = 'Súťaže'
 
@@ -85,8 +86,22 @@ class Game(models.Model):
         if competitor.started_at is not None:
             competitor.started_at = now()
 
+    @classmethod
+    def get_current_registration(cls):
+        return cls.objects.filter(registration_start__lte=now(), registration_end__gte=now()).get()
+    
+    @classmethod
+    def get_current(cls):
+        return cls.objects.filter(registration_start__lte=now()).latest()
+    
+    def is_user_registered(self,user):
+        return self.competitor_set.filter(user=user).exists()
+
     def is_active(self):
         return self.start <= now() < self.end
+    
+    def is_registration_active(self):
+        return self.registration_start <= now() < self.registration_end
 
     def __str__(self):
         return self.name
@@ -211,8 +226,8 @@ class Competitor(models.Model):
         verbose_name = 'Súťažiaci'
         verbose_name_plural = 'Súťažiaci'
 
-    user = models.OneToOneField(
-        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='competitor')
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='competitor_set')
     # Nechajme zatial ako text, časom prepojíme asi v backendom stránky
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
@@ -242,6 +257,10 @@ class Competitor(models.Model):
 
     def finished(self):
         return self.game.is_active() and self.started() and self.game.get_finish_time(self) < now()
+    
+    @classmethod
+    def get_competitor(cls,user,game):
+        return cls.objects.filter(user=user,game=game).get()
 
     def to_invoice_dict(self):
         return {

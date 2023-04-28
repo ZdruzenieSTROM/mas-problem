@@ -6,6 +6,7 @@
 
 {% if form.initial.game %}
 <h2>Registrácia súťažiaceho na {{form.initial.game}}</h2>
+Ak si sa už v minulosti do súťaže zapojil/a, <a href="{% url 'competition:login' %}">prihlás sa do svojho účtu</a>.
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
