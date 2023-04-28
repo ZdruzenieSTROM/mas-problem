@@ -10,6 +10,7 @@ urlpatterns = [
     path('registracia', views.SignUpView.as_view(), name='registration'),
     path('prihlasenie', views.LoginFormView.as_view(), name='login'),
     path('odhlasenie', views.logout_view, name='logout'),
+    path('registracia-na-hru/<int:pk>',views.UserNotRegisteredToGameView.as_view(),name='register-to-game'),
     path('pred-hrou/<int:pk>', views.BeforeGameView.as_view(), name='before-game'),
     path('zacat-hru/<int:pk>', views.GameReadyView.as_view(), name='game-ready'),
     path('koniec-hry/<int:pk>',
