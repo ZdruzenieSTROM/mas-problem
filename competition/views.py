@@ -205,7 +205,7 @@ class BeforeGameView(LoginRequiredMixin, DetailView):
         if now() < self.object.start:
             response = super().get(request, *args, **kwargs)
             return response
-        return game_redirect(self.request.user)
+        return game_redirect(self.object, self.request.user)
 
 
 class AfterGameView(LoginRequiredMixin, DetailView):
