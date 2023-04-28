@@ -1,4 +1,5 @@
 
+import csv
 from datetime import datetime
 
 from allauth.account.models import EmailAddress
@@ -17,7 +18,7 @@ from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
                               OuterRef, Q, Subquery)
 from django.db.models.functions import Cast
 from django.dispatch import receiver
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect, render, resolve_url
 from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
@@ -520,8 +521,13 @@ class CompetitorCertificateView(LoginRequiredMixin,View):
             return FileResponse(competitor.certificate)
         return redirect('competition:after-game')
 
-class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
-    template_name = 'competition/certificate_administration.html'
+@login_required
+def current_administration_view(request):
+    # TODO: Replace by get current
+    return redirect('competition:game-admin',pk=1)
+
+class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
+    template_name = 'competition/game_administration.html'
 
     def test_func(self):
         return self.request.user.is_staff
@@ -530,13 +536,14 @@ class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,Resul
         context = super().get_context_data(**kwargs)
         list_of_certificates = []
         user_ids = []
-        for results in context['results']:
-            for row in results['results']:
-                if row.place<=self.object.number_of_competitor_with_certificate:
-                    list_of_certificates.append(r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
-                else:
-                    list_of_certificates.append(r'\diplomucast{'+str(row)+r'}{'+results['name']+r'}')
-                user_ids.append(str(row.pk))
+        if 'results' in context:
+            for results in context['results']:
+                for row in results['results']:
+                    if row.place<=self.object.number_of_competitor_with_certificate:
+                        list_of_certificates.append(r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
+                    else:
+                        list_of_certificates.append(r'\diplomucast{'+str(row)+r'}{'+results['name']+r'}')
+                    user_ids.append(str(row.pk))
         context['certificates'] = list_of_certificates
         context['user_ids'] = user_ids
         return context
@@ -559,3 +566,23 @@ class CertificateAdministrationView(LoginRequiredMixin,UserPassesTestMixin,Resul
         messages.add_message(request,level=1,message='Diplomy nahraté')
         return redirect('competition:certificates',pk=self.get_object().pk)
         
+class ExportCompetitorsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
+    model = Game
+    def test_func(self):
+        return self.request.user.is_staff
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="export.csv"'},
+        )
+        writer = csv.writer(response)
+        for competitor in Competitor.objects.filter(game=self.object).all():
+            writer.writerow([
+                competitor.first_name,
+                competitor.last_name,
+                competitor.grade,
+                competitor.school,
+                competitor.user.email
+                ])
+        return response
