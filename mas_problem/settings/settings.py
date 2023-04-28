@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'allauth',
     'allauth.account',
+    'django_admin_listfilter_dropdown',
     'competition'
 ]
 

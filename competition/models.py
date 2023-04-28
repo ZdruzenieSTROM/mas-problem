@@ -176,12 +176,14 @@ class Problem(models.Model):
     class Meta:
         verbose_name = 'Úloha'
         verbose_name_plural = 'Úlohy'
+        ordering = ['level','order']
 
     level = models.ForeignKey(
-        Level, on_delete=models.CASCADE, related_name='problems')
-    text = models.TextField()
-    image = models.ImageField(null=True,blank=True,upload_to='public')
-    solution = models.CharField(max_length=25)
+        Level, on_delete=models.CASCADE, related_name='problems',verbose_name='Level')
+    text = models.TextField(verbose_name='Zadanie')
+    order = models.PositiveSmallIntegerField(null=True,verbose_name='Poradie úlohy v úrovni')
+    image = models.ImageField(null=True,blank=True,verbose_name='Obrázok')
+    solution = models.CharField(max_length=25,verbose_name='Správna odpoveď')
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
@@ -218,7 +220,10 @@ class Problem(models.Model):
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
 
     def __str__(self):
-        return self.text
+        if self.order is not None:
+            return f'{self.level.game} - {self.level.level_letter()} - {self.order}'
+        else:
+            return f'{self.level.game} - {self.level.level_letter()} - {self.text[:min(20,len(self.text))]}'
 
 class Competitor(models.Model):
     """Súťažiaci"""
@@ -278,12 +283,14 @@ class Submission(models.Model):
     class Meta:
         verbose_name = 'Odpoveď na úlohu'
         verbose_name_plural = 'Odpovede na úlohy'
+        ordering = ['submitted_at']
+        get_latest_by = 'submitted_at'
 
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
-    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE)
-    competitor_answer = models.CharField(max_length=25)
-    submitted_at = models.DateTimeField()
-    correct = models.BooleanField()
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE,verbose_name='Úloha')
+    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE,verbose_name='Súťažiaci')
+    competitor_answer = models.CharField(max_length=25,verbose_name='Odovzdaná odpoveď')
+    submitted_at = models.DateTimeField(verbose_name='Odovzdané o')
+    correct = models.BooleanField(verbose_name='Správne')
 
     def time_after_start(self):
         return self.submitted_at-self.competitor.started_at
