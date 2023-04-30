@@ -398,3 +398,14 @@ class Payment(models.Model):
         mail.attach('faktura.pdf', invoice_content,
                     mimetype='application/pdf')
         mail.send()
+
+class UTMinfo(models.Model):
+    """Informácie o tom odkiaľ prišiel užívateľ na náš web"""
+    class Meta:
+        verbose_name = 'UTM info'
+        verbose_name_plural = 'UTM info'
+    source = models.CharField(max_length=64,null=True,blank=True)
+    medium = models.CharField(max_length=64,null=True,blank=True)
+    campaign = models.CharField(max_length=64,null=True,blank=True)
+    content = models.CharField(max_length=64,null=True,blank=True)
+    timestamp = models.DateTimeField(auto_now=True,editable=False)

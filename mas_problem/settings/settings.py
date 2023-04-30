@@ -67,6 +67,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'mas_problem.middlewares.UTMMiddleware'
+   
 ]
 
 ROOT_URLCONF = 'mas_problem.urls'
