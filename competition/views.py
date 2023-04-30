@@ -30,6 +30,7 @@ from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
 from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
                      Problem, Submission, User)
+from .parsers import MasProblemCurrentParser
 
 
 def view_404(request, exception=None):  # pylint: disable=unused-argument
@@ -591,6 +592,17 @@ class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
                 competitor.save()
         messages.add_message(request,level=1,message='Diplomy nahraté')
         return redirect('competition:certificates',pk=self.get_object().pk)
+    
+def upload_problems(request,pk):
+    file = request.FILES['filename']
+    parser  = MasProblemCurrentParser(file.file)
+    game = Game.objects.get(pk=pk)
+    if game.levels.count()==0:
+        parser.create_problems(game)
+    else:
+        raise BadRequest('Súťaž už má nahraté úlohy')
+    return redirect('competition:game-admin',pk=pk)
+
         
 class ExportCompetitorsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
     model = Game

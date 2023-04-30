@@ -21,9 +21,20 @@
   </div>
 </div>
 <h1>{{game.name}}</h1>
-<a class="main-button" href="{% url 'competition:statistics' pk=game.pk %}">
-  Štatistiky
-</a>
+{% if game.levels.count == 0 %}
+
+  <form action="{% url 'competition:upload-problems' pk=game.pk %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" id="source" name="filename">
+    <input type="submit">
+  </form>
+
+{% else %}
+  <a class="main-button" href="{% url 'competition:statistics' pk=game.pk %}">
+    Štatistiky
+  </a>
+{% endif %}
+
 <h2>Export súťažiacich</h2>
 <a class="main-button" href="{% url 'competition:export-competitors' pk=game.pk %}">
   Export súťažiacich

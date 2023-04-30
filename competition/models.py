@@ -113,7 +113,7 @@ class Level(models.Model):
         verbose_name = 'Úroveň'
         verbose_name_plural = 'Úrovne'
 
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE,related_name='levels')
     order = models.IntegerField()
     previous_level = models.ForeignKey(
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
