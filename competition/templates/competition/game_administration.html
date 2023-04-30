@@ -21,6 +21,9 @@
   </div>
 </div>
 <h1>{{game.name}}</h1>
+<a class="main-button" href="{% url 'competition:statistics' pk=game.pk %}">
+  Štatistiky
+</a>
 <h2>Export súťažiacich</h2>
 <a class="main-button" href="{% url 'competition:export-competitors' pk=game.pk %}">
   Export súťažiacich

@@ -9,7 +9,7 @@
         <th>Ročník</th>
         <th>Zadania a riešenia</th>
         <th>Výsledky</th>
-        <!-- <th>Štatistiky úloh</th> -->
+        <th>Štatistiky úloh</th>
         <th>Počet riešiteľov</th>
     </tr>
     {% for game in games %}
@@ -23,7 +23,7 @@
             <a href="{% url 'competition:results' pk=game.pk %}">Výsledky</a>
             {% endif %}
         </td>
-        <!-- <td><a href="">Štatistiky</a></td> -->
+        <td><a href="{% url 'competition:statistics' pk=game.pk %}">Štatistiky</a></td>
         <td>{% if not game.pdf_results %}{{game.number_of_participants}}{% endif %}</td>
 
     </tr>
