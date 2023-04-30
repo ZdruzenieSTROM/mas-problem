@@ -550,8 +550,7 @@ class CompetitorCertificateView(LoginRequiredMixin,View):
 
 @login_required
 def current_administration_view(request):
-    # TODO: Replace by get current
-    return redirect('competition:game-admin',pk=1)
+    return redirect('competition:game-admin',pk=Game.get_current().pk)
 
 class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
     template_name = 'competition/game_administration.html'
