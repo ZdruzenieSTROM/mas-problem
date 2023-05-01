@@ -203,11 +203,11 @@ class Problem(models.Model):
         )
 
     def competitor_submissions(self, competitor):
-        return self.submission_set.filter(competitor=competitor)
+        return self.submissions.filter(competitor=competitor)
 
     def get_timeout(self, competitor):
         """Return timeout"""
-        submission = self.submission_set.filter(
+        submission = self.submissions.filter(
             competitor=competitor, correct=False)
         if submission.count() < 3:
             return timedelta(0)
