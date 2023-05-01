@@ -22,8 +22,10 @@
 </div>
 <h1>{{game.name}}</h1>
 <h2>Export súťažiacich</h2>
-<a class="main-button" href="{% url 'competition:export-competitors' pk=game.pk %}">
-  Export súťažiacich
+<a href="{% url 'competition:export-competitors' pk=game.pk %}">
+  <button class="main-button">
+    Export súťažiacich
+  </button>
 </a>
 <h2>Nahrávanie diplomov</h2>
 <form action="{% url 'competition:game-admin' pk=1 %}" method="POST" enctype="multipart/form-data">
