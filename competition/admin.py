@@ -1,5 +1,7 @@
 from django.contrib import admin
-from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
+from django_admin_listfilter_dropdown.filters import (AllValuesFieldListFilter,
+                                                      DropdownFilter,
+                                                      RelatedDropdownFilter)
 
 from competition import models
 
@@ -73,3 +75,13 @@ class PaymentAdmin(admin.ModelAdmin):
     list_editable=('paid',)
     list_filter = ('paid',)
     search_fields = ('payment_reference_number','competitor__first_name','competitor__last_name')
+
+@admin.register(models.UTMinfo)
+class UTMinfoAdmin(admin.ModelAdmin):
+    list_display = ( 'source','medium','campaign','content','timestamp')
+    list_filter = ( 
+        ('source',AllValuesFieldListFilter),
+        ('medium',DropdownFilter),
+        ('campaign',DropdownFilter),
+        ('content',DropdownFilter),
+                   )

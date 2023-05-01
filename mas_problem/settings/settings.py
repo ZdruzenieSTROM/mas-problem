@@ -67,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'mas_problem.middlewares.UTMMiddleware',
 ]
 
 ROOT_URLCONF = 'mas_problem.urls'
@@ -132,7 +133,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
-MEDIA_URL = 'media/' 
+MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 CERTIFICATES_ROOT = BASE_DIR / 'diplomy'
@@ -174,4 +175,4 @@ SERVER_EMAIL = 'noreply@strom.sk'
 EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
 DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
 
-ADMINS = [('Kovacs','kovacs@strom.sk'), ('Masrna','michal.masrna@strom.sk')]
+ADMINS = [('Kovacs', 'kovacs@strom.sk'), ('Masrna', 'michal.masrna@strom.sk')]
