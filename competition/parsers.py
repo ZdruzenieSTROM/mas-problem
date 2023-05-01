@@ -1,15 +1,17 @@
 import re
+from io import BytesIO
+
+from competition.models import Level, Problem
 
 
 class CompetitionParser:
-    def __init__(self, file_name):
-        self.file_name = file_name
+    def __init__(self, file):
+        self.file : BytesIO = file
 
     def load_file(self):
-        with open(self.file_name, newline='', encoding='utf-8') as file:
-            lines = file.readlines()
-            text = ''.join(lines)
-            return text
+        lines = self.file.readlines()
+        text = ''.join(l.decode("utf-8")  for l in lines)
+        return text
 
     def parse(self):
         return self.load_file()
@@ -60,4 +62,23 @@ class MasProblemCurrentParser(CompetitionParser):
                 }
             )
         return levels
+
+    def create_problems(self,game):
+        levels = self.parse()
+        previous_level =None
+        for i,level in enumerate(levels):
+            new_level = Level.objects.create(
+                game=game,
+                order=i+1,
+                previous_level=previous_level
+            )
+            previous_level = new_level
+            for j,(problem,result) in enumerate(zip(level['problems'],level['results'])):
+                Problem.objects.create(
+                    level=new_level,
+                    text = problem,
+                    order = j+1,
+                    solution=result
+                )
+
 

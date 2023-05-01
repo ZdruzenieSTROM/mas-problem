@@ -16,7 +16,7 @@ from django.core.files import File
 from django.db import IntegrityError
 from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
                               OuterRef, Q, Subquery)
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, Coalesce
 from django.dispatch import receiver
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect, render, resolve_url
@@ -30,6 +30,7 @@ from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
 from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
                      Problem, Submission, User)
+from .parsers import MasProblemCurrentParser
 
 
 def view_404(request, exception=None):  # pylint: disable=unused-argument
@@ -429,25 +430,51 @@ class ProblemView(LoginRequiredMixin, DetailView):
 class UploadGameView():
     pass
 
-# class GameStatisticsView(DetailView):
-#     """Štatistika hry"""
-#     model = Game
-#     template_name = 'competition/game_statistics.html'
+class GameStatisticsView(UserPassesTestMixin,DetailView):
+    """Štatistika hry"""
+    model = Game
+    template_name = 'competition/game_statistics.html'
+    def test_func(self):
+        return self.get_object().results_public or self.request.user.is_staff
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['problems'] = Problem.objects.filter(
-#             level__game=self.object
-#         ).annotate(
-#             num_correctly_submitted=Count('submissions',filter=Q(submissions__correct=True)),
-#             average_time=Count('submissions',filter=Q(submissions__correct=True))/Count('submissions')
 
-#         )
-#         context['grades'] = Competitor.objects.filter(started_at__isnull=False).values('grade').annotate(
-#             correct=Count('submissions',filter=Q(submissions__correct=True),output_filed=FloatField()),
-#             competitors=Count('pk',output_filed=FloatField())
-#         )
-#         return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['problems'] = Problem.objects.filter(
+            level__game=self.object
+        ).annotate(
+            num_correctly_submitted=Count('submissions',filter=Q(submissions__correct=True)),
+            num_submitted=Count('submissions')
+        )
+        for problem in context['problems']:
+            problem.max_competitors = problem.number_submissions()
+            problem.success_rate = "%.2f" % (100* problem.num_correctly_submitted/problem.max_competitors)
+        context['grades'] = Competitor.objects.filter(started_at__isnull=False).values('grade__shortcut').annotate(
+            correct=Count('submissions',filter=Q(submissions__correct=True),output_filed=FloatField()),
+            competitors=Count('pk',output_filed=FloatField())
+        )
+        return context
+    
+class ProblemStatisticsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
+    model = Problem
+    template_name = 'competition/problem_statistics.html'
+    context_object_name='problem'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        submissions = {}
+        for submission in self.object.submissions.all():
+            if submission.competitor_answer in submissions:
+                submissions[submission.competitor_answer] += 1
+            else:
+                submissions[submission.competitor_answer] = 1
+        context['submissions'] =submissions
+        return context
+
+
 
 class ArchiveView(ListView):
     model=Game
@@ -523,8 +550,7 @@ class CompetitorCertificateView(LoginRequiredMixin,View):
 
 @login_required
 def current_administration_view(request):
-    # TODO: Replace by get current
-    return redirect('competition:game-admin',pk=1)
+    return redirect('competition:game-admin',pk=Game.get_current().pk)
 
 class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
     template_name = 'competition/game_administration.html'
@@ -565,6 +591,17 @@ class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
                 competitor.save()
         messages.add_message(request,level=1,message='Diplomy nahraté')
         return redirect('competition:certificates',pk=self.get_object().pk)
+    
+def upload_problems(request,pk):
+    file = request.FILES['filename']
+    parser  = MasProblemCurrentParser(file.file)
+    game = Game.objects.get(pk=pk)
+    if game.levels.count()==0:
+        parser.create_problems(game)
+    else:
+        raise BadRequest('Súťaž už má nahraté úlohy')
+    return redirect('competition:game-admin',pk=pk)
+
         
 class ExportCompetitorsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
     model = Game

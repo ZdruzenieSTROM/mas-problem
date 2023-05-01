@@ -1,6 +1,14 @@
 {% extends "competition/base.html" %}
 
 {% block title %}{{game.name}} - Štatistika{% endblock %}
+{% block header %}
+
+{% load static %}
+<script src="{% static 'competition/game.js' %}"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+{% endblock %}
 {% load competition_tags %}
 {% block content %}
 <h1>{{game.name}} - Štatistiky úloh</h1>
@@ -12,16 +20,21 @@
         <th>Počet správnych odpovedí</th>
         <th>Priemerný čas vyriešenia</th>
         <th>Priemerné správne odovzdanie</th>
+        {% if user.is_staff %}
+        <th></th>
+        {% endif %}
     </tr>
     {% for problem in problems %}
     <tr>
-        <td>{{ problem.level }}</td>
+        <td>{{ problem.level.level_letter }}</td>
         <td>{{ problem.text }}</td>
         <td>{{problem.solution}}</td>
-        <td>{{problem.num_correctly_submitted}}</td>
-        <td>{{problem.average_correct_submission|format_timedelta}}</td>
-        <td>{{problem.average_time}}</td>
-
+        <td>{{problem.success_rate}} % ({{problem.num_correctly_submitted}}/{{problem.max_competitors}})</td>
+        <td>{{problem.average_correct_submission_time|default_if_none:"-"}}</td>
+        <td>{{problem.average_correct_submission|default_if_none:"-"}}</td>
+        {% if user.is_staff %}
+        <td><a href="{% url 'competition:problem-statistics' pk=problem.pk %}">Detail</a></td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>
@@ -36,11 +49,9 @@
     </tr>
     {% for grade in grades %}
     <tr>
-        <td>{{ grade.grade }}</td>
+        <td>{{ grade.grade__shortcut }}</td>
         <td>{{ grade.correct }}</td>
         <td>{{grade.competitors}}</td>
-
-
     </tr>
     {% endfor %}
 </table>

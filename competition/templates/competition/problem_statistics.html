@@ -1,0 +1,42 @@
+{% extends "competition/base.html" %}
+{% block header %}
+{% load static %}
+<script src="{% static 'competition/game.js' %}"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% load competition_tags %}
+{% endblock %}
+{% block title %}Štatistky úlohy{% endblock %}
+{% load competition_tags %}
+{% block content %}
+<h1>{{problem}}</h1>
+<p>{{ problem.text }}</p>
+<p><b>Riešenie:</b> {{problem.solution}}</p>
+<table>
+    <tr>
+        <td>Level:</td>
+        <td>{{problem.level.level_letter}}</td>
+    </tr>
+    <tr>
+        <td>Priemerné správne odovzdanie:</td>
+        <td>{{problem.average_correct_submission|default_if_none:"-"}}</td>
+    </tr>
+    <tr>
+        <td>Priemerný čas vyriešenia:</td>
+        <td>{{problem.average_correct_submission_time|default_if_none:"-"}}</td>
+    </tr>
+</table>
+
+<h2>Odovzdané výsledky</h2>
+<table>
+    {% for submission,count in submissions.items %}
+    <tr>
+        <td>{{submission}}</td>
+        <td>{{count}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+
+{% endblock %}

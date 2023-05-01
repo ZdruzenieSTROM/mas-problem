@@ -113,7 +113,7 @@ class Level(models.Model):
         verbose_name = 'Úroveň'
         verbose_name_plural = 'Úrovne'
 
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE,related_name='levels')
     order = models.IntegerField()
     previous_level = models.ForeignKey(
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
@@ -215,9 +215,25 @@ class Problem(models.Model):
             '-submitted_at')[0].submitted_at
         return time_of_last_submission + timedelta(seconds=60) - now()
 
-    def average_correct_submission(self):
+    def average_correct_submission_time(self):
         correct_submissions = self.submissions.filter(correct=True).all()
+        if correct_submissions.count()==0:
+            return None
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
+    
+    def average_correct_submission(self):
+        count = self.submissions.filter(competitor__submissions__correct=True).count()
+        all = self.submissions.filter(correct=True).count()
+        if count==0:
+            return None
+        return count/all
+        
+    def number_submissions(self):
+        allowed_grades = set()
+        for group in self.level.setting_groups.all():
+            for grade in group.competitor_group.grades.all():
+                allowed_grades.add(grade)
+        return Competitor.objects.filter(game=self.level.game,grade__in=allowed_grades).count()
 
     def __str__(self):
         if self.order is not None:
@@ -286,14 +302,17 @@ class Submission(models.Model):
         ordering = ['submitted_at']
         get_latest_by = 'submitted_at'
 
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE,verbose_name='Úloha')
-    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE,verbose_name='Súťažiaci')
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE,verbose_name='Úloha',related_name='submissions')
+    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE,verbose_name='Súťažiaci',related_name='submissions')
     competitor_answer = models.CharField(max_length=25,verbose_name='Odovzdaná odpoveď')
     submitted_at = models.DateTimeField(verbose_name='Odovzdané o')
     correct = models.BooleanField(verbose_name='Správne')
 
     def time_after_start(self):
         return self.submitted_at-self.competitor.started_at
+    
+    def related_submissions(self):
+        return Submission.objects.filter(problem=self.problem,competitor=self.competitor).all()
 
 
 class ResultGroup(models.Model):

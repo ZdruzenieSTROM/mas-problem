@@ -18,7 +18,8 @@ urlpatterns = [
     path('po-hre/<int:pk>', views.AfterGameView.as_view(), name='after-game'),
     path('neuhradene',views.not_paid,name='not-paid'),
     path('archiv',views.ArchiveView.as_view(),name='archive'),
-#     path('statistiky/<int:pk>',views.GameStatisticsView.as_view(),name='statistics'),
+    path('statistiky/<int:pk>',views.GameStatisticsView.as_view(),name='statistics'),
+    path('statistiky-ulohy/<int:pk>',views.ProblemStatisticsView.as_view(),name='problem-statistics'),
     path('sutaz', views.GameView.as_view(), name='game'),
     path('vysledky/<int:pk>', views.ResultView.as_view(), name='results'),
     path('aktualne-vysledky', views.CurrentResultView.as_view(),
@@ -30,5 +31,6 @@ urlpatterns = [
     path('sprava-hry/<int:pk>',views.GameAdministrationView.as_view(),name='game-admin'),
     path('sprava-hry',views.current_administration_view,name='current-game-admin'),
     path('export-sutaziacich/<int:pk>',views.ExportCompetitorsView.as_view(),name='export-competitors'),
-    path('moj-diplom',view=views.CompetitorCertificateView.as_view(),name='my-certificate')
+    path('moj-diplom',view=views.CompetitorCertificateView.as_view(),name='my-certificate'),
+    path('upload-problems/<int:pk>',views.upload_problems,name='upload-problems')
 ]
