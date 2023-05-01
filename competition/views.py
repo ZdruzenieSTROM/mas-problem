@@ -316,7 +316,7 @@ class GameView(LoginRequiredMixin, DetailView):
         for level in context['levels']:
             level.problems_with_submissions = []
             for problem in level.problems.all():
-                problem.competitor_submissions = problem.submission_set.filter(
+                problem.competitor_submissions = problem.submissions.filter(
                     competitor=competitor).order_by('-submitted_at')
                 level.problems_with_submissions.append(problem)
         context['competitor'] = competitor
