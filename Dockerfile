@@ -15,6 +15,6 @@ COPY . /app/
 
 # TODO: change to prod_settings after test
 ENV DJANGO_SETTINGS_MODULE=$SETTINGS_MODULE
-
+RUN chmod +x /app/entrypoint.sh
 
 CMD ["/app/entrypoint.sh"]
