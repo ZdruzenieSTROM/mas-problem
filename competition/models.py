@@ -98,8 +98,14 @@ class Game(models.Model):
         return self.competitor_set.filter(user=user).exists()
 
     def is_active(self):
-        return self.start <= now() < self.end
+        return self.is_started() and not self.is_finished()
     
+    def is_started(self):
+        return self.start <= now()
+    
+    def is_finished(self):
+        return self.end < now()
+
     def is_registration_active(self):
         return self.registration_start <= now() < self.registration_end
 
