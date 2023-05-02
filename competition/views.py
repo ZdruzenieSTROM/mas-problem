@@ -204,7 +204,7 @@ class BeforeGameView(LoginRequiredMixin, DetailView):
         self.object: Game = self.get_object()
         if (
             self.object.is_user_registered(self.request.user)
-            and now() < self.object.start
+            and not self.object.is_started()
         ):
             return super().get(request,*args,**kwargs)
         return game_redirect(self.object, self.request.user)
@@ -220,7 +220,7 @@ class AfterGameView(LoginRequiredMixin, DetailView):
         self.object:Game = self.get_object()
         if (
             self.object.is_user_registered(self.request.user)
-            and now() > self.object.end
+            and self.object.is_finished()
         ):
             return super().get(request,*args,**kwargs)
         return game_redirect(self.object, self.request.user)
@@ -389,10 +389,10 @@ def game_redirect(game:Game, user:Competitor):
 
     if not competitor.paid:
         return redirect('competition:not-paid')
-    if now() < game.start:
+    if not game.is_started():
         # Pred začatím hry
         return redirect('competition:before-game', pk=game.pk)
-    if game.end < now():
+    if game.is_finished():
         # Po konci hry
         return redirect('competition:after-game', pk=game.pk)
     if not competitor.started():
@@ -500,7 +500,7 @@ class ResultView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['games'] = Game.objects.all()
-        if self.object.start < now() and not self.object.results_public:
+        if self.object.is_started() and not self.object.results_public:
             return context
         if self.object.pdf_results:
             context['pdf_results'] = self.object.pdf_results
