@@ -17,4 +17,4 @@ COPY . /app/
 ENV DJANGO_SETTINGS_MODULE=$SETTINGS_MODULE
 
 
-CMD ["entrypoint.sh"]
+CMD ["/app/entrypoint.sh"]
