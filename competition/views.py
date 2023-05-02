@@ -448,7 +448,7 @@ class GameStatisticsView(UserPassesTestMixin,DetailView):
         )
         for problem in context['problems']:
             problem.max_competitors = problem.number_submissions()
-            problem.success_rate = "%.2f" % (100* problem.num_correctly_submitted/problem.max_competitors)
+            problem.success_rate = "%.2f" % (100* problem.num_correctly_submitted/problem.max_competitors) if problem.max_competitors>0 else None
         context['grades'] = Competitor.objects.filter(started_at__isnull=False).values('grade__shortcut').annotate(
             correct=Count('submissions',filter=Q(submissions__correct=True),output_filed=FloatField()),
             competitors=Count('pk',output_filed=FloatField())
