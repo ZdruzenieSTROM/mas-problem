@@ -29,7 +29,11 @@
         <td>{{ problem.level.level_letter }}</td>
         <td>{{ problem.text }}</td>
         <td>{{problem.solution}}</td>
-        <td>{{problem.success_rate}} % ({{problem.num_correctly_submitted}}/{{problem.max_competitors}})</td>
+        <td>
+            {% if problem.success_rate %}
+            {{problem.success_rate}} % ({{problem.num_correctly_submitted}}/{{problem.max_competitors}})
+            {%else%}-{%endif%}
+        </td>
         <td>{{problem.average_correct_submission_time|default_if_none:"-"}}</td>
         <td>{{problem.average_correct_submission|default_if_none:"-"}}</td>
         {% if user.is_staff %}
