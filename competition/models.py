@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, Exists, Q
 from django.db.models.fields import BooleanField
 from django.template.loader import render_to_string
 from django.utils.timezone import now
@@ -228,7 +228,8 @@ class Problem(models.Model):
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
     
     def average_correct_submission(self):
-        count = self.submissions.filter(competitor__submissions__correct=True).count()
+        Competitor.objects.filter(submissions__correct=Exists())
+        count = self.submissions.filter(competitor__in=True).count()
         all = self.submissions.filter(correct=True).count()
         if count==0:
             return None

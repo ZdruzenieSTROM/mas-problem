@@ -512,13 +512,13 @@ class ResultView(DetailView):
                     grade__in=result_group.grades.all(), user__is_active=True
             ).annotate(
                 solved_problems=Count(
-                    'submission', filter=Q(submission__correct=True)),
+                    'submissions', filter=Q(submissions__correct=True)),
                 max_level=Subquery(
                     Submission.objects.filter(competitor=OuterRef('pk'), correct=True).order_by(
                         '-problem__level__order').values('problem__level__order')[:1]
                 ),
                 last_correct_submission=(Max(
-                    'submission__submitted_at', filter=Q(submission__correct=True)) - F('started_at'))
+                    'submissions__submitted_at', filter=Q(submissions__correct=True)) - F('started_at'))
             ).order_by('-max_level', '-solved_problems', 'last_correct_submission', 'grade')
 
             results.append(
