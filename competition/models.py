@@ -43,16 +43,21 @@ class Game(models.Model):
     name = models.CharField(max_length=128)
     start = models.DateTimeField()
     end = models.DateTimeField()
-    registration_start = models.DateTimeField(verbose_name='Začiatok registrácie')
+    registration_start = models.DateTimeField(
+        verbose_name='Začiatok registrácie')
     registration_end = models.DateTimeField(verbose_name='Koniec registrácie')
-    max_session_duration = models.DurationField(verbose_name='Maximálny čas riešenia')
-    results_public = models.BooleanField(default=False,verbose_name='Zverejniť výsledky')
+    max_session_duration = models.DurationField(
+        verbose_name='Maximálny čas riešenia')
+    results_public = models.BooleanField(
+        default=False, verbose_name='Zverejniť výsledky')
     price = models.DecimalField(
         verbose_name='Účastnícky poplatok', decimal_places=2, max_digits=5)
     number_of_competitor_with_certificate = models.PositiveSmallIntegerField(
-        verbose_name='Počet prvých miest s diplomom s miestom',default=3)
-    publication = models.FileField(null=True,blank=True,verbose_name='Brožúra',upload_to='public')
-    pdf_results = models.FileField(null=True,blank=True,verbose_name='PDF výsledkovka',upload_to='public')
+        verbose_name='Počet prvých miest s diplomom s miestom', default=3)
+    publication = models.FileField(
+        null=True, blank=True, verbose_name='Brožúra', upload_to='public')
+    pdf_results = models.FileField(
+        null=True, blank=True, verbose_name='PDF výsledkovka', upload_to='public')
 
     def create_game(levels):
         game = Game.objects.create(
@@ -89,20 +94,20 @@ class Game(models.Model):
     @classmethod
     def get_current_registration(cls):
         return cls.objects.filter(registration_start__lte=now(), registration_end__gte=now()).get()
-    
+
     @classmethod
     def get_current(cls):
         return cls.objects.filter(registration_start__lte=now()).latest()
-    
-    def is_user_registered(self,user):
+
+    def is_user_registered(self, user):
         return self.competitor_set.filter(user=user).exists()
 
     def is_active(self):
         return self.is_started() and not self.is_finished()
-    
+
     def is_started(self):
         return self.start <= now()
-    
+
     def is_finished(self):
         return self.end < now()
 
@@ -119,7 +124,8 @@ class Level(models.Model):
         verbose_name = 'Úroveň'
         verbose_name_plural = 'Úrovne'
 
-    game = models.ForeignKey(Game, on_delete=models.CASCADE,related_name='levels')
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, related_name='levels')
     order = models.IntegerField()
     previous_level = models.ForeignKey(
         'Level', on_delete=models.SET_NULL, null=True, blank=True, related_name='levels')
@@ -182,14 +188,15 @@ class Problem(models.Model):
     class Meta:
         verbose_name = 'Úloha'
         verbose_name_plural = 'Úlohy'
-        ordering = ['level','order']
+        ordering = ['level', 'order']
 
     level = models.ForeignKey(
-        Level, on_delete=models.CASCADE, related_name='problems',verbose_name='Level')
+        Level, on_delete=models.CASCADE, related_name='problems', verbose_name='Level')
     text = models.TextField(verbose_name='Zadanie')
-    order = models.PositiveSmallIntegerField(null=True,verbose_name='Poradie úlohy v úrovni')
-    image = models.ImageField(null=True,blank=True,verbose_name='Obrázok')
-    solution = models.CharField(max_length=25,verbose_name='Správna odpoveď')
+    order = models.PositiveSmallIntegerField(
+        null=True, verbose_name='Poradie úlohy v úrovni')
+    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok')
+    solution = models.CharField(max_length=25, verbose_name='Správna odpoveď')
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
@@ -223,30 +230,31 @@ class Problem(models.Model):
 
     def average_correct_submission_time(self):
         correct_submissions = self.submissions.filter(correct=True).all()
-        if correct_submissions.count()==0:
+        if correct_submissions.count() == 0:
             return None
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
-    
+
     def average_correct_submission(self):
         Competitor.objects.filter(submissions__correct=Exists())
         count = self.submissions.filter(competitor__in=True).count()
         all = self.submissions.filter(correct=True).count()
-        if count==0:
+        if count == 0:
             return None
         return count/all
-        
+
     def number_submissions(self):
         allowed_grades = set()
         for group in self.level.setting_groups.all():
             for grade in group.competitor_group.grades.all():
                 allowed_grades.add(grade)
-        return Competitor.objects.filter(game=self.level.game,grade__in=allowed_grades).count()
+        return Competitor.objects.filter(game=self.level.game, grade__in=allowed_grades).count()
 
     def __str__(self):
         if self.order is not None:
             return f'{self.level.game} - {self.level.level_letter()} - {self.order}'
         else:
             return f'{self.level.game} - {self.level.level_letter()} - {self.text[:min(20,len(self.text))]}'
+
 
 class Competitor(models.Model):
     """Súťažiaci"""
@@ -268,10 +276,10 @@ class Competitor(models.Model):
     )
     phone_number = models.CharField(
         validators=[phone_regex], max_length=17, blank=True)  # Validators should be a list
-    started_at = models.DateTimeField(null=True,blank=True)
+    started_at = models.DateTimeField(null=True, blank=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
-    certificate = models.FileField(null=True,blank=True,upload_to='diplomy')
+    certificate = models.FileField(null=True, blank=True, upload_to='diplomy')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -285,17 +293,17 @@ class Competitor(models.Model):
 
     def finished(self):
         return self.game.is_active() and self.started() and self.game.get_finish_time(self) < now()
-    
+
     @classmethod
-    def get_competitor(cls,user,game):
-        return cls.objects.filter(user=user,game=game).get()
+    def get_competitor(cls, user, game):
+        return cls.objects.filter(user=user, game=game).get()
 
     def to_invoice_dict(self):
         return {
             'o_name': f'{self.first_name} {self.last_name}',
             'o_email': self.user.email,
         }
-    
+
     @property
     def paid(self):
         return hasattr(self, 'payment') and self.payment.paid
@@ -309,17 +317,20 @@ class Submission(models.Model):
         ordering = ['submitted_at']
         get_latest_by = 'submitted_at'
 
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE,verbose_name='Úloha',related_name='submissions')
-    competitor = models.ForeignKey(Competitor, on_delete=models.CASCADE,verbose_name='Súťažiaci',related_name='submissions')
-    competitor_answer = models.CharField(max_length=25,verbose_name='Odovzdaná odpoveď')
+    problem = models.ForeignKey(
+        Problem, on_delete=models.CASCADE, verbose_name='Úloha', related_name='submissions')
+    competitor = models.ForeignKey(
+        Competitor, on_delete=models.CASCADE, verbose_name='Súťažiaci', related_name='submissions')
+    competitor_answer = models.CharField(
+        max_length=25, verbose_name='Odovzdaná odpoveď')
     submitted_at = models.DateTimeField(verbose_name='Odovzdané o')
     correct = models.BooleanField(verbose_name='Správne')
 
     def time_after_start(self):
         return self.submitted_at-self.competitor.started_at
-    
+
     def related_submissions(self):
-        return Submission.objects.filter(problem=self.problem,competitor=self.competitor).all()
+        return Submission.objects.filter(problem=self.problem, competitor=self.competitor).all()
 
 
 class ResultGroup(models.Model):
@@ -425,13 +436,14 @@ class Payment(models.Model):
                     mimetype='application/pdf')
         mail.send()
 
+
 class UTMinfo(models.Model):
     """Informácie o tom odkiaľ prišiel užívateľ na náš web"""
     class Meta:
         verbose_name = 'UTM info'
         verbose_name_plural = 'UTM info'
-    source = models.CharField(max_length=64,null=True,blank=True)
-    medium = models.CharField(max_length=64,null=True,blank=True)
-    campaign = models.CharField(max_length=64,null=True,blank=True)
-    content = models.CharField(max_length=64,null=True,blank=True)
-    timestamp = models.DateTimeField(auto_now=True,editable=False)
+    source = models.CharField(max_length=64, null=True, blank=True)
+    medium = models.CharField(max_length=64, null=True, blank=True)
+    campaign = models.CharField(max_length=64, null=True, blank=True)
+    content = models.CharField(max_length=64, null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now=True, editable=False)
