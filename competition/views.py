@@ -38,11 +38,12 @@ def view_404(request, exception=None):  # pylint: disable=unused-argument
     return redirect('competition:pravidla')
 
 
-def create_invoice(user,game:Game):
-    competitor = Competitor.get_competitor(user,game)
+def create_invoice(user, game: Game):
+    competitor = Competitor.get_competitor(user, game)
     payment = Payment.objects.create(
         amount=competitor.game.price, competitor=competitor)
     payment.send_invoice()
+
 
 @receiver(email_confirmed)  # Signal sent to activate user upon confirmation
 def email_confirmed_(request, email_address, **kwargs):
@@ -51,10 +52,9 @@ def email_confirmed_(request, email_address, **kwargs):
     user.save()
     try:
         game = Game.get_current()
-        create_invoice(user,game)
+        create_invoice(user, game)
     except Game.DoesNotExist:
         pass
-    
 
 
 class SignUpView(FormView):
@@ -126,7 +126,8 @@ class EditProfileView(LoginRequiredMixin, FormView):
 
         initial = super().get_initial()
         try:
-            competitor = Competitor.get_competitor(self.request.user,Game.get_current())
+            competitor = Competitor.get_competitor(
+                self.request.user, Game.get_current())
         except Competitor.DoesNotExist:
             return initial
         initial['first_name'] = competitor.first_name
@@ -141,7 +142,8 @@ class EditProfileView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         if hasattr(self.request.user, 'competitor'):
             try:
-                competitor = Competitor.get_competitor(self.request.user,Game.get_current())
+                competitor = Competitor.get_competitor(
+                    self.request.user, Game.get_current())
             except Competitor.DoesNotExist:
                 raise BadRequest
             competitor.first_name = form.cleaned_data['first_name']
@@ -157,10 +159,12 @@ class EditProfileView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['not_registered'] = False
-        context['current_game']= Game.get_current()
+        context['current_game'] = Game.get_current()
         try:
-            competitor = Competitor.get_competitor(self.request.user,context['current_game'])
-            payment = competitor.payment if hasattr(competitor, 'payment') else False
+            competitor = Competitor.get_competitor(
+                self.request.user, context['current_game'])
+            payment = competitor.payment if hasattr(
+                competitor, 'payment') else False
         except Competitor.DoesNotExist:
             payment = False
             context['not_registered'] = True
@@ -206,7 +210,7 @@ class BeforeGameView(LoginRequiredMixin, DetailView):
             self.object.is_user_registered(self.request.user)
             and not self.object.is_started()
         ):
-            return super().get(request,*args,**kwargs)
+            return super().get(request, *args, **kwargs)
         return game_redirect(self.object, self.request.user)
 
 
@@ -217,18 +221,19 @@ class AfterGameView(LoginRequiredMixin, DetailView):
     context_object_name = 'game'
 
     def get(self, request, *args, **kwargs):
-        self.object:Game = self.get_object()
+        self.object: Game = self.get_object()
         if (
             self.object.is_user_registered(self.request.user)
             and self.object.is_finished()
         ):
-            return super().get(request,*args,**kwargs)
+            return super().get(request, *args, **kwargs)
         return game_redirect(self.object, self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            competitor = Competitor.get_competitor(self.request.user,self.object)
+            competitor = Competitor.get_competitor(
+                self.request.user, self.object)
             context['has_certificate'] = competitor.certificate.name
         except Competitor.DoesNotExist:
             pass
@@ -247,17 +252,19 @@ class GameReadyView(LoginRequiredMixin, DetailView):
             self.object.is_user_registered(self.request.user)
             and self.object.is_active()
         ):
-            competitor = Competitor.get_competitor(self.request.user,self.object)
+            competitor = Competitor.get_competitor(
+                self.request.user, self.object)
             if not competitor.started() and competitor.paid:
-                return super().get(request,*args,**kwargs)
-        return game_redirect(self.object,self.request.user)
+                return super().get(request, *args, **kwargs)
+        return game_redirect(self.object, self.request.user)
 
     def post(self, request, *args, **kwargs):
-        self.object=self.get_object()
+        self.object = self.get_object()
         try:
-            competitor = Competitor.get_competitor(self.request.user,self.object)
+            competitor = Competitor.get_competitor(
+                self.request.user, self.object)
         except Competitor.DoesNotExist:
-            return game_redirect(self.object,self.request.user)
+            return game_redirect(self.object, self.request.user)
         if not competitor.started():
             competitor.start()
         return game_redirect(self.object, self.request.user)
@@ -275,10 +282,11 @@ class GameFinishedView(LoginRequiredMixin, DetailView):
             self.object.is_user_registered(self.request.user)
             and self.object.is_active()
         ):
-            competitor = Competitor.get_competitor(self.request.user,self.object)
+            competitor = Competitor.get_competitor(
+                self.request.user, self.object)
             if competitor.finished():
                 return super().get(request, *args, **kwargs)
-        return game_redirect(self.object,self.request.user)
+        return game_redirect(self.object, self.request.user)
 
 
 class GameView(LoginRequiredMixin, DetailView):
@@ -293,17 +301,18 @@ class GameView(LoginRequiredMixin, DetailView):
             self.object.is_user_registered(self.request.user)
             and self.object.is_active()
         ):
-            competitor = Competitor.get_competitor(self.request.user,self.object)
+            competitor = Competitor.get_competitor(
+                self.request.user, self.object)
             if competitor.started() and not competitor.finished():
                 return super().get(request, *args, **kwargs)
-        return game_redirect(self.object,self.request.user)
+        return game_redirect(self.object, self.request.user)
 
     def get_object(self):
         return Game.get_current()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        competitor = Competitor.get_competitor(self.request.user,self.object)
+        competitor = Competitor.get_competitor(self.request.user, self.object)
         group = CompetitorGroup.objects.filter(
             game=competitor.game, grades=competitor.grade).get()
         context['levels'] = Level.objects.filter(
@@ -327,10 +336,11 @@ class GameView(LoginRequiredMixin, DetailView):
         context['endDateTimeString'] = (competitor.started_at +
                                         competitor.game.max_session_duration).isoformat()
         return context
-    
-class UserNotRegisteredToGameView(LoginRequiredMixin,FormView):
+
+
+class UserNotRegisteredToGameView(LoginRequiredMixin, FormView):
     form_class = EditCompetitorForm
-    template_name='competition/game_registration.html'
+    template_name = 'competition/game_registration.html'
 
     success_url = reverse_lazy('competition:profile')
 
@@ -345,13 +355,14 @@ class UserNotRegisteredToGameView(LoginRequiredMixin,FormView):
         initial['legal_representative'] = competitor.legal_representative
         initial['address'] = competitor.address
         return initial
-    
+
     def get(self, request, *args, **kwargs):
         self.object = Game.get_current()
         if self.object.is_user_registered(self.request.user):
-            game_redirect(self.object,Competitor.get_competitor(self.request.user,self.object))
+            game_redirect(self.object, Competitor.get_competitor(
+                self.request.user, self.object))
         return super().get(request, *args, **kwargs)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['game'] = self.object
@@ -361,13 +372,13 @@ class UserNotRegisteredToGameView(LoginRequiredMixin,FormView):
         self.object = Game.get_current()
         if not self.object.is_user_registered(self.request.user):
             competitor = Competitor(
-                first_name = form.cleaned_data['first_name'],
-                last_name = form.cleaned_data['last_name'],
-                grade = form.cleaned_data['grade'],
-                school = form.cleaned_data['school'],
-                phone_number = form.cleaned_data['phone_number'],
-                legal_representative = form.cleaned_data['legal_representative'],
-                address = form.cleaned_data['address'],
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                grade=form.cleaned_data['grade'],
+                school=form.cleaned_data['school'],
+                phone_number=form.cleaned_data['phone_number'],
+                legal_representative=form.cleaned_data['legal_representative'],
+                address=form.cleaned_data['address'],
                 game=self.object,
                 user=self.request.user
             )
@@ -375,17 +386,18 @@ class UserNotRegisteredToGameView(LoginRequiredMixin,FormView):
         return super().form_valid(form)
 
 
-
 @login_required
 def not_paid(request):
-    return render(request,'competition/not_paid.html')
+    return render(request, 'competition/not_paid.html')
 
 # This should probably be defined in another file
-def game_redirect(game:Game, user:Competitor):
-    if not game.is_user_registered(user):
-        return redirect('competition:register-to-game',pk=game.pk)
 
-    competitor = Competitor.get_competitor(user,game)
+
+def game_redirect(game: Game, user: Competitor):
+    if not game.is_user_registered(user):
+        return redirect('competition:register-to-game', pk=game.pk)
+
+    competitor = Competitor.get_competitor(user, game)
 
     if not competitor.paid:
         return redirect('competition:not-paid')
@@ -410,7 +422,7 @@ class ProblemView(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
-        competitor = Competitor.get_competitor(self.request.user,self.object)
+        competitor = Competitor.get_competitor(self.request.user, self.object)
         self.object = self.get_object()
         if self.object.can_submit(competitor):
             answer = self.request.POST['answer']
@@ -428,35 +440,40 @@ class ProblemView(LoginRequiredMixin, DetailView):
 class UploadGameView():
     pass
 
-class GameStatisticsView(UserPassesTestMixin,DetailView):
+
+class GameStatisticsView(UserPassesTestMixin, DetailView):
     """Štatistika hry"""
     model = Game
     template_name = 'competition/game_statistics.html'
+
     def test_func(self):
         return self.get_object().results_public or self.request.user.is_staff
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['problems'] = Problem.objects.filter(
             level__game=self.object
         ).annotate(
-            num_correctly_submitted=Count('submissions',filter=Q(submissions__correct=True)),
+            num_correctly_submitted=Count(
+                'submissions', filter=Q(submissions__correct=True)),
             num_submitted=Count('submissions')
         )
         for problem in context['problems']:
             problem.max_competitors = problem.number_submissions()
-            problem.success_rate = "%.2f" % (100* problem.num_correctly_submitted/problem.max_competitors) if problem.max_competitors>0 else None
+            problem.success_rate = "%.2f" % (
+                100 * problem.num_correctly_submitted/problem.max_competitors) if problem.max_competitors > 0 else None
         context['grades'] = Competitor.objects.filter(started_at__isnull=False).values('grade__shortcut').annotate(
-            correct=Count('submissions',filter=Q(submissions__correct=True),output_filed=FloatField()),
-            competitors=Count('pk',output_filed=FloatField())
+            correct=Count('submissions', filter=Q(
+                submissions__correct=True), output_filed=FloatField()),
+            competitors=Count('pk', output_filed=FloatField())
         )
         return context
-    
-class ProblemStatisticsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
+
+
+class ProblemStatisticsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Problem
     template_name = 'competition/problem_statistics.html'
-    context_object_name='problem'
+    context_object_name = 'problem'
 
     def test_func(self):
         return self.request.user.is_staff
@@ -469,16 +486,16 @@ class ProblemStatisticsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
                 submissions[submission.competitor_answer] += 1
             else:
                 submissions[submission.competitor_answer] = 1
-        context['submissions'] =submissions
+        context['submissions'] = submissions
         return context
 
 
-
 class ArchiveView(ListView):
-    model=Game
-    template_name='competition/archive.html'
+    model = Game
+    template_name = 'competition/archive.html'
     context_object_name = 'games'
     queryset = Game.objects.filter(results_public=True).order_by('-end')
+
 
 class ResultView(DetailView):
     """Náhľad súťaže"""
@@ -509,7 +526,7 @@ class ResultView(DetailView):
         results = []
         for result_group in result_groups:
             result = self.object.competitor_set.filter(
-                    grade__in=result_group.grades.all(), user__is_active=True
+                grade__in=result_group.grades.all(), user__is_active=True
             ).annotate(
                 solved_problems=Count(
                     'submissions', filter=Q(submissions__correct=True)),
@@ -539,18 +556,21 @@ class CurrentResultView(ResultView):
                 kwargs={'pk': Game.objects.order_by('-start').first().pk})
         )
 
-class CompetitorCertificateView(LoginRequiredMixin,View):
+
+class CompetitorCertificateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        competitor = Competitor.get_competitor(self.request.user,self.object)
+        competitor = Competitor.get_competitor(self.request.user, self.object)
         if competitor.certificate is not None:
             return FileResponse(competitor.certificate)
         return redirect('competition:after-game')
 
+
 @login_required
 def current_administration_view(request):
-    return redirect('competition:game-admin',pk=Game.get_current().pk)
+    return redirect('competition:game-admin', pk=Game.get_current().pk)
 
-class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
+
+class GameAdministrationView(LoginRequiredMixin, UserPassesTestMixin, ResultView):
     template_name = 'competition/game_administration.html'
 
     def test_func(self):
@@ -563,10 +583,12 @@ class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
         if 'results' in context:
             for results in context['results']:
                 for row in results['results']:
-                    if row.place<=self.object.number_of_competitor_with_certificate:
-                        list_of_certificates.append(r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
+                    if row.place <= self.object.number_of_competitor_with_certificate:
+                        list_of_certificates.append(
+                            r'\diplom{'+str(row.place)+r'}{'+str(row)+r'}{'+results['name']+r'}')
                     else:
-                        list_of_certificates.append(r'\diplomucast{'+str(row)+r'}{'+results['name']+r'}')
+                        list_of_certificates.append(
+                            r'\diplomucast{'+str(row)+r'}{'+results['name']+r'}')
                     user_ids.append(str(row.pk))
         context['certificates'] = list_of_certificates
         context['user_ids'] = user_ids
@@ -585,26 +607,29 @@ class GameAdministrationView(LoginRequiredMixin,UserPassesTestMixin,ResultView):
             with open(certificate_path, "wb") as outputStream:
                 output.write(outputStream)
             with open(certificate_path, "rb") as fs:
-                competitor.certificate = File(fs,name=certificate_name)
+                competitor.certificate = File(fs, name=certificate_name)
                 competitor.save()
-        messages.add_message(request,level=1,message='Diplomy nahraté')
-        return redirect('competition:certificates',pk=self.get_object().pk)
-    
-def upload_problems(request,pk):
+        messages.add_message(request, level=1, message='Diplomy nahraté')
+        return redirect('competition:certificates', pk=self.get_object().pk)
+
+
+def upload_problems(request, pk):
     file = request.FILES['filename']
-    parser  = MasProblemCurrentParser(file.file)
+    parser = MasProblemCurrentParser(file.file)
     game = Game.objects.get(pk=pk)
-    if game.levels.count()==0:
+    if game.levels.count() == 0:
         parser.create_problems(game)
     else:
         raise BadRequest('Súťaž už má nahraté úlohy')
-    return redirect('competition:game-admin',pk=pk)
+    return redirect('competition:game-admin', pk=pk)
 
-        
-class ExportCompetitorsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
+
+class ExportCompetitorsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Game
+
     def test_func(self):
         return self.request.user.is_staff
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         response = HttpResponse(
@@ -619,5 +644,5 @@ class ExportCompetitorsView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
                 competitor.grade,
                 competitor.school,
                 competitor.user.email
-                ])
+            ])
         return response
