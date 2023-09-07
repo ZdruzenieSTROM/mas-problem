@@ -46,6 +46,7 @@ def create_invoice(user, game: Game):
         payment.paid = True
         payment.save()
         return
+    # Only send the invoice if the game is not free
     payment.send_invoice()
 
 
