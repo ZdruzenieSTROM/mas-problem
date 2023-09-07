@@ -389,11 +389,7 @@ class UserNotRegisteredToGameView(LoginRequiredMixin, FormView):
                 user=self.request.user
             )
             competitor.save()
-            payment = Payment.objects.create(
-                amount=competitor.game.price, competitor=competitor)
-            if competitor.game.price == 0:
-                payment.paid = True
-                payment.save()
+            create_invoice(self.request.user, self.object)
         return super().form_valid(form)
 
 
