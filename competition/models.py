@@ -113,6 +113,9 @@ class Game(models.Model):
 
     def is_registration_active(self):
         return self.registration_start <= now() < self.registration_end
+    
+    def is_free(self):
+        return self.price == 0
 
     def __str__(self):
         return self.name

@@ -42,7 +42,7 @@ def create_invoice(user, game: Game):
     competitor = Competitor.get_competitor(user, game)
     payment = Payment.objects.create(
         amount=competitor.game.price, competitor=competitor)
-    if competitor.game.price == 0:
+    if competitor.game.is_free():
         payment.paid = True
         payment.save()
         return
@@ -175,7 +175,6 @@ class EditProfileView(LoginRequiredMixin, FormView):
             payment = False
             context['not_registered'] = True
         context['payment'] = payment
-        context['is_game_free'] = game.price == 0
         return context
 
 
