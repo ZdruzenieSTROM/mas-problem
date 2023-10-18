@@ -42,6 +42,11 @@ def create_invoice(user, game: Game):
     competitor = Competitor.get_competitor(user, game)
     payment = Payment.objects.create(
         amount=competitor.game.price, competitor=competitor)
+    if competitor.game.is_free():
+        payment.paid = True
+        payment.save()
+        return
+    # Only send the invoice if the game is not free
     payment.send_invoice()
 
 
@@ -158,8 +163,9 @@ class EditProfileView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        game = Game.get_current()
         context['not_registered'] = False
-        context['current_game'] = Game.get_current()
+        context['current_game'] = game
         try:
             competitor = Competitor.get_competitor(
                 self.request.user, context['current_game'])
@@ -383,6 +389,7 @@ class UserNotRegisteredToGameView(LoginRequiredMixin, FormView):
                 user=self.request.user
             )
             competitor.save()
+            create_invoice(self.request.user, self.object)
         return super().form_valid(form)
 
 
