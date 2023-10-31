@@ -6,11 +6,11 @@ from competition.models import Level, Problem
 
 class CompetitionParser:
     def __init__(self, file):
-        self.file : BytesIO = file
+        self.file: BytesIO = file
 
     def load_file(self):
         lines = self.file.readlines()
-        text = ''.join(l.decode("utf-8")  for l in lines)
+        text = ''.join(l.decode("utf-8") for l in lines)
         return text
 
     def parse(self):
@@ -46,7 +46,7 @@ class MasProblemCurrentParser(CompetitionParser):
     def parse(self):
         text = super().parse()
         level_text = text.split(sep=r'\uroven')
-        #levels = re.findall(r'\\uroven\{(.)\}', text)
+        # levels = re.findall(r'\\uroven\{(.)\}', text)
         levels = []
         for level in level_text:
             problems = re.findall(
@@ -63,21 +63,21 @@ class MasProblemCurrentParser(CompetitionParser):
             )
         return levels
 
-    def create_problems(self,game):
+    def create_problems(self, game):
         levels = self.parse()
-        previous_level =None
-        for i,level in enumerate(levels):
+        previous_level = None
+        for i, level in enumerate(levels):
             new_level = Level.objects.create(
                 game=game,
                 order=i+1,
                 previous_level=previous_level
             )
             previous_level = new_level
-            for j,(problem,result) in enumerate(zip(level['problems'],level['results'])):
+            for j, (problem, result) in enumerate(zip(level['problems'], level['results'])):
                 Problem.objects.create(
                     level=new_level,
-                    text = problem,
-                    order = j+1,
+                    text=problem,
+                    order=j+1,
                     solution=result
                 )
 
