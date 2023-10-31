@@ -43,8 +43,16 @@ class CompetitorAdmin(admin.ModelAdmin):
     list_filter = ('grade', 'game', 'user__is_active')
     search_fields = ('first_name', 'last_name')
 
+    actions = ['activate_users']
+
     def user_is_active(self, obj):
         return obj.user.is_active
+
+    @admin.action(description="Aktivovať označených súťažiacich")
+    def activate_users(self, request, queryset):
+        for competitor in queryset:
+            competitor.user.is_active = True
+            competitor.user.save()
 
 
 @admin.register(models.Submission)
