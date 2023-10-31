@@ -1,7 +1,9 @@
 import re
 from io import BytesIO
+from random import choice
+from unidecode import unidecode
 
-from competition.models import Level, Problem
+from competition.models import Competitor, Grade, Level, Problem, User
 
 
 class UTF8Parser:
@@ -81,4 +83,47 @@ class MasProblemCurrentParser(UTF8Parser):
                     solution=result
                 )
 
+# TODO: Should be defined in another file
+def generate_password():
+    return ''.join(choice('abcdefghijklmnopqrstuvwxyz') for _ in range(8))
 
+
+class CompetitorsParser(UTF8Parser):
+    def parse(self):
+        text = super().parse()
+        competitors = []
+        for user_line in text.split('\n'):
+            if not user_line:
+                continue
+            firstname, lastname, school, grade, legal_representative = user_line.split(';')
+            competitors.append(
+                {
+                    'firstname': firstname,
+                    'lastname': lastname,
+                    'school': school,
+                    'grade': Grade.grade_from_number(int(grade)),
+                    'legal_representative': legal_representative
+                }
+            )
+        return competitors
+
+    def create_users(self, game):
+        competitors = self.parse()
+        for competitor in competitors:
+            email = ''
+            username = f"{unidecode(competitor['firstname'] + competitor['lastname']).replace(' ', '').lower()}"
+            password = generate_password()
+            user = User.objects.create_user(username, email, password)
+            Competitor.objects.create(
+                user=user,
+                game=game,
+                first_name=competitor['firstname'],
+                last_name=competitor['lastname'],
+                school=competitor['school'],
+                grade=competitor['grade'],
+                legal_representative=competitor['legal_representative']
+            )
+
+            # TODO: payments
+
+            print(username, password)  # TODO: display this on the page

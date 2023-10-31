@@ -30,7 +30,7 @@ from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
 from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
                      Problem, Submission, User)
-from .parsers import MasProblemCurrentParser
+from .parsers import CompetitorsParser, MasProblemCurrentParser
 
 
 def view_404(request, exception=None):  # pylint: disable=unused-argument
@@ -628,6 +628,16 @@ def upload_problems(request, pk):
         parser.create_problems(game)
     else:
         raise BadRequest('Súťaž už má nahraté úlohy')
+    return redirect('competition:game-admin', pk=pk)
+
+
+@login_required
+def upload_competitors(request, pk):
+    file = request.FILES['filename']
+    parser = CompetitorsParser(file.file)
+    game = Game.objects.get(pk=pk)
+    parser.create_users(game)
+
     return redirect('competition:game-admin', pk=pk)
 
 

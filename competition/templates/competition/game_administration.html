@@ -21,6 +21,15 @@
   </div>
 </div>
 <h1>{{game.name}}</h1>
+
+<h2>Nahrávanie súťažiacich</h2>
+<form action="{% url 'competition:upload-competitors' pk=game.pk %}" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="file" id="source" name="filename">
+  <input type="submit" class="main-button">
+</form>
+
+
 {% if game.levels.count == 0 %}
 
   <form action="{% url 'competition:upload-problems' pk=game.pk %}" method="POST" enctype="multipart/form-data">
