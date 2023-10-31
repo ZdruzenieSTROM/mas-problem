@@ -2,8 +2,10 @@ from django.contrib import admin
 from django_admin_listfilter_dropdown.filters import (AllValuesFieldListFilter,
                                                       DropdownFilter,
                                                       RelatedDropdownFilter)
+from allauth.account.models import EmailAddress
 
 from competition import models
+from .views import email_confirmed_
 
 
 # Register your models here.
@@ -51,8 +53,8 @@ class CompetitorAdmin(admin.ModelAdmin):
     @admin.action(description="Aktivovať označených súťažiacich")
     def activate_users(self, request, queryset):
         for competitor in queryset:
-            competitor.user.is_active = True
-            competitor.user.save()
+            email = EmailAddress.objects.get(email=competitor.user.email)
+            email_confirmed_(request, email)  # Probably not ideal to call this directly but we want to go through the payment logic
 
 
 @admin.register(models.Submission)
