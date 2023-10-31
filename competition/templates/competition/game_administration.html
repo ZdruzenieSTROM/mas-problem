@@ -30,8 +30,10 @@
   </form>
 
 {% else %}
-  <a class="main-button" href="{% url 'competition:statistics' pk=game.pk %}">
-    Štatistiky
+  <a href="{% url 'competition:statistics' pk=game.pk %}">
+    <button class="main-button">
+      Štatistiky
+    </button>
   </a>
 {% endif %}
 
