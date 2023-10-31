@@ -4,7 +4,7 @@ from io import BytesIO
 from competition.models import Level, Problem
 
 
-class CompetitionParser:
+class UTF8Parser:
     def __init__(self, file):
         self.file: BytesIO = file
 
@@ -17,7 +17,7 @@ class CompetitionParser:
         return self.load_file()
 
 
-class MasProblemUntil2021Parse(CompetitionParser):
+class MasProblemUntil2021Parse(UTF8Parser):
 
     def parse(self):
         text = super().parse()
@@ -42,7 +42,7 @@ class MasProblemUntil2021Parse(CompetitionParser):
         return levels
 
 
-class MasProblemCurrentParser(CompetitionParser):
+class MasProblemCurrentParser(UTF8Parser):
     def parse(self):
         text = super().parse()
         level_text = text.split(sep=r'\uroven')
