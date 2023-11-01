@@ -31,11 +31,6 @@ class Grade(models.Model):
 
     def __str__(self):
         return self.shortcut
-    
-    # This might need some serious thought later
-    @staticmethod
-    def grade_from_number(number):
-        return Grade.objects.get(pk=number - 4)
 
 
 class Game(models.Model):

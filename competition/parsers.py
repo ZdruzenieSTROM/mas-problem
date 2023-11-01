@@ -102,7 +102,7 @@ class CompetitorsParser(UTF8Parser):
                     'firstname': firstname,
                     'lastname': lastname,
                     'school': school,
-                    'grade': Grade.grade_from_number(int(grade)),
+                    'grade': Grade.objects.get(shortcut=grade),
                     'legal_representative': legal_representative
                 }
             )
