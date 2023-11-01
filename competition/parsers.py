@@ -1,6 +1,7 @@
 import re
 from io import BytesIO
 from random import choice
+from string import ascii_lowercase
 from unidecode import unidecode
 
 from competition.models import Competitor, Grade, Level, Problem, User
@@ -85,7 +86,7 @@ class MasProblemCurrentParser(UTF8Parser):
 
 # TODO: Should be defined in another file
 def generate_password():
-    return ''.join(choice('abcdefghijklmnopqrstuvwxyz') for _ in range(8))
+    return ''.join(choice(ascii_lowercase) for _ in range(8))
 
 
 class CompetitorsParser(UTF8Parser):
