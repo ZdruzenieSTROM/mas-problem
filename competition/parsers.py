@@ -52,6 +52,9 @@ class MasProblemCurrentParser(UTF8Parser):
         # levels = re.findall(r'\\uroven\{(.)\}', text)
         levels = []
         for level in level_text:
+            # Usually the file will start with \uroven{A} so there is an empty string at the beginning.
+            if not level:
+                continue
             problems = re.findall(
                 r'\\begin\{zadanie\}(.*?)\\end\{zadanie\}', level, re.S)
             problems = [problem.strip() for problem in problems]
