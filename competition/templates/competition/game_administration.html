@@ -21,15 +21,24 @@
   </div>
 </div>
 <h1>{{game.name}}</h1>
-{% if game.levels.count == 0 %}
 
+<h2>Nahrávanie súťažiacich</h2>
+<form action="{% url 'competition:upload-competitors' pk=game.pk %}" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="file" id="source" name="filename">
+  <input type="submit" class="main-button">
+</form>
+
+
+{% if game.levels.count == 0 %}
+  <h2>Nahrávanie úloh</h2>
   <form action="{% url 'competition:upload-problems' pk=game.pk %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" id="source" name="filename">
-    <input type="submit">
+    <input type="submit" class="main-button">
   </form>
-
 {% else %}
+  <h2>Štatistiky</h2>
   <a href="{% url 'competition:statistics' pk=game.pk %}">
     <button class="main-button">
       Štatistiky
@@ -43,6 +52,7 @@
     Export súťažiacich
   </button>
 </a>
+
 <h2>Nahrávanie diplomov</h2>
 <form action="{% url 'competition:game-admin' pk=1 %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
@@ -50,7 +60,7 @@
     {% for id in user_ids %}
         <input hidden type="text" name="competitor_ids" value="{{id}}">
     {% endfor %}
-    <input type="submit">
+    <input type="submit" class="main-button">
   </form>
 
 Skopíruj nasledujúci text do overleafu, pre výrobu diplomov. Vznikne jedno pdf, ktoré následne nahraj cez nahrávač vyššie.<br>

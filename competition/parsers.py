@@ -1,23 +1,26 @@
 import re
 from io import BytesIO
+from random import choice
+from string import ascii_lowercase
+from unidecode import unidecode
 
-from competition.models import Level, Problem
+from competition.models import Competitor, Grade, Level, Problem, User
 
 
-class CompetitionParser:
+class UTF8Parser:
     def __init__(self, file):
-        self.file : BytesIO = file
+        self.file: BytesIO = file
 
     def load_file(self):
         lines = self.file.readlines()
-        text = ''.join(l.decode("utf-8")  for l in lines)
+        text = ''.join(l.decode("utf-8") for l in lines)
         return text
 
     def parse(self):
         return self.load_file()
 
 
-class MasProblemUntil2021Parse(CompetitionParser):
+class MasProblemUntil2021Parse(UTF8Parser):
 
     def parse(self):
         text = super().parse()
@@ -42,11 +45,11 @@ class MasProblemUntil2021Parse(CompetitionParser):
         return levels
 
 
-class MasProblemCurrentParser(CompetitionParser):
+class MasProblemCurrentParser(UTF8Parser):
     def parse(self):
         text = super().parse()
         level_text = text.split(sep=r'\uroven')
-        #levels = re.findall(r'\\uroven\{(.)\}', text)
+        # levels = re.findall(r'\\uroven\{(.)\}', text)
         levels = []
         for level in level_text:
             problems = re.findall(
@@ -63,22 +66,67 @@ class MasProblemCurrentParser(CompetitionParser):
             )
         return levels
 
-    def create_problems(self,game):
+    def create_problems(self, game):
         levels = self.parse()
-        previous_level =None
-        for i,level in enumerate(levels):
+        previous_level = None
+        for i, level in enumerate(levels):
             new_level = Level.objects.create(
                 game=game,
                 order=i+1,
                 previous_level=previous_level
             )
             previous_level = new_level
-            for j,(problem,result) in enumerate(zip(level['problems'],level['results'])):
+            for j, (problem, result) in enumerate(zip(level['problems'], level['results'])):
                 Problem.objects.create(
                     level=new_level,
-                    text = problem,
-                    order = j+1,
+                    text=problem,
+                    order=j+1,
                     solution=result
                 )
 
+# TODO: Should be defined in another file
+def generate_password():
+    return ''.join(choice(ascii_lowercase) for _ in range(8))
 
+
+class CompetitorsParser(UTF8Parser):
+    def parse(self):
+        text = super().parse()
+        competitors = []
+        for user_line in text.split('\n'):
+            if not user_line:
+                continue
+            firstname, lastname, school, grade, legal_representative = user_line.split(';')
+            competitors.append(
+                {
+                    'firstname': firstname,
+                    'lastname': lastname,
+                    'school': school,
+                    'grade': Grade.objects.get(shortcut=grade),
+                    'legal_representative': legal_representative
+                }
+            )
+        return competitors
+
+    def create_users(self, game):
+        competitors = self.parse()
+        result = []
+        for competitor in competitors:
+            email = ''
+            username = f"{unidecode(competitor['firstname'] + competitor['lastname']).replace(' ', '').lower()}"
+            password = generate_password()
+
+            user = User.objects.create_user(username, email, password)
+            Competitor.objects.create(
+                user=user,
+                game=game,
+                first_name=competitor['firstname'],
+                last_name=competitor['lastname'],
+                school=competitor['school'],
+                grade=competitor['grade'],
+                legal_representative=competitor['legal_representative']
+            )
+
+            result.append({'username': username, 'password': password, 'user': user})
+
+        return result
