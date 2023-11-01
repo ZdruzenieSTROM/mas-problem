@@ -636,9 +636,19 @@ def upload_competitors(request, pk):
     file = request.FILES['filename']
     parser = CompetitorsParser(file.file)
     game = Game.objects.get(pk=pk)
-    parser.create_users(game)
+    users = parser.create_users(game)
 
-    return redirect('competition:game-admin', pk=pk)
+    for user in users:
+        # create_invoice can't be called from the parser due to circular import error
+        # maybe we should rethink the responsibilities of the parsers and objects should only be
+        # created in the views and the parsers should just parse the file
+        create_invoice(user['user'], game)
+
+    return HttpResponse(
+        content_type="text/plain",
+        headers={"Content-Disposition": 'attachment; filename="competitors.txt"'},
+        content='\n'.join([f"{user['username']};{user['password']}" for user in users])
+    )
 
 
 class ExportCompetitorsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):

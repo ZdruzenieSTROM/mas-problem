@@ -109,10 +109,12 @@ class CompetitorsParser(UTF8Parser):
 
     def create_users(self, game):
         competitors = self.parse()
+        result = []
         for competitor in competitors:
             email = ''
             username = f"{unidecode(competitor['firstname'] + competitor['lastname']).replace(' ', '').lower()}"
             password = generate_password()
+
             user = User.objects.create_user(username, email, password)
             Competitor.objects.create(
                 user=user,
@@ -124,6 +126,6 @@ class CompetitorsParser(UTF8Parser):
                 legal_representative=competitor['legal_representative']
             )
 
-            # TODO: payments
+            result.append({'username': username, 'password': password, 'user': user})
 
-            print(username, password)  # TODO: display this on the page
+        return result
