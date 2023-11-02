@@ -429,8 +429,8 @@ class ProblemView(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
-        competitor = Competitor.get_competitor(self.request.user, self.object)
         self.object = self.get_object()
+        competitor = Competitor.get_competitor(self.request.user, self.object.level.game)
         if self.object.can_submit(competitor):
             answer = self.request.POST['answer']
 

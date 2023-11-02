@@ -148,8 +148,8 @@ class Level(models.Model):
     def number_of_solved(self, competitor):
         """Počet vyriešených úloh"""
         return Problem.objects.annotate(
-            num_correct=Count('submission', filter=Q(
-                submission__competitor=competitor, submission__correct=True))
+            num_correct=Count('submissions', filter=Q(
+                submissions__competitor=competitor, submissions__correct=True))
         ).filter(
             level=self,
             num_correct__gte=1
@@ -363,9 +363,13 @@ class CompetitorGroup(models.Model):
     end_level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='groups_ending')
 
+
+    def __str__(self):
+        return f"{self.game} - {','.join([str(grade) for grade in self.grades.all()])}"
+
     @classmethod
     def get_group_from_competitor(cls, competitor: Competitor):
-        return cls.objects.get(grades=competitor.grade)
+        return cls.objects.get(grades=competitor.grade, game=competitor.game)
 
 
 class CompetitorGroupLevelSettings(models.Model):

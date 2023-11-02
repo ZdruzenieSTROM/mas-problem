@@ -51,7 +51,8 @@ class MasProblemCurrentParser(UTF8Parser):
         level_text = text.split(sep=r'\uroven')
         # levels = re.findall(r'\\uroven\{(.)\}', text)
         levels = []
-        for level in level_text:
+        # We want to skip anything before the first \uroven command, otherwise it creates and empty level
+        for level in level_text[1:]:
             problems = re.findall(
                 r'\\begin\{zadanie\}(.*?)\\end\{zadanie\}', level, re.S)
             problems = [problem.strip() for problem in problems]
