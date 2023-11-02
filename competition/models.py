@@ -198,7 +198,7 @@ class Problem(models.Model):
     text = models.TextField(verbose_name='Zadanie')
     order = models.PositiveSmallIntegerField(
         null=True, verbose_name='Poradie úlohy v úrovni')
-    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok')
+    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok', upload_to='public')
     solution = models.CharField(max_length=25, verbose_name='Správna odpoveď')
 
     def correctly_submitted(self, competitor):
