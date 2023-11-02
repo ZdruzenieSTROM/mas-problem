@@ -363,6 +363,10 @@ class CompetitorGroup(models.Model):
     end_level = models.ForeignKey(
         Level, on_delete=models.CASCADE, related_name='groups_ending')
 
+
+    def __str__(self):
+        return f"{self.game} - {','.join([str(grade) for grade in self.grades.all()])}"
+
     @classmethod
     def get_group_from_competitor(cls, competitor: Competitor):
         return cls.objects.get(grades=competitor.grade)
