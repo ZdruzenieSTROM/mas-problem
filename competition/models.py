@@ -369,7 +369,7 @@ class CompetitorGroup(models.Model):
 
     @classmethod
     def get_group_from_competitor(cls, competitor: Competitor):
-        return cls.objects.get(grades=competitor.grade)
+        return cls.objects.get(grades=competitor.grade, game=competitor.game)
 
 
 class CompetitorGroupLevelSettings(models.Model):
