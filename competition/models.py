@@ -148,8 +148,8 @@ class Level(models.Model):
     def number_of_solved(self, competitor):
         """Počet vyriešených úloh"""
         return Problem.objects.annotate(
-            num_correct=Count('submission', filter=Q(
-                submission__competitor=competitor, submission__correct=True))
+            num_correct=Count('submissions', filter=Q(
+                submissions__competitor=competitor, submissions__correct=True))
         ).filter(
             level=self,
             num_correct__gte=1
