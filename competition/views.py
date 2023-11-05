@@ -566,6 +566,7 @@ class CurrentResultView(ResultView):
 
 class CompetitorCertificateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        # self.object should be game but there is no way to get game from this url, nor does this have any object
         competitor = Competitor.get_competitor(self.request.user, self.object)
         if competitor.certificate is not None:
             return FileResponse(competitor.certificate)
@@ -617,6 +618,7 @@ class GameAdministrationView(LoginRequiredMixin, UserPassesTestMixin, ResultView
                 competitor.certificate = File(fs, name=certificate_name)
                 competitor.save()
         messages.add_message(request, level=1, message='Diplomy nahraté')
+        # There is no such url
         return redirect('competition:certificates', pk=self.get_object().pk)
 
 
