@@ -617,7 +617,7 @@ class GameAdministrationView(LoginRequiredMixin, UserPassesTestMixin, ResultView
                 competitor.certificate = File(fs, name=certificate_name)
                 competitor.save()
         messages.add_message(request, level=1, message='Diplomy nahraté')
-        return redirect('competition:certificates', pk=self.get_object().pk)
+        return redirect('competition:game-admin', pk=self.get_object().pk)
 
 
 def upload_problems(request, pk):
