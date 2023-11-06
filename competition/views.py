@@ -564,9 +564,11 @@ class CurrentResultView(ResultView):
         )
 
 
-class CompetitorCertificateView(LoginRequiredMixin, View):
+class CompetitorCertificateView(LoginRequiredMixin, DetailView):
+    model = Game
+
     def get(self, request, *args, **kwargs):
-        competitor = Competitor.get_competitor(self.request.user, self.object)
+        competitor = Competitor.get_competitor(self.request.user, self.get_object())
         if competitor.certificate is not None:
             return FileResponse(competitor.certificate)
         return redirect('competition:after-game')
