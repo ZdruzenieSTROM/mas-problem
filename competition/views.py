@@ -354,6 +354,8 @@ class UserNotRegisteredToGameView(LoginRequiredMixin, FormView):
 
         initial = super().get_initial()
         competitor = self.request.user.competitor_set.last()
+        if competitor is None:
+            return initial
         initial['first_name'] = competitor.first_name
         initial['last_name'] = competitor.last_name
         initial['school'] = competitor.school
