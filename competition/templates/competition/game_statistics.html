@@ -35,7 +35,7 @@
             {%else%}-{%endif%}
         </td>
         <td>{{problem.average_correct_submission_time|default_if_none:"-"}}</td>
-        <td>{{problem.average_correct_submission|default_if_none:"-"}}</td>
+        <!-- <td>{{problem.average_correct_submission|default_if_none:"-"}}</td> -->
         {% if user.is_staff %}
         <td><a href="{% url 'competition:problem-statistics' pk=problem.pk %}">Detail</a></td>
         {% endif %}
