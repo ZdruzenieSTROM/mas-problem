@@ -238,8 +238,8 @@ class Problem(models.Model):
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
 
     def average_correct_submission(self):
-        Competitor.objects.filter(submissions__correct=Exists())
-        count = self.submissions.filter(competitor__in=True).count()
+        # BUG: Nepočíta to, to čo má
+        count = self.submissions.count()
         all = self.submissions.filter(correct=True).count()
         if count == 0:
             return None
