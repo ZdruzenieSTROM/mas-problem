@@ -536,7 +536,10 @@ class ResultView(DetailView):
         for result_group in result_groups:
             result = self.object.competitor_set.filter(
                 grade__in=result_group.grades.all(), user__is_active=True
-            ).annotate(
+            )
+            if self.object.is_started():
+                result = result.filter(started_at__isnull=False)
+            result = result.annotate(
                 solved_problems=Count(
                     'submissions', filter=Q(submissions__correct=True)),
                 max_level=Subquery(
