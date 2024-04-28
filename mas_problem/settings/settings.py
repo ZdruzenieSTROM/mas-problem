@@ -26,7 +26,7 @@ def read_secret(secret_name: str) -> str:
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i26a%-vwf9_dfqkw@rc4#q$bb4$u%qzplnh%a3qtiu-a3dzv%)'
+SECRET_KEY = read_secret('django_secret_key.txt')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
