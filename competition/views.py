@@ -145,20 +145,19 @@ class EditProfileView(LoginRequiredMixin, FormView):
         return initial
 
     def form_valid(self, form):
-        if hasattr(self.request.user, 'competitor'):
-            try:
-                competitor = Competitor.get_competitor(
-                    self.request.user, Game.get_current())
-            except Competitor.DoesNotExist:
-                raise BadRequest
-            competitor.first_name = form.cleaned_data['first_name']
-            competitor.last_name = form.cleaned_data['last_name']
-            competitor.grade = form.cleaned_data['grade']
-            competitor.school = form.cleaned_data['school']
-            competitor.phone_number = form.cleaned_data['phone_number']
-            competitor.legal_representative = form.cleaned_data['legal_representative']
-            competitor.address = form.cleaned_data['address']
-            competitor.save()
+        try:
+            competitor = Competitor.get_competitor(
+                self.request.user, Game.get_current())
+        except Competitor.DoesNotExist:
+            raise BadRequest
+        competitor.first_name = form.cleaned_data['first_name']
+        competitor.last_name = form.cleaned_data['last_name']
+        competitor.grade = form.cleaned_data['grade']
+        competitor.school = form.cleaned_data['school']
+        competitor.phone_number = form.cleaned_data['phone_number']
+        competitor.legal_representative = form.cleaned_data['legal_representative']
+        competitor.address = form.cleaned_data['address']
+        competitor.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -432,7 +431,8 @@ class ProblemView(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
         self.object = self.get_object()
-        competitor = Competitor.get_competitor(self.request.user, self.object.level.game)
+        competitor = Competitor.get_competitor(
+            self.request.user, self.object.level.game)
         if self.object.can_submit(competitor):
             answer = self.request.POST['answer']
 
@@ -573,7 +573,8 @@ class CompetitorCertificateView(LoginRequiredMixin, DetailView):
     model = Game
 
     def get(self, request, *args, **kwargs):
-        competitor = Competitor.get_competitor(self.request.user, self.get_object())
+        competitor = Competitor.get_competitor(
+            self.request.user, self.get_object())
         if competitor.certificate is not None:
             return FileResponse(competitor.certificate)
         return redirect('competition:after-game')
@@ -654,7 +655,8 @@ def upload_competitors(request, pk):
     return HttpResponse(
         content_type="text/plain",
         headers={"Content-Disposition": 'attachment; filename="competitors.txt"'},
-        content='\n'.join([f"{user['username']};{user['password']}" for user in users])
+        content='\n'.join(
+            [f"{user['username']};{user['password']}" for user in users])
     )
 
 
