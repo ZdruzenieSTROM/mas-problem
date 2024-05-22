@@ -9,18 +9,19 @@ services:
     ports:
       - "8630:8000"
     volumes:
-      - "staticfiles:/app/static:ro"
+      - "staticfiles:/app/static:rw"
       - type: "bind"
-        source: "./db.sqlite3"
+        source: "/data/www/mas-problem-test/db.sqlite3"
         target: "/app/db.sqlite3"
       - type: "bind"
-        source: "./media"
+        source: "/data/www/mas-problem-test/media"
         target: "/app/media"
-
-
+      - type: "bind"
+        source: "/data/www/mas-problem-test/.secrets"
+        target: "/app/.secrets"
 
   static:
-    image: "nginx:1.23"
+    image: "nginx:1.25"
     depends_on:
       - "website"
     ports:
