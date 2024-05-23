@@ -6,17 +6,20 @@ services:
     ports:
       - "8620:8000"
     volumes:
-      - "staticfiles:/app/static:ro"
+      - "staticfiles:/app/static:rw"
       - type: "bind"
-        source: "./db.sqlite3"
+        source: "/data/www/mas-problem/db.sqlite3"
         target: "/app/db.sqlite3"
       - type: "bind"
-        source: "./media"
+        source: "/data/www/mas-problem/media"
         target: "/app/media"
+      - type: "bind"
+        source: "/data/www/mas-problem/.secrets"
+        target: "/app/.secrets"
     restart: always
 
   static:
-    image: "nginx:1.23"
+    image: "nginx:1.25"
     depends_on:
       - "website"
     ports:
