@@ -31,14 +31,8 @@ SECRET_KEY = read_secret('django_secret_key.txt')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['masproblem.strom.sk',
-                 'masproblemtest.strom.sk', 'localhost']
+ALLOWED_HOSTS = []
 
-CSRF_TRUSTED_ORIGINS = ['https://masproblem.strom.sk',
-                        'https://www.masproblem.strom.sk',
-                        'http://masproblemtest.strom.sk',
-                        'http://www.masproblemtest.strom.sk'
-                        ]
 SITE_ID = 1
 
 # Application definition

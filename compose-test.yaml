@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        SETTINGS_MODULE: mas_problem.settings.settings
+        SETTINGS_MODULE: mas_problem.settings.test_settings
     ports:
       - "8630:8000"
     volumes:
