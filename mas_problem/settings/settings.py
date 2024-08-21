@@ -167,12 +167,12 @@ INVOICE_ISSUER = 'Mgr. Peter Kovács'
 
 ####### Email ################
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST = 'smtp-relay.gmail.com'
 EMAIL_PORT = '587'
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'noreply@strom.sk'
-SERVER_EMAIL = 'noreply@strom.sk'
-EMAIL_HOST_PASSWORD = read_secret('email_password.txt')
+
 DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 ADMINS = [('Kovacs', 'kovacs@strom.sk'), ('Masrna', 'michal.masrna@strom.sk')]
