@@ -169,4 +169,5 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'noreply@strom.sk'
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-ADMINS = [('Kovacs', 'kovacs@strom.sk'), ('Masrna', 'michal.masrna@strom.sk')]
+ADMINS = [('Kovacs', 'kovacs@strom.sk'), ('Masrna',
+                                          'michal.masrna@strom.sk'), ('Smilnak', 'martin.smilnak@strom.sk')]
