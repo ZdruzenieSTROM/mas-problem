@@ -372,7 +372,7 @@ class UserNotRegisteredToGameView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['game'] = self.object
+        context['game'] = Game.get_current()
         return context
 
     def form_valid(self, form):
