@@ -38,6 +38,10 @@ def view_404(request, exception=None):  # pylint: disable=unused-argument
     return redirect('competition:pravidla')
 
 
+def view_429(request, exception=None):
+    return render(request, 'error.html')
+
+
 def create_invoice(user, game: Game):
     competitor = Competitor.get_competitor(user, game)
     payment = Payment.objects.create(
