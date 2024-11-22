@@ -216,6 +216,7 @@ class Problem(models.Model):
             self.level.unlocked(competitor)
             and not self.correctly_submitted(competitor)
             and not self.get_timeout(competitor) > timedelta(0)
+            and not competitor.finished()
         )
 
     def competitor_submissions(self, competitor):
