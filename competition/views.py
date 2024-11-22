@@ -38,7 +38,7 @@ def view_404(request, exception=None):  # pylint: disable=unused-argument
     return redirect('competition:pravidla')
 
 
-def view_429(request, exception=None):
+def view_400(request, exception=None):
     return render(request, 'error.html')
 
 
