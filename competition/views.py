@@ -31,6 +31,8 @@ from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
 from .models import (Competitor, CompetitorGroup, Game, Level, Payment,
                      Problem, Submission, User)
 from .parsers import CompetitorsParser, MasProblemCurrentParser
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import AnonymousUser
 
 
 def view_404(request, exception=None):  # pylint: disable=unused-argument
@@ -366,8 +368,7 @@ class UserNotRegisteredToGameView(LoginRequiredMixin, FormView):
     def get(self, request, *args, **kwargs):
         self.object = Game.get_current()
         if self.object.is_user_registered(self.request.user):
-            game_redirect(self.object, Competitor.get_competitor(
-                self.request.user, self.object))
+            return game_redirect(self.object, self.request.user)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -401,7 +402,7 @@ def not_paid(request):
 # This should probably be defined in another file
 
 
-def game_redirect(game: Game, user: Competitor):
+def game_redirect(game: Game, user: AbstractBaseUser | AnonymousUser):
     if not game.is_user_registered(user):
         return redirect('competition:register-to-game', pk=game.pk)
 
