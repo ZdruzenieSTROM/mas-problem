@@ -1,6 +1,7 @@
 
 import csv
 from datetime import datetime
+from typing import Union
 
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
@@ -402,7 +403,7 @@ def not_paid(request):
 # This should probably be defined in another file
 
 
-def game_redirect(game: Game, user: AbstractBaseUser | AnonymousUser):
+def game_redirect(game: Game, user: Union[AbstractBaseUser, AnonymousUser]):
     if not game.is_user_registered(user):
         return redirect('competition:register-to-game', pk=game.pk)
 
