@@ -117,6 +117,12 @@ class CompetitorsParser(UTF8Parser):
             username = f"{unidecode(competitor['firstname'] + competitor['lastname']).replace(' ', '').lower()}"
             password = generate_password()
 
+            username_base = username
+            username_decorator = 0
+            while User.objects.filter(username=username).exists():
+                username_decorator += 1
+                username = username_base + str(username_decorator)
+
             user = User.objects.create_user(username, email, password)
             Competitor.objects.create(
                 user=user,
