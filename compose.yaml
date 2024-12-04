@@ -4,7 +4,7 @@ services:
   website:
     build: .
     ports:
-      - "8620:8000"
+      - "127.0.0.1:8620:8000"
     volumes:
       - "staticfiles:/app/static:rw"
       - type: "bind"
@@ -23,7 +23,7 @@ services:
     depends_on:
       - "website"
     ports:
-      - "8621:80"
+      - "127.0.0.1:8621:80"
     volumes:
       - "staticfiles:/usr/share/nginx/html:ro"
     restart: always
