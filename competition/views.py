@@ -102,7 +102,8 @@ class SignUpView(FormView):
             grade=form.cleaned_data['grade'],
             school=form.cleaned_data['school'],
             game=form.cleaned_data['game'],
-            address=form.cleaned_data['address'],
+            # address=form.cleaned_data['address'],
+            address='',
             legal_representative=form.cleaned_data['legal_representative'],
             phone_number=form.cleaned_data['phone_number']
         )
