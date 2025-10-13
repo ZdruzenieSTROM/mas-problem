@@ -51,6 +51,10 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Meno a priezvisko zákonného zástupcu*'
     )
+    referral_source = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
+        label='Ako si sa dozvedel o Máš probléme?!?*'
+    )
     '''
     address = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
