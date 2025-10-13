@@ -51,11 +51,13 @@ class RegisterForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Meno a priezvisko zákonného zástupcu*'
     )
+    '''
     address = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control main-input'}),
         label='Adresa (údaj je nepovinný a bude použitý iba v prípade zaslania ocenenia)',
         required=False
     )
+    '''
     gdpr = forms.CharField(
         widget=forms.CheckboxInput(attrs={'class': 'checkbox-input'}),
         label="",
