@@ -105,6 +105,7 @@ class SignUpView(FormView):
             # address=form.cleaned_data['address'],
             address='',
             legal_representative=form.cleaned_data['legal_representative'],
+            referral_source=form.cleaned_data['referral_source'],
             phone_number=form.cleaned_data['phone_number']
         )
         send_email_confirmation(self.request, user, True)

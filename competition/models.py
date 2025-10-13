@@ -283,6 +283,7 @@ class Competitor(models.Model):
     started_at = models.DateTimeField(null=True, blank=True)
     address = models.CharField(max_length=256, blank=True)
     legal_representative = models.CharField(max_length=128)
+    referral_source = models.CharField(max_length=1024, null=True, blank=True)
     certificate = models.FileField(null=True, blank=True, upload_to='diplomy')
 
     def __str__(self):
