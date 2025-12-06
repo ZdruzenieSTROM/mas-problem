@@ -37,9 +37,16 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'competition:pravidla'%}">Pravidlá</a>
                             </li>
+                            {% if user.is_staff %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'competition:current-results' %}">Výsledky</a>
                             </li>
+                            {% endif %}
+                            {% if user.is_active and not user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'competition:placements'%}">Umiestnenia</a>
+                            </li>
+                            {% endif %}               
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'competition:archive'%}">Archív</a>
                             </li>

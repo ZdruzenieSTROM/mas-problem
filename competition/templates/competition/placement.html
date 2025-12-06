@@ -1,0 +1,36 @@
+{% extends "competition/base.html" %}
+
+{% block title %}Umiestnenia{% endblock %}
+
+{% block content %}
+<h1>Tvoje umiestnenia v minulých ročníkoch</h1>
+
+{% if placements %}
+<table>
+    <tr>
+        <th>Súťaž</th>
+        <th>Kategória</th>
+        <th>Umiestnenie</th>
+        <th>Počet súťažiacich</th>
+    </tr>
+    {% for placement in placements %}
+    <tr>
+        <td>{{ placement.game.name }}</td>
+        <td>{{ placement.competitor.grade }}</td>
+    {% if placement.game.results_public %}
+        <td>{{ placement.place }}</td>
+        <td>{{ placement.total }}</td>
+    {% else %}
+        <td colspan="2" style="text-align:center">
+            Táto súťaž sa ešte vyhodnocuje
+        </td>
+    {% endif %}
+
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+Žiadna súťaž, ktorej si sa zúčastnil, ešte nebola vyhodnotená.
+{% endif %}
+
+{% endblock %}

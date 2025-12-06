@@ -33,5 +33,6 @@ urlpatterns = [
     path('export-sutaziacich/<int:pk>',views.ExportCompetitorsView.as_view(),name='export-competitors'),
     path('moj-diplom/<int:pk>',view=views.CompetitorCertificateView.as_view(),name='my-certificate'),
     path('upload-problems/<int:pk>',views.upload_problems,name='upload-problems'),
-    path('upload-competitors/<int:pk>',views.upload_competitors,name='upload-competitors')
+    path('upload-competitors/<int:pk>',views.upload_competitors,name='upload-competitors'),
+    path('umiestnenia',views.PlacementsView.as_view(),name='placements')
 ]
