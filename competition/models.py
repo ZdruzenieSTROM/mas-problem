@@ -226,7 +226,7 @@ class Problem(models.Model):
         """Return timeout"""
         submission = self.submissions.filter(
             competitor=competitor, correct=False)
-        if submission.count() < 3:
+        if submission.count() < 2:
             return timedelta(0)
         time_of_last_submission = submission.order_by(
             '-submitted_at')[0].submitted_at
