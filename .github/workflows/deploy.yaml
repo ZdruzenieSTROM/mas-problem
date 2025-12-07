@@ -10,7 +10,7 @@ jobs:
         with:
           path: mas-problem
 
-      - uses: wshihadeh/docker-deployment-action@v2
+      - uses: ZdruzenieSTROM/docker-deployment-action@v2
         with:
           remote_docker_host: webstrom@server.strom.sk
           ssh_private_key: ${{ secrets.WEBSTROM_DEPLOY_SSH_PRIVATE_KEY }}
