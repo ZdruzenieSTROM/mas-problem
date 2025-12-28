@@ -509,11 +509,7 @@ class ArchiveView(ListView):
     queryset = Game.objects.filter(results_public=True).order_by('-end')
 
 
-class ResultView(DetailView):
-    """Náhľad súťaže"""
-    model = Game
-    template_name = 'competition/results.html'
-
+class ResultsMixin:
     def add_places(self, results):
         current_place = 1
         previous_last_correct_submission = None
@@ -530,23 +526,16 @@ class ResultView(DetailView):
                 previous_solved_problems = result_row.solved_problems
             result_row.place = current_place
             results_list.append(result_row)
-        return results_list
+        return results_list        
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['games'] = Game.objects.all()
-        if self.object.is_started() and not self.object.results_public:
-            return context
-        if self.object.pdf_results:
-            context['pdf_results'] = self.object.pdf_results
-            return context
-        result_groups = self.object.result_groups.all()
+    def build_game_results(self, game):
+        result_groups = game.result_groups.all()
         results = []
         for result_group in result_groups:
-            result = self.object.competitor_set.filter(
+            result = game.competitor_set.filter(
                 grade__in=result_group.grades.all(), user__is_active=True
             )
-            if self.object.is_started():
+            if game.is_started():
                 result = result.filter(started_at__isnull=False)
             result = result.annotate(
                 solved_problems=Count(
@@ -565,7 +554,49 @@ class ResultView(DetailView):
                     'results': self.add_places(result)
                 }
             )
-        context['results'] = results
+
+        return results
+
+
+class PlacementsView(LoginRequiredMixin, ResultsMixin, ListView):
+    model = Competitor
+    template_name = 'competition/placement.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        placements = []
+        competitors = Competitor.objects.filter(user=self.request.user)
+        for competitor in competitors:
+            results = self.build_game_results(competitor.game)
+            for result_group in results:
+                for result in result_group['results']:
+                    if result == competitor:
+                        placements.append({
+                            'game': competitor.game,
+                            'place': result.place,
+                            'total': len(result_group['results']),
+                            'competitor': competitor
+                        })
+        placements.sort(key=lambda x: x['game'].start, reverse=True)
+        context['placements'] = placements
+        return context
+
+
+class ResultView(ResultsMixin, LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    """Náhľad súťaže"""
+    model = Game
+    template_name = 'competition/results.html'
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['games'] = Game.objects.all()
+        if self.object.pdf_results:
+            context['pdf_results'] = self.object.pdf_results
+            return context
+        context['results'] = self.build_game_results(self.object)
         return context
 
 
@@ -594,11 +625,8 @@ def current_administration_view(request):
     return redirect('competition:game-admin', pk=Game.get_current().pk)
 
 
-class GameAdministrationView(LoginRequiredMixin, UserPassesTestMixin, ResultView):
+class GameAdministrationView(ResultView):
     template_name = 'competition/game_administration.html'
-
-    def test_func(self):
-        return self.request.user.is_staff
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
