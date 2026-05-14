@@ -35,6 +35,12 @@
                     <div id="navbar" class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-left">
                             <li class="nav-item">
+                                <a class="nav-link" href="{% url 'competition:info'%}">Info</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'competition:akosazapojit'%}">Ako sa zapojiť</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'competition:pravidla'%}">Pravidlá</a>
                             </li>
                             {% if user.is_staff %}
