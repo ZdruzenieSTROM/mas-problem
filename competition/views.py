@@ -439,6 +439,9 @@ class ProblemView(LoginRequiredMixin, DetailView):
         if self.object.can_submit(competitor):
             answer = self.request.POST['answer']
 
+            next_lvl = self.object.level.next_level()
+            was_next_unlocked = next_lvl.unlocked(competitor) if next_lvl else True
+            
             Submission.objects.create(
                 problem=self.object,
                 competitor=competitor,
@@ -446,6 +449,13 @@ class ProblemView(LoginRequiredMixin, DetailView):
                 submitted_at=now(),
                 correct=self.object.check_answer(answer)
             )
+
+            if next_lvl and not was_next_unlocked and next_lvl.unlocked(competitor):
+                messages.success(
+                    request, 
+                    f'Nová úroveň {next_lvl.level_letter()} bola odomknutá! Veľa šťastia pri jej prekonávaní!'
+                )
+
         return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
 
