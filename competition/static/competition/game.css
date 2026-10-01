@@ -236,6 +236,12 @@ tr:nth-child(even) {
     border-top: none;
 }
 
+.no-select {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 @media screen and (max-width: 768px) {
     .footer {
         font-size: 1rem;
