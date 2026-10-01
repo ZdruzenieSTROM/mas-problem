@@ -455,6 +455,7 @@ class ProblemView(LoginRequiredMixin, DetailView):
                     request, 
                     f'Nová úroveň {next_lvl.level_letter()} bola odomknutá! Veľa šťastia pri jej prekonávaní!'
                 )
+                return redirect(reverse('competition:game')+f'?level={next_lvl.pk}')
 
         return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
