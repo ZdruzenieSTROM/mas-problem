@@ -4,5 +4,13 @@
 
 {% block content %}
 <h1>Čas na súťaž ti už vypršal.</h1>
-<p class="fs-2">Po skončení súťaže budú výsledky zverejnené <a href="{% url 'competition:results' pk=game.pk %}" class="main-link">na tomto odkaze</a><!-- a zadania s riešeniami budú zverejnené v  <a href="#}">Archíve</a> -->.</p>
+<p class="fs-2">Po skončení súťaže si budeš vedieť pozrieť svoje umiestnenie <a href="{% url 'competition:placements' %}">na tomto odkaze</a><!-- a zadania s riešeniami budú zverejnené v  <a href="#}">Archíve</a> -->.</p>
+<br>
+<p class="fs-2">Vieš, že okrem tejto súťaže organizujeme aj týždňové sústredenie vo februári?</p>
+<h2>
+    Máš záujem?! - 
+    <a href="https://strom.sk/{% if is_malynar_age %}malynar{% else %}matik{% endif %}/ako-prebieha-{% if is_malynar_age %}malynar{% else %}matik{% endif %}">
+        Áno!
+    </a>
+</h2>
 {% endblock %}
