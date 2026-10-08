@@ -297,6 +297,17 @@ class GameFinishedView(LoginRequiredMixin, DetailView):
                 return super().get(request, *args, **kwargs)
         return game_redirect(self.object, self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            competitor = Competitor.get_competitor(self.request.user, self.object)
+            context['is_malynar_age'] = competitor.grade.shortcut in {"Z4", "Z5", "Z6"} 
+
+        except Competitor.DoesNotExist:
+            context['is_malynar_age'] = False
+
+        return context
+
 
 class GameView(LoginRequiredMixin, DetailView):
     """Náhľad súťaže"""
