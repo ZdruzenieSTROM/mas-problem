@@ -137,8 +137,11 @@ class Level(models.Model):
         """Vráti či súťažiaci má odomknutý level"""
         if self.previous_level is None:
             return self.game == competitor.game
-        level_settings = CompetitorGroupLevelSettings.get_settings(
-            competitor, self)
+        try:
+            level_settings = CompetitorGroupLevelSettings.get_settings(
+                competitor, self)
+        except:
+            return False
         return level_settings.is_starting_level() or (
             self.previous_level.number_of_solved(
                 competitor) >= level_settings.num_to_unlock
