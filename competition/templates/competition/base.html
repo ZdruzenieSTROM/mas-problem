@@ -21,7 +21,9 @@
     <div class="page">
         <nav class="navbar navbar-inverse" role="navigation">
             <div class="navbar-container">
-                <img alt="logo" src="{% static 'competition/logo.png' %}" class="logo" />
+                <a href="{% url 'competition:info' %}" class="logo-link" title="Máš problém?! – domovská stránka">
+                    <img alt="Máš problém?!" src="{% static 'competition/logo.png' %}" class="logo" />
+                </a>
                 <div class="container navbar-inner-container">
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
