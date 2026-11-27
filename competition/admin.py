@@ -44,6 +44,8 @@ class CompetitorAdmin(admin.ModelAdmin):
                     'school', 'started_at', 'user_is_active')
     list_filter = ('grade', 'game', 'user__is_active')
     search_fields = ('first_name', 'last_name')
+    # Also determines the order of competitors in related filters (e.g. in submissions)
+    ordering = ('first_name', 'last_name')
 
     actions = ['activate_users']
 
@@ -65,6 +67,7 @@ class SubmissionAdmin(admin.ModelAdmin):
                    ('competitor', RelatedDropdownFilter),
                    ('problem__level', RelatedDropdownFilter),
                    ('problem__level__game', RelatedDropdownFilter))
+    search_fields = ('competitor__first_name', 'competitor__last_name')
 
 
 @admin.register(models.ResultGroup)
