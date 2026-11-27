@@ -201,8 +201,21 @@ class Problem(models.Model):
     text = models.TextField(verbose_name='Zadanie')
     order = models.PositiveSmallIntegerField(
         null=True, verbose_name='Poradie úlohy v úrovni')
-    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok', upload_to='public')
+    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok', upload_to='problems')
     solution = models.CharField(max_length=25, verbose_name='Správna odpoveď')
+
+    def image_visible_for(self, user) -> bool:
+        """Či môže používateľ vidieť obrázok úlohy (zadanie nesmie uniknúť pred hrou)"""
+        game = self.level.game
+        if user.is_staff or game.is_finished():
+            return True
+        if not user.is_authenticated or not game.is_started():
+            return False
+        try:
+            competitor = Competitor.get_competitor(user, game)
+        except Competitor.DoesNotExist:
+            return False
+        return competitor.started() and self.level.unlocked(competitor)
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
