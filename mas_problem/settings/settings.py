@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'mas_problem.middlewares.UTMMiddleware',
 ]
 
@@ -138,14 +139,12 @@ CERTIFICATES_ROOT = BASE_DIR / 'diplomy'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ####### Allauth #############
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_PREVENT_ENUMERATION = False
-ACCOUNT_PASSWORD_MIN_LENGTH = 1
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 LOGIN_URL = 'competition:login'
 LOGIN_REDIRECT_URL = 'competition:login'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'competition:login'

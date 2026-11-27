@@ -136,3 +136,5 @@ media/*
 !media/.gitkeep
 diplomy/*
 !diplomy/.gitkeep
+# Lokálne uložené emaily
+emails/
