@@ -242,12 +242,16 @@ class Problem(models.Model):
         return timedelta(seconds=sum(submission.time_after_start().seconds for submission in correct_submissions)/correct_submissions.count())
 
     def average_correct_submission(self):
-        # BUG: Nepočíta to, to čo má
-        count = self.submissions.count()
-        all = self.submissions.filter(correct=True).count()
-        if count == 0:
+        """Priemerný počet pokusov, na ktorý súťažiaci úlohu správne vyriešili"""
+        correct_submissions = self.submissions.filter(correct=True)
+        num_correct = correct_submissions.count()
+        if num_correct == 0:
             return None
-        return count/all
+        # Po správnej odpovedi už súťažiaci nemôže odovzdávať, takže všetky
+        # odovzdania riešiteľov sú pokusy až po správnu odpoveď vrátane.
+        num_attempts = self.submissions.filter(
+            competitor__in=correct_submissions.values('competitor')).count()
+        return round(num_attempts / num_correct, 2)
 
     def number_submissions(self):
         allowed_grades = set()
