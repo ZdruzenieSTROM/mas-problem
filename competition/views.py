@@ -442,6 +442,11 @@ def game_redirect(game: Game, user: Union[AbstractBaseUser, AnonymousUser]):
 class ProblemView(LoginRequiredMixin, DetailView):
     model = Problem
 
+    def get(self, request, *args, **kwargs):
+        """Detail úlohy nemá vlastnú stránku, presmeruj na hru"""
+        problem = self.get_object()
+        return redirect(reverse('competition:game')+f'?level={problem.level.pk}')
+
     def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
         self.object = self.get_object()
