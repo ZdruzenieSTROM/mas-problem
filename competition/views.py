@@ -703,7 +703,15 @@ def upload_competitors(request, pk):
     file = request.FILES['filename']
     parser = CompetitorsParser(file.file)
     game = Game.objects.get(pk=pk)
-    users = parser.create_users(game)
+    try:
+        users = parser.create_users(game)
+    except UnicodeDecodeError:
+        messages.error(
+            request,
+            'Súbor so súťažiacimi nie je v kódovaní UTF-8. '
+            'Ulož ho ako CSV v UTF-8 a nahraj znova.'
+        )
+        return redirect('competition:game-admin', pk=pk)
 
     for user in users:
         # create_invoice can't be called from the parser due to circular import error
