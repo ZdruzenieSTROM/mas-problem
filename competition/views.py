@@ -5,7 +5,6 @@ from typing import Union
 
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
-from allauth.account.utils import send_email_confirmation
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -25,7 +24,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from django.views.generic import DetailView, FormView, ListView, View
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from pypdf import PdfReader, PdfWriter
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
@@ -87,7 +86,7 @@ class SignUpView(FormView):
             user = User.objects.create_user(email, email, password)
             user.is_active = False
             user.save()
-            EmailAddress.objects.create(
+            email_address = EmailAddress.objects.create(
                 user=user, email=email, primary=True, verified=False)
         except IntegrityError:
             messages.error(
@@ -107,7 +106,7 @@ class SignUpView(FormView):
             legal_representative=form.cleaned_data['legal_representative'],
             phone_number=form.cleaned_data['phone_number']
         )
-        send_email_confirmation(self.request, user, True)
+        email_address.send_confirmation(self.request, signup=True)
 
         return super().form_valid(form)
 
@@ -676,10 +675,10 @@ class GameAdministrationView(ResultView):
     def post(self, request, *args, **kwargs):
         file = request.FILES['filename']
         competitor_ids = request.POST.getlist('competitor_ids')
-        inputpdf = PdfFileReader(file)
+        inputpdf = PdfReader(file)
         for i, competitor_id in enumerate(competitor_ids):
-            output = PdfFileWriter()
-            output.addPage(inputpdf.getPage(i))
+            output = PdfWriter()
+            output.add_page(inputpdf.pages[i])
             competitor = Competitor.objects.get(pk=competitor_id)
             certificate_name = f"diplom_{slugify(competitor.game)}_{competitor_id}.pdf"
             certificate_path = settings.CERTIFICATES_ROOT / certificate_name
