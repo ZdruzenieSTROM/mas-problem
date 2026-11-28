@@ -18,6 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 def read_secret(secret_name: str) -> str:
+    env_name = secret_name.removesuffix('.txt').upper()
+    if env_name in os.environ:
+        return os.environ[env_name]
     with open(os.path.join(BASE_DIR, '.secrets', secret_name)) as secret_file:
         return secret_file.readline()
 
