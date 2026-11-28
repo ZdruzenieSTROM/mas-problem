@@ -215,7 +215,16 @@ class Problem(models.Model):
             competitor = Competitor.get_competitor(user, game)
         except Competitor.DoesNotExist:
             return False
-        return competitor.started() and self.level.unlocked(competitor)
+        if not competitor.started():
+            return False
+        # Rovnaké obmedzenie úrovní ako v GameView - len úrovne skupiny súťažiaceho
+        try:
+            group = CompetitorGroup.get_group_from_competitor(competitor)
+        except CompetitorGroup.DoesNotExist:
+            return False
+        if not group.start_level.order <= self.level.order <= group.end_level.order:
+            return False
+        return self.level.unlocked(competitor)
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
