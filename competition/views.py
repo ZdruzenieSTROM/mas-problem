@@ -7,6 +7,7 @@ from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -23,6 +24,7 @@ from django.shortcuts import redirect, render, resolve_url
 from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, FormView, ListView, View
 from pypdf import PdfReader, PdfWriter
 
@@ -707,6 +709,8 @@ class GameAdministrationView(ResultView):
         return redirect('competition:game-admin', pk=self.get_object().pk)
 
 
+@staff_member_required
+@require_POST
 def upload_problems(request, pk):
     file = request.FILES['filename']
     parser = MasProblemCurrentParser(file.file)
@@ -718,7 +722,8 @@ def upload_problems(request, pk):
     return redirect('competition:game-admin', pk=pk)
 
 
-@login_required
+@staff_member_required
+@require_POST
 def upload_competitors(request, pk):
     file = request.FILES['filename']
     parser = CompetitorsParser(file.file)
