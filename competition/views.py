@@ -477,6 +477,19 @@ class ProblemView(LoginRequiredMixin, DetailView):
         return redirect(reverse('competition:game')+f'?level={self.object.level.pk}')
 
 
+class ProblemImageView(View):
+    """Obrázok k úlohe - dostupný až keď súťažiaci vidí zadanie"""
+
+    def get(self, request, pk):
+        problem = Problem.objects.filter(pk=pk).select_related('level__game').first()
+        if problem is None or not problem.image or not problem.image_visible_for(request.user):
+            raise Http404
+        try:
+            return FileResponse(problem.image.open('rb'))
+        except FileNotFoundError as exc:
+            raise Http404 from exc
+
+
 class UploadGameView():
     pass
 

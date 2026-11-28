@@ -27,6 +27,7 @@ urlpatterns = [
     path('zmena-hesla', views.change_password, name='change-password'),
     path('profil', views.EditProfileView.as_view(), name='profile'),
     path('problem/<int:pk>',views.ProblemView.as_view(),name='problem'),
+    path('problem/<int:pk>/obrazok',views.ProblemImageView.as_view(),name='problem-image'),
     path('', flatpage, {'url': '/info/'}, name='info'),
     path('pravidla', flatpage, {'url': '/pravidla/'}, name='pravidla'),
     path('akosazapojit', flatpage, {'url': '/akosazapojit/'}, name='akosazapojit'),

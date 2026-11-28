@@ -201,8 +201,30 @@ class Problem(models.Model):
     text = models.TextField(verbose_name='Zadanie')
     order = models.PositiveSmallIntegerField(
         null=True, verbose_name='Poradie úlohy v úrovni')
-    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok', upload_to='public')
+    image = models.ImageField(null=True, blank=True, verbose_name='Obrázok', upload_to='problems')
     solution = models.CharField(max_length=25, verbose_name='Správna odpoveď')
+
+    def image_visible_for(self, user) -> bool:
+        """Či môže používateľ vidieť obrázok úlohy (zadanie nesmie uniknúť pred hrou)"""
+        game = self.level.game
+        if user.is_staff or game.is_finished():
+            return True
+        if not user.is_authenticated or not game.is_started():
+            return False
+        try:
+            competitor = Competitor.get_competitor(user, game)
+        except Competitor.DoesNotExist:
+            return False
+        if not competitor.started():
+            return False
+        # Rovnaké obmedzenie úrovní ako v GameView - len úrovne skupiny súťažiaceho
+        try:
+            group = CompetitorGroup.get_group_from_competitor(competitor)
+        except CompetitorGroup.DoesNotExist:
+            return False
+        if not group.start_level.order <= self.level.order <= group.end_level.order:
+            return False
+        return self.level.unlocked(competitor)
 
     def correctly_submitted(self, competitor):
         """Vráti či súťažiaci správne odovzdal daný príklad"""
