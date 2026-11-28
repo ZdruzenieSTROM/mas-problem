@@ -11,15 +11,15 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView
-from django.core.exceptions import BadRequest
+from django.contrib.auth.views import LoginView, redirect_to_login
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.core.files import File
 from django.db import IntegrityError
 from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
                               OuterRef, Q, Subquery)
 from django.db.models.functions import Cast, Coalesce
 from django.dispatch import receiver
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import redirect, render, resolve_url
 from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
@@ -641,11 +641,28 @@ class CompetitorCertificateView(LoginRequiredMixin, DetailView):
     model = Game
 
     def get(self, request, *args, **kwargs):
-        competitor = Competitor.get_competitor(
-            self.request.user, self.get_object())
-        if competitor.certificate is not None:
-            return FileResponse(competitor.certificate)
-        return redirect('competition:after-game')
+        game = self.get_object()
+        competitor = Competitor.objects.filter(
+            user=self.request.user, game=game).first()
+        if competitor is not None and competitor.certificate:
+            # Samotný súbor servuje protected_certificate_view (kontrola práv)
+            return redirect(competitor.certificate.url)
+        return redirect('competition:after-game', pk=game.pk)
+
+
+def protected_certificate_view(request, path):
+    """Servuje diplom z media/diplomy - iba vlastníkovi diplomu alebo
+    používateľovi s právom vidieť súťažiacich (napr. v admine)."""
+    competitor = Competitor.objects.filter(
+        certificate=f'diplomy/{path}').first()
+    if competitor is None:
+        raise Http404
+    user = request.user
+    if not user.is_authenticated:
+        return redirect_to_login(request.get_full_path())
+    if competitor.user_id != user.pk and not user.has_perm('competition.view_competitor'):
+        raise PermissionDenied
+    return FileResponse(competitor.certificate.open('rb'))
 
 
 @login_required

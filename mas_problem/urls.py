@@ -5,7 +5,8 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.static import serve
 
-from competition.views import LoginFormView, SignUpView
+from competition.views import (LoginFormView, SignUpView,
+                                protected_certificate_view)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +38,11 @@ urlpatterns = [
 #     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # else:
 
+# Diplomy sú súkromné - servujeme ich cez view s kontrolou oprávnení,
+# aby fungoval aj odkaz z Django admina (FieldFile.url -> /media/diplomy/...)
+urlpatterns.append(
+    re_path(r'^media/diplomy/(?P<path>.+)$', protected_certificate_view, name='protected-certificate')
+)
 urlpatterns.append(
             re_path(r'^media/public/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT / 'public'})
              )
