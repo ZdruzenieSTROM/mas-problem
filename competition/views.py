@@ -5,14 +5,14 @@ from typing import Union
 
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_confirmed
-from allauth.account.utils import send_email_confirmation
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView
-from django.core.exceptions import BadRequest
+from django.contrib.auth.views import LoginView, redirect_to_login
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.core.files import File
 from django.db import IntegrityError
 from django.db.models import (Avg, Count, DecimalField, F, FloatField, Max,
@@ -24,8 +24,9 @@ from django.shortcuts import redirect, render, resolve_url
 from django.template.defaultfilters import slugify
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, FormView, ListView, View
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from pypdf import PdfReader, PdfWriter
 
 from .forms import (AuthForm, ChangePasswordForm, EditCompetitorForm,
                     RegisterForm)
@@ -87,7 +88,7 @@ class SignUpView(FormView):
             user = User.objects.create_user(email, email, password)
             user.is_active = False
             user.save()
-            EmailAddress.objects.create(
+            email_address = EmailAddress.objects.create(
                 user=user, email=email, primary=True, verified=False)
         except IntegrityError:
             messages.error(
@@ -107,7 +108,7 @@ class SignUpView(FormView):
             legal_representative=form.cleaned_data['legal_representative'],
             phone_number=form.cleaned_data['phone_number']
         )
-        send_email_confirmation(self.request, user, True)
+        email_address.send_confirmation(self.request, signup=True)
 
         return super().form_valid(form)
 
@@ -442,6 +443,11 @@ def game_redirect(game: Game, user: Union[AbstractBaseUser, AnonymousUser]):
 class ProblemView(LoginRequiredMixin, DetailView):
     model = Problem
 
+    def get(self, request, *args, **kwargs):
+        """Detail úlohy nemá vlastnú stránku, presmeruj na hru"""
+        problem = self.get_object()
+        return redirect(reverse('competition:game')+f'?level={problem.level.pk}')
+
     def post(self, request, *args, **kwargs):
         """Odovzdanie úlohy"""
         self.object = self.get_object()
@@ -648,11 +654,28 @@ class CompetitorCertificateView(LoginRequiredMixin, DetailView):
     model = Game
 
     def get(self, request, *args, **kwargs):
-        competitor = Competitor.get_competitor(
-            self.request.user, self.get_object())
-        if competitor.certificate is not None:
-            return FileResponse(competitor.certificate)
-        return redirect('competition:after-game')
+        game = self.get_object()
+        competitor = Competitor.objects.filter(
+            user=self.request.user, game=game).first()
+        if competitor is not None and competitor.certificate:
+            # Samotný súbor servuje protected_certificate_view (kontrola práv)
+            return redirect(competitor.certificate.url)
+        return redirect('competition:after-game', pk=game.pk)
+
+
+def protected_certificate_view(request, path):
+    """Servuje diplom z media/diplomy - iba vlastníkovi diplomu alebo
+    používateľovi s právom vidieť súťažiacich (napr. v admine)."""
+    competitor = Competitor.objects.filter(
+        certificate=f'diplomy/{path}').first()
+    if competitor is None:
+        raise Http404
+    user = request.user
+    if not user.is_authenticated:
+        return redirect_to_login(request.get_full_path())
+    if competitor.user_id != user.pk and not user.has_perm('competition.view_competitor'):
+        raise PermissionDenied
+    return FileResponse(competitor.certificate.open('rb'))
 
 
 @login_required
@@ -684,10 +707,10 @@ class GameAdministrationView(ResultView):
     def post(self, request, *args, **kwargs):
         file = request.FILES['filename']
         competitor_ids = request.POST.getlist('competitor_ids')
-        inputpdf = PdfFileReader(file)
+        inputpdf = PdfReader(file)
         for i, competitor_id in enumerate(competitor_ids):
-            output = PdfFileWriter()
-            output.addPage(inputpdf.getPage(i))
+            output = PdfWriter()
+            output.add_page(inputpdf.pages[i])
             competitor = Competitor.objects.get(pk=competitor_id)
             certificate_name = f"diplom_{slugify(competitor.game)}_{competitor_id}.pdf"
             certificate_path = settings.CERTIFICATES_ROOT / certificate_name
@@ -700,6 +723,8 @@ class GameAdministrationView(ResultView):
         return redirect('competition:game-admin', pk=self.get_object().pk)
 
 
+@staff_member_required
+@require_POST
 def upload_problems(request, pk):
     file = request.FILES['filename']
     parser = MasProblemCurrentParser(file.file)
@@ -711,12 +736,21 @@ def upload_problems(request, pk):
     return redirect('competition:game-admin', pk=pk)
 
 
-@login_required
+@staff_member_required
+@require_POST
 def upload_competitors(request, pk):
     file = request.FILES['filename']
     parser = CompetitorsParser(file.file)
     game = Game.objects.get(pk=pk)
-    users = parser.create_users(game)
+    try:
+        users = parser.create_users(game)
+    except UnicodeDecodeError:
+        messages.error(
+            request,
+            'Súbor so súťažiacimi nie je v kódovaní UTF-8. '
+            'Ulož ho ako CSV v UTF-8 a nahraj znova.'
+        )
+        return redirect('competition:game-admin', pk=pk)
 
     for user in users:
         # create_invoice can't be called from the parser due to circular import error

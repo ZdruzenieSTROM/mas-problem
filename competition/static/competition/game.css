@@ -21,9 +21,14 @@ body {
     padding: 0 10% 10% 10%;
 }
 
+.logo-link {
+    display: flex;
+    align-items: center;
+    margin: auto 0 auto 1%;
+}
+
 .logo {
     max-height: 40px;
-    margin: auto 0 auto 1%;
 }
 
 .navbar {
@@ -251,7 +256,7 @@ tr:nth-child(even) {
         padding: 0 5% 25% 5%;
     }
 
-    .logo {
+    .logo-link {
         position: absolute;
     }
 
