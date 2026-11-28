@@ -118,3 +118,12 @@ class ProtectedCertificateTest(TestCase):
         self.assertRedirects(
             response, reverse('competition:after-game', kwargs={'pk': self.game.pk}),
             fetch_redirect_response=False)
+
+    def test_my_certificate_without_competitor(self):
+        User.objects.create_user('other', password='x')
+        self.client.login(username='other', password='x')
+        response = self.client.get(
+            reverse('competition:my-certificate', kwargs={'pk': self.game.pk}))
+        self.assertRedirects(
+            response, reverse('competition:after-game', kwargs={'pk': self.game.pk}),
+            fetch_redirect_response=False)

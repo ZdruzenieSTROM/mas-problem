@@ -642,8 +642,9 @@ class CompetitorCertificateView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         game = self.get_object()
-        competitor = Competitor.get_competitor(self.request.user, game)
-        if competitor.certificate:
+        competitor = Competitor.objects.filter(
+            user=self.request.user, game=game).first()
+        if competitor is not None and competitor.certificate:
             # Samotný súbor servuje protected_certificate_view (kontrola práv)
             return redirect(competitor.certificate.url)
         return redirect('competition:after-game', pk=game.pk)
